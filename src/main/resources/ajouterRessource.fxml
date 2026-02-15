@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.controllers.FormulaireRessourceController"
+            prefHeight="500" prefWidth="500"
+            style="-fx-background-color: white;">
+
+    <!-- En-tête -->
+    <top>
+        <VBox spacing="10" style="-fx-background-color: #2c3e50; -fx-padding: 20;">
+            <Label fx:id="titreFormulaire" text="Ajouter une ressource"
+                   style="-fx-text-fill: white; -fx-font-size: 22; -fx-font-weight: bold; -fx-alignment: center;"/>
+        </VBox>
+    </top>
+
+    <!-- Centre avec formulaire -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox spacing="15" style="-fx-padding: 25;">
+
+                <!-- ID caché -->
+                <TextField fx:id="idField" visible="false" managed="false"/>
+
+                <!-- Nom -->
+                <VBox spacing="5">
+                    <Label text="Nom de la ressource :" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="nomField" promptText="Ex: Ordinateur, Chaise, Papier..."/>
+                </VBox>
+
+                <!-- Type -->
+                <VBox spacing="5">
+                    <Label text="Type de ressource :" style="-fx-font-weight: bold;"/>
+                    <ComboBox fx:id="typeCombo" promptText="Choisir un type" prefWidth="400"/>
+                </VBox>
+
+                <!-- Quantité -->
+                <VBox spacing="5">
+                    <Label text="Quantité :" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="quantiteField" promptText="Ex: 10"/>
+                </VBox>
+
+                <!-- Fournisseur -->
+                <VBox spacing="5">
+                    <Label text="Fournisseur :" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="fournisseurField" promptText="Ex: Fournitures SARL"/>
+                </VBox>
+
+                <!-- Séparateur -->
+                <Separator/>
+
+                <!-- Boutons -->
+                <HBox spacing="15" alignment="CENTER">
+                    <Button fx:id="btnValider" text="Ajouter"
+                            style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 14; -fx-font-weight: bold; -fx-padding: 10 30;"
+                            onAction="#validerFormulaire"/>
+                    <Button text="Annuler"
+                            style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14; -fx-font-weight: bold; -fx-padding: 10 30;"
+                            onAction="#annulerFormulaire"/>
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- Pied de page -->
+    <bottom>
+        <HBox style="-fx-background-color: #ecf0f1; -fx-padding: 10;" alignment="CENTER">
+            <Label text="* Tous les champs sont obligatoires" style="-fx-text-fill: #7f8c8d; -fx-font-style: italic;"/>
+        </HBox>
+    </bottom>
+</BorderPane>
