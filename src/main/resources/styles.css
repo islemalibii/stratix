@@ -1,0 +1,77 @@
+.root-container {
+    -fx-background-color: #f5f7fa;
+}
+
+.summary-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 8, 0, 0, 4);
+}
+
+.summary-label {
+    -fx-text-fill: #718096;
+    -fx-font-size: 13px;
+}
+
+.project-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+.card-termine { -fx-border-color: #10b981; -fx-border-width: 0 0 0 6; }
+.card-en-cours { -fx-border-color: #f59e0b; -fx-border-width: 0 0 0 6; }
+.card-annule { -fx-border-color: #ef4444; -fx-border-width: 0 0 0 6; }
+.card-planifie { -fx-border-color: #6b7280; -fx-border-width: 0 0 0 6; }
+
+.form-container {
+    -fx-background-color: #f8fafc;
+}
+
+.input-label {
+    -fx-text-fill: #4a5568;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.modern-input, .modern-datepicker, .modern-choicebox, .combo-tri {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 8;
+    -fx-font-size: 14px;
+}
+
+.modern-input:focused, .modern-datepicker:focused, .combo-tri:focused {
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 2;
+}
+
+
+.btn-ajout, .btn-save, .btn-primary {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-save:hover, .btn-ajout:hover {
+    -fx-background-color: #2563eb;
+}
+
+.btn-archive-view, .btn-cancel, .btn-secondary {
+    -fx-background-color: white;
+    -fx-text-fill: #64748b;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+.btn-cancel:hover, .btn-archive-view:hover {
+    -fx-background-color: #f1f5f9;
+}

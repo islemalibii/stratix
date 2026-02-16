@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controller.ListeArchivesController"
+      spacing="15" styleClass="root-container" prefWidth="550" prefHeight="600">
+
+    <padding>
+        <Insets top="25" right="25" bottom="25" left="25"/>
+    </padding>
+
+    <Label text="📁 Historique des Archives" styleClass="page-title"
+           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2d3748;"/>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane"
+                style="-fx-background-color: transparent; -fx-border-color: transparent;">
+        <VBox fx:id="containerArchives" spacing="10">
+            <padding>
+                <Insets top="5" right="10" bottom="5" left="5"/>
+            </padding>
+        </VBox>
+    </ScrollPane>
+
+    <HBox alignment="CENTER_RIGHT">
+        <Button text="Fermer" onAction="#fermerFenetre" styleClass="btn-secondary"
+                style="-fx-background-color: #4b5563; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 8 20; -fx-cursor: hand;"/>
+    </HBox>
+
+</VBox>
