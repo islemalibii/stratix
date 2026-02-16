@@ -1,0 +1,245 @@
+/* GLOBAL THEME */
+.root {
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.main-bg {
+    -fx-background-color: #F8FAFC;
+    -fx-padding: 30;
+}
+
+/* CARDS */
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);
+}
+
+.form-card {
+    -fx-background-color: white;
+    -fx-padding: 30;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 10);
+}
+
+/* TEXT STYLES */
+.heading-large {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.heading-medium {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.subheading {
+    -fx-text-fill: #64748B;
+    -fx-font-size: 14px;
+}
+
+.input-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #475569;
+}
+
+.table-header-label {
+    -fx-text-fill: #64748B;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+}
+
+/* INPUTS */
+.text-input, .date-picker, .combo-box {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.text-field {
+    -fx-padding: 10;
+}
+
+/* BUTTONS */
+.btn-primary {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 10 25;
+    -fx-cursor: hand;
+}
+
+.btn-success {
+    -fx-background-color: #10B981;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 10 25;
+    -fx-cursor: hand;
+}
+
+.btn-dark {
+    -fx-background-color: #1E293B;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 8 15;
+    -fx-cursor: hand;
+}
+
+.btn-secondary {
+    -fx-background-color: #94A3B8;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: #64748B;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+/* TABLE COMPONENTS */
+.table-header {
+    -fx-padding: 0 25;
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 12;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+/* Styles spécifiques aux compteurs du Dashboard */
+.stat-value {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+}
+
+.stat-planned {
+    -fx-text-fill: #059669;
+}
+
+.stat-finished {
+    -fx-text-fill: #2563EB;
+}
+
+.stat-cancelled {
+    -fx-text-fill: #DC2626;
+}
+
+/* Label des stats (le petit texte au dessus) */
+.stat-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748B;
+}
+
+/* Personnalisation du ScrollPane pour qu'il soit invisible */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+
+/* Styling for the archived row container */
+.archive-row {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 5);
+}
+
+/* Hover effect to make it feel "Fresh" */
+.archive-row:hover {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 12;
+}
+
+.archive-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+    -fx-font-size: 14px;
+}
+
+.archive-description {
+    -fx-text-fill: #94A3B8;
+}
+
+.archive-text {
+    -fx-text-fill: #475569;
+}
+
+.archive-status-label {
+    -fx-text-fill: #64748B;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-background-color: #F1F5F9;
+    -fx-padding: 5 10;
+    -fx-background-radius: 20;
+}
+
+/* Container for each event row */
+.event-row {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    /* Soft shadow for depth */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 5);
+}
+
+.event-row:hover {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 15;
+}
+
+/* Text styles */
+.event-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E293B;
+    -fx-font-size: 14px;
+}
+
+.event-description {
+    -fx-text-fill: #64748B;
+}
+
+.event-details {
+    -fx-text-fill: #475569;
+}
+
+/* Status Labels */
+.status-planned { -fx-text-fill: #27AE60; -fx-font-weight: bold; -fx-font-size: 11; }
+.status-finished { -fx-text-fill: #3498DB; -fx-font-weight: bold; -fx-font-size: 11; }
+.status-cancelled { -fx-text-fill: #E74C3C; -fx-font-weight: bold; -fx-font-size: 11; }
+
+/* Action Buttons */
+.btn-modify {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-archive {
+    -fx-background-color: #F44336;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}

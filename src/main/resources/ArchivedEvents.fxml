@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox prefHeight="600.0" prefWidth="1000.0" spacing="25" styleClass="main-bg"
+      stylesheets="@/style/global.css" xmlns="http://javafx.com/javafx/20"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ArchivedEventsController">
+
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Button text="Retour" onAction="#goBack" styleClass="btn-dark"/>
+        <Label text="Événements Archivés" styleClass="heading-medium"/>
+    </HBox>
+
+    <HBox prefHeight="50.0" spacing="20" styleClass="table-header">
+        <Label prefWidth="150" text="TITRE" styleClass="table-header-label" />
+        <Label prefWidth="200" text="DESCRIPTION" styleClass="table-header-label" />
+        <Label prefWidth="100" text="DATE" styleClass="table-header-label" />
+        <Label prefWidth="100" text="TYPE" styleClass="table-header-label" />
+        <Label prefWidth="100" text="STATUT" styleClass="table-header-label" />
+        <Label prefWidth="150" text="LIEU" styleClass="table-header-label" />
+    </HBox>
+
+    <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+        <VBox fx:id="archiveContainer" spacing="12" style="-fx-background-color: transparent;">
+            <padding>
+                <Insets bottom="10" />
+            </padding>
+        </VBox>
+    </ScrollPane>
+
+</VBox>

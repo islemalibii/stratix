@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<StackPane prefHeight="650.0" prefWidth="1000.0" styleClass="main-bg"
+           stylesheets="@/style/global.css"
+           xmlns="http://javafx.com/javafx/20"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.ModifyEventController">
+
+    <VBox alignment="CENTER" spacing="25" maxWidth="500.0">
+        <VBox spacing="5" alignment="CENTER_LEFT">
+            <Label text="Modifier l'événement" styleClass="heading-large" />
+            <Label text="Mettez à jour les informations de votre événement ci dessous" styleClass="subheading" />
+        </VBox>
+
+        <VBox spacing="15" styleClass="form-card">
+
+            <VBox spacing="5">
+                <Label text="Titre de l'événement" styleClass="input-label" />
+                <TextField fx:id="titreField" />
+            </VBox>
+
+            <VBox spacing="5">
+                <Label text="Description" styleClass="input-label" />
+                <TextField fx:id="descriptionField" />
+            </VBox>
+
+            <HBox spacing="15">
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Date" styleClass="input-label" />
+                    <DatePicker fx:id="datePicker" maxWidth="Infinity" />
+                </VBox>
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Type d'événement" styleClass="input-label" />
+                    <ComboBox fx:id="typeCombo" maxWidth="Infinity" />
+                </VBox>
+            </HBox>
+
+            <VBox spacing="5">
+                <Label text="Lieu" styleClass="input-label" />
+                <TextField fx:id="lieuField" />
+            </VBox>
+
+            <VBox spacing="5">
+                <Label text="Statut de l'événement" styleClass="input-label" />
+                <ComboBox fx:id="statusCombo" maxWidth="Infinity" />
+            </VBox>
+
+            <Separator style="-fx-padding: 10 0;" />
+
+            <HBox spacing="15" alignment="CENTER_RIGHT">
+                <Button text="Annuler" onAction="#goBack" styleClass="btn-ghost" />
+                <Button text="Enregistrer les modifications" onAction="#modifyEvent" styleClass="btn-success" />
+            </HBox>
+        </VBox>
+    </VBox>
+</StackPane>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+
+<StackPane prefHeight="650.0" prefWidth="1000.0" styleClass="main-bg"
+           stylesheets="@/style/global.css"
+           xmlns="http://javafx.com/javafx/20"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="controllers.AddEventController">
+
+    <VBox alignment="CENTER" spacing="25" maxWidth="500.0">
+
+        <VBox spacing="5" alignment="CENTER_LEFT">
+            <Label text="Créer un nouvel événement" styleClass="heading-large" />
+            <Label text="Remplissez les détails ci dessous pour planifier votre événement" styleClass="subheading" />
+        </VBox>
+
+        <VBox spacing="15" styleClass="form-card">
+
+            <VBox spacing="5">
+                <Label text="Titre de l'événement" styleClass="input-label" />
+                <TextField fx:id="titreField" promptText="nom" />
+            </VBox>
+
+            <VBox spacing="5">
+                <Label text="Description" styleClass="input-label" />
+                <TextField fx:id="descriptionField" promptText="Décrivezl'événement" />
+            </VBox>
+
+            <HBox spacing="15">
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Date" styleClass="input-label" />
+                    <DatePicker fx:id="datePicker" maxWidth="Infinity" promptText="Choisir une date" />
+                </VBox>
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Type" styleClass="input-label" />
+                    <ComboBox fx:id="typeCombo" maxWidth="Infinity" promptText="Sélectionner..." />
+                </VBox>
+            </HBox>
+
+            <VBox spacing="5">
+                <Label text="Lieu" styleClass="input-label" />
+                <TextField fx:id="lieuField" promptText="lieu.." />
+            </VBox>
+
+            <VBox spacing="5">
+                <Label text="Statut Initial" styleClass="input-label" />
+                <ComboBox fx:id="statusCombo" maxWidth="Infinity" promptText="Choisir le statut" />
+            </VBox>
+
+            <Separator style="-fx-padding: 10 0;" />
+
+            <HBox spacing="15" alignment="CENTER_RIGHT">
+                <Button text="Annuler" onAction="#goBack" styleClass="btn-ghost" />
+                <Button text="Créer l'événement" onAction="#addEvent" styleClass="btn-primary" />
+            </HBox>
+        </VBox>
+    </VBox>
+</StackPane>
