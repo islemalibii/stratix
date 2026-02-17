@@ -77,7 +77,7 @@ public class ServiceEvenementTest {
         boolean stillExists = evenements.stream()
                 .anyMatch(ev -> ev.getId() == idTestEvent);
 
-        assertFalse(stillExists, "it should be removed from the evenement table !!");
+        assertFalse(stillExists, "it should be removed >:/ !!");
     }
 
     @AfterAll

@@ -154,7 +154,6 @@ public class EventDashboardController {
     private void goToArchived() {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/ArchivedEvents.fxml"));
-
             eventContainer.getScene().setRoot(root);
 
         } catch (IOException e) {

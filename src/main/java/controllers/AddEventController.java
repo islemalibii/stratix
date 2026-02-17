@@ -109,7 +109,7 @@ public class AddEventController {
 
             stage.setScene(new javafx.scene.Scene(loader.load()));
         } catch (IOException e) {
-            System.out.println("Erreur de navigation : " + e.getMessage());
+            System.out.println(e.getMessage());
         }
     }
 }
