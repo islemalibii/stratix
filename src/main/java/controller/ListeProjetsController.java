@@ -2,16 +2,19 @@ package controller;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.fxml.FXMLLoader;
 import model.Projet;
 import service.ProjetService;
+
+import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ListeProjetsController {
 
@@ -27,6 +30,7 @@ public class ListeProjetsController {
     public void initialize() {
         projetService = new ProjetService();
 
+        // Initialisation du ComboBox de filtrage
         if (comboFiltre != null) {
             comboFiltre.setItems(FXCollections.observableArrayList(
                     "Tous les projets", "Planifié", "En cours", "Terminé", "Annulé"
@@ -35,6 +39,7 @@ public class ListeProjetsController {
             comboFiltre.setOnAction(e -> filtrerEtAfficher());
         }
 
+        // Recherche dynamique
         if (searchField != null) {
             searchField.textProperty().addListener((obs, oldVal, newVal) -> filtrerEtAfficher());
         }
@@ -43,24 +48,23 @@ public class ListeProjetsController {
     }
 
     public void rafraichirDonnees() {
+        // Le service doit retourner uniquement is_archived = 0
         listeCompleteProjets = projetService.listerTousLesProjets();
         updateStatistics(listeCompleteProjets);
         filtrerEtAfficher();
     }
 
     private void updateStatistics(List<Projet> projets) {
-        if (lblTotal == null) {
-            System.err.println("ERREUR : Les fx:id ne sont pas reconnus. Vérifiez le FXML.");
-            return;
-        }
+        if (lblTotal == null) return;
 
         lblTotal.setText(String.valueOf(projets.size()));
         lblEnCours.setText(String.valueOf(projets.stream().filter(p -> "En cours".equals(p.getStatut())).count()));
         lblTermine.setText(String.valueOf(projets.stream().filter(p -> "Terminé".equals(p.getStatut())).count()));
         lblAnnule.setText(String.valueOf(projets.stream().filter(p -> "Annulé".equals(p.getStatut())).count()));
 
-        if (lblPlanifie != null)
+        if (lblPlanifie != null) {
             lblPlanifie.setText(String.valueOf(projets.stream().filter(p -> "Planifié".equals(p.getStatut())).count()));
+        }
     }
 
     private void filtrerEtAfficher() {
@@ -68,46 +72,50 @@ public class ListeProjetsController {
         containerProjets.getChildren().clear();
 
         String statut = (comboFiltre != null) ? comboFiltre.getValue() : "Tous les projets";
-        String recherche = (searchField != null) ? searchField.getText().toLowerCase() : "";
+        String recherche = (searchField != null) ? searchField.getText() : "";
 
-        for (Projet p : listeCompleteProjets) {
-            boolean matchStatut = statut.equals("Tous les projets") || p.getStatut().equals(statut);
-            boolean matchRecherche = p.getNom().toLowerCase().contains(recherche);
+        // APPEL AU SERVICE
+        List<Projet> filtree = projetService.rechercherProjets(recherche, statut);
 
-            if (matchStatut && matchRecherche) {
-                containerProjets.getChildren().add(creerCardProjet(p));
-            }
+        for (Projet p : filtree) {
+            containerProjets.getChildren().add(creerCardProjet(p));
         }
     }
+
     private HBox creerCardProjet(Projet p) {
         HBox card = new HBox(15);
         card.getStyleClass().add("project-card");
 
-        String s = p.getStatut();
-        if ("Terminé".equals(s)) card.getStyleClass().add("card-termine");
-        else if ("En cours".equals(s)) card.getStyleClass().add("card-en-cours");
-        else if ("Annulé".equals(s)) card.getStyleClass().add("card-annule");
-        else card.getStyleClass().add("card-planifie");
+        // Application de la couleur de bordure selon le statut (via ton CSS)
+        switch (p.getStatut()) {
+            case "Terminé" -> card.getStyleClass().add("card-termine");
+            case "En cours" -> card.getStyleClass().add("card-en-cours");
+            case "Annulé" -> card.getStyleClass().add("card-annule");
+            default -> card.getStyleClass().add("card-planifie");
+        }
 
         VBox info = new VBox(5);
         Label nom = new Label(p.getNom());
         nom.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
 
         Label desc = new Label(p.getDescription());
-        desc.setStyle("-fx-text-fill: #555; -fx-font-size: 13px;");
+        desc.setStyle("-fx-text-fill: #718096; -fx-font-size: 13px;");
+        desc.setWrapText(true);
 
-        Label footer = new Label("Statut: " + s + " | Budget: " + p.getBudget() + "€ | " + p.getProgression() + "%");
-        footer.setStyle("-fx-text-fill: #718096; -fx-font-size: 12px;");
+        Label footer = new Label("Budget: " + p.getBudget() + " DT | Progression: " + p.getProgression() + "%");
+        footer.setStyle("-fx-font-size: 11px; -fx-text-fill: #a0aec0;");
 
         info.getChildren().addAll(nom, desc, footer);
         HBox.setHgrow(info, Priority.ALWAYS);
 
+        // Boutons
         Button btnMod = new Button("Modifier");
-        btnMod.getStyleClass().add("btn-modify");
+        btnMod.getStyleClass().add("btn-secondary");
         btnMod.setOnAction(e -> ouvrirFenetreModification(p));
 
         Button btnArch = new Button("Archiver");
-        btnArch.getStyleClass().add("btn-archive");
+        btnArch.getStyleClass().add("btn-primary");
+        btnArch.setStyle("-fx-background-color: #f59e0b;"); // Orange pour l'archive
         btnArch.setOnAction(e -> {
             projetService.archiverUnProjet(p.getId());
             rafraichirDonnees();
@@ -122,40 +130,17 @@ public class ListeProjetsController {
 
     @FXML
     private void allerAjouterProjet() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/AjouterProjet.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            stage.setTitle("Nouveau Projet");
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(root));
-
-            stage.showAndWait();
-
-            rafraichirDonnees();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet");
     }
 
     @FXML
     private void voirArchives() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ListeArchives.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            stage.setTitle("Projets Archivés");
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        chargerFenetre("/ListeArchives.fxml", "Projets Archivés");
     }
 
     private void ouvrirFenetreModification(Projet p) {
         try {
+            // Utilisation du chemin relatif à la racine de resources
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ModifierProjet.fxml"));
             Parent root = loader.load();
 
@@ -166,12 +151,35 @@ public class ListeProjetsController {
             stage.setTitle("Modifier Projet");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
-
             stage.showAndWait();
 
             rafraichirDonnees();
-        } catch (Exception e) {
+        } catch (IOException e) {
+            afficherErreur("Fichier introuvable", "Impossible de charger ModifierProjet.fxml");
             e.printStackTrace();
         }
+    }
+
+    private void chargerFenetre(String fxmlPath, String titre) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle(titre);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+            rafraichirDonnees();
+        } catch (IOException e) {
+            afficherErreur("Erreur de chargement", "Impossible de charger la vue : " + fxmlPath);
+            e.printStackTrace();
+        }
+    }
+
+    private void afficherErreur(String titre, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titre);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

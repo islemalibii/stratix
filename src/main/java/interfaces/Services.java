@@ -16,4 +16,6 @@ public interface Services {
     void mettreAJourProjet(Projet p);
 
     void supprimerUnProjet(int id);
+
+    Projet chercherProjetParId(int idProjet);
 }

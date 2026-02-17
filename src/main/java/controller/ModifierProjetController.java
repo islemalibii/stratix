@@ -1,12 +1,12 @@
 package controller;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import model.Projet;
 import service.ProjetService;
 import java.time.LocalDate;
-import java.util.Date;
 
 public class ModifierProjetController {
 
@@ -25,16 +25,17 @@ public class ModifierProjetController {
             txtNom.setText(projetEnModification.getNom());
             txtDescription.setText(projetEnModification.getDescription());
             txtBudget.setText(String.valueOf(projetEnModification.getBudget()));
+
+            // Correction ici : Utilisation du TextField txtProgression défini dans ton FXML
             txtProgression.setText(String.valueOf(projetEnModification.getProgression()));
+
             comboStatut.setValue(projetEnModification.getStatut());
 
             if (projetEnModification.getDateDebut() != null) {
-                Date d1 = projetEnModification.getDateDebut();
-                dateDebut.setValue(new java.sql.Date(d1.getTime()).toLocalDate());
+                dateDebut.setValue(((java.sql.Date) projetEnModification.getDateDebut()).toLocalDate());
             }
             if (projetEnModification.getDateFin() != null) {
-                Date d2 = projetEnModification.getDateFin();
-                dateFin.setValue(new java.sql.Date(d2.getTime()).toLocalDate());
+                dateFin.setValue(((java.sql.Date) projetEnModification.getDateFin()).toLocalDate());
             }
         }
     }
@@ -45,43 +46,57 @@ public class ModifierProjetController {
             projetEnModification.setNom(txtNom.getText());
             projetEnModification.setDescription(txtDescription.getText());
             projetEnModification.setBudget(Double.parseDouble(txtBudget.getText()));
+
+            // On récupère la valeur du TextField
             projetEnModification.setProgression(Integer.parseInt(txtProgression.getText()));
             projetEnModification.setStatut(comboStatut.getValue());
 
-            if (dateDebut.getValue() != null) {
-                projetEnModification.setDateDebut(java.sql.Date.valueOf(dateDebut.getValue()));
-            }
-            if (dateFin.getValue() != null) {
-                projetEnModification.setDateFin(java.sql.Date.valueOf(dateFin.getValue()));
-            }
+            projetEnModification.setDateDebut(java.sql.Date.valueOf(dateDebut.getValue()));
+            projetEnModification.setDateFin(java.sql.Date.valueOf(dateFin.getValue()));
 
             service.mettreAJourProjet(projetEnModification);
-
             fermerFenetre();
 
-        } catch (NumberFormatException e) {
-            afficherErreur("Erreur de format", "Le budget doit être un nombre et la progression un entier.");
         } catch (Exception e) {
-            afficherErreur("Erreur", "Une erreur est survenue lors de la mise à jour.");
-            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Erreur lors de la mise à jour : " + e.getMessage());
+            alert.show();
         }
     }
 
-    @FXML
-    private void handleAnnuler() {
-        fermerFenetre();
-    }
+    @FXML private void handleAnnuler() { fermerFenetre(); }
 
     private void fermerFenetre() {
-        if (txtNom.getScene() != null) {
-            ((Stage) txtNom.getScene().getWindow()).close();
-        }
+        Stage stage = (Stage) txtNom.getScene().getWindow();
+        stage.close();
     }
 
-    private void afficherErreur(String titre, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+    private boolean validerChamps() {
+        LocalDate aujourdhui = LocalDate.now();
+        LocalDate debut = dateDebut.getValue();
+        LocalDate fin = dateFin.getValue();
+
+        if (txtNom.getText().isEmpty() || debut == null || fin == null) {
+            afficherAlerte(Alert.AlertType.WARNING, "Champs requis", "Veuillez remplir tous les champs.");
+            return false;
+        }
+
+        // NOUVELLE CONDITION : Interdire une date de début dans le passé
+        if (debut.isBefore(aujourdhui)) {
+            afficherAlerte(Alert.AlertType.WARNING, "Dates invalides", "La date de début ne peut pas être dans le passé.");
+            return false;
+        }
+
+        if (fin.isBefore(debut)) {
+            afficherAlerte(Alert.AlertType.WARNING, "Dates invalides", "La date de fin doit être après la date de début.");
+            return false;
+        }
+        return true;
+    }
+
+    private void afficherAlerte(Alert.AlertType type, String titre, String message) {
+        Alert alert = new Alert(type);
         alert.setTitle(titre);
-        alert.setHeaderText(null);
+        alert.setHeaderText(null); // Optionnel : mettez une String si vous voulez un sous-titre
         alert.setContentText(message);
         alert.showAndWait();
     }

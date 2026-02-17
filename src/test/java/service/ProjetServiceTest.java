@@ -3,7 +3,6 @@ package service;
 import model.Projet;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;

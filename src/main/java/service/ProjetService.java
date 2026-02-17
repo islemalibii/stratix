@@ -3,150 +3,139 @@ package service;
 import interfaces.Services;
 import model.Projet;
 import util.DBConnection;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Date;
-public class ProjetService implements Services {
+import java.util.stream.Collectors;
 
+public class ProjetService implements Services {
     private Connection connection;
 
     public ProjetService() {
         this.connection = DBConnection.getConnection();
     }
 
+    @Override
     public void ajouterProjet(Projet p) {
-        if (p.getBudget() < 0) {
-            System.err.println("Erreur : Le budget ne peut pas être négatif !");
-            return;
-        }
-
-        if (p.getDateFin() != null && p.getDateDebut() != null && p.getDateFin().before(p.getDateDebut())) {
-            System.err.println("Erreur : La date de fin doit être après la date de début !");
-            return;
-        }
-
-        String sql = "INSERT INTO projet (nom, description, date_debut, date_fin, budget, statut, progression) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
+        String sql = "INSERT INTO projet (nom, description, date_debut, date_fin, budget, statut, progression, is_archived) VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, p.getNom());
             ps.setString(2, p.getDescription());
-
             ps.setDate(3, new java.sql.Date(p.getDateDebut().getTime()));
             ps.setDate(4, new java.sql.Date(p.getDateFin().getTime()));
-
             ps.setDouble(5, p.getBudget());
             ps.setString(6, p.getStatut());
             ps.setInt(7, p.getProgression());
-
             ps.executeUpdate();
-            System.out.println("> Projet inséré avec succès !");
-        } catch (SQLException e) {
-            System.err.println("Erreur Insertion: " + e.getMessage());
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    public void mettreAJourProjet(Projet p) {
-        if (p.getProgression() < 0 || p.getProgression() > 100) {
-            System.err.println("Erreur : Progression doit être entre 0 et 100.");
-            return;
-        }
-
-        if (p.getDateFin() != null && p.getDateDebut() != null && p.getDateFin().before(p.getDateDebut())) {
-            System.err.println("Erreur : Date fin invalide !");
-            return;
-        }
-
-        String sql = "UPDATE projet SET nom=?, description=?, date_debut=?, date_fin=?, budget=?, statut=?, progression=? WHERE id=?";
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, p.getNom());
-            ps.setString(2, p.getDescription());
-
-            ps.setDate(3, new java.sql.Date(p.getDateDebut().getTime()));
-            ps.setDate(4, new java.sql.Date(p.getDateFin().getTime()));
-
-            ps.setDouble(5, p.getBudget());
-            ps.setString(6, p.getStatut());
-            ps.setInt(7, p.getProgression());
-            ps.setInt(8, p.getId());
-
-            ps.executeUpdate();
-            System.out.println("> Projet mis à jour avec succès !");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Projet mapResultSetToProjet(ResultSet rs) throws SQLException {
-        Date dateDebut = rs.getDate("date_debut");
-        Date dateFin = rs.getDate("date_fin");
-
-        return new Projet(
-                rs.getInt("id"),
-                rs.getString("nom"),
-                rs.getString("description"),
-                dateDebut,
-                dateFin,
-                rs.getDouble("budget"),
-                rs.getString("statut"),
-                rs.getInt("progression")
-        );
-    }
-
+    @Override
     public List<Projet> listerTousLesProjets() {
+        return recupererParEtat(0); // 0 = Non archivés
+    }
+
+    @Override
+    public List<Projet> listerArchives() {
+        return recupererParEtat(1); // 1 = Archivés
+    }
+
+    private List<Projet> recupererParEtat(int etat) {
         List<Projet> projets = new ArrayList<>();
-        String sql = "SELECT * FROM projet";
-        try (Statement st = connection.createStatement(); ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) { projets.add(mapResultSetToProjet(rs)); }
+        String sql = "SELECT * FROM projet WHERE is_archived = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, etat);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                projets.add(new Projet(
+                        rs.getInt("id"), rs.getString("nom"), rs.getString("description"),
+                        rs.getDate("date_debut"), rs.getDate("date_fin"),
+                        rs.getDouble("budget"), rs.getString("statut"),
+                        rs.getInt("progression"), rs.getBoolean("is_archived")
+                ));
+            }
         } catch (SQLException e) { e.printStackTrace(); }
         return projets;
     }
 
-    public List<Projet> listerArchives() {
-        List<Projet> projetsArchives = new ArrayList<>();
-        String sql = "SELECT * FROM archiveProjet";
-        try (Statement st = connection.createStatement(); ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) { projetsArchives.add(mapResultSetToProjet(rs)); }
-        } catch (SQLException e) { System.err.println("Erreur archives : " + e.getMessage()); }
-        return projetsArchives;
-    }
-
+    @Override
     public void archiverUnProjet(int id) {
-        String sqlCopie = "INSERT INTO archiveProjet SELECT * FROM projet WHERE id=?";
-        String sqlSuppression = "DELETE FROM projet WHERE id=?";
-        try {
-            connection.setAutoCommit(false);
-            try (PreparedStatement psCopie = connection.prepareStatement(sqlCopie);
-                 PreparedStatement psSupp = connection.prepareStatement(sqlSuppression)) {
-                psCopie.setInt(1, id);
-                if (psCopie.executeUpdate() > 0) {
-                    psSupp.setInt(1, id);
-                    psSupp.executeUpdate();
-                    connection.commit();
-                }
-            } catch (SQLException e) { connection.rollback(); e.printStackTrace();
-            } finally { connection.setAutoCommit(true); }
-        } catch (SQLException e) { e.printStackTrace(); }
-    }
-
-    public void supprimerUnProjet(int id) {
-        String sql = "DELETE FROM projet WHERE id=?";
+        // Cette méthode sert aussi à DÉSARCHIVER si on change le paramètre
+        String sql = "UPDATE projet SET is_archived = 1 WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    public Projet chercherProjetParId(int id) {
-        String sql = "SELECT * FROM projet WHERE id=?";
+    // Ajout d'une méthode pour restaurer (désarchiver)
+    public void desarchiverUnProjet(int id) {
+        String sql = "UPDATE projet SET is_archived = 0 WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return mapResultSetToProjet(rs);
-            }
+            ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
-        return null;
+    }
+
+    @Override
+    public void mettreAJourProjet(Projet p) {
+        String sql = "UPDATE projet SET nom=?, description=?, date_debut=?, date_fin=?, budget=?, statut=?, progression=? WHERE id=?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, p.getNom());
+            ps.setString(2, p.getDescription());
+            ps.setDate(3, new java.sql.Date(p.getDateDebut().getTime()));
+            ps.setDate(4, new java.sql.Date(p.getDateFin().getTime()));
+            ps.setDouble(5, p.getBudget());
+            ps.setString(6, p.getStatut());
+            ps.setInt(7, p.getProgression());
+            ps.setInt(8, p.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    @Override
+    public void supprimerUnProjet(int id) {
+        String sql = "DELETE FROM projet WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    public Projet chercherProjetParId(int idProjet) {
+        String sql = "SELECT * FROM projet WHERE id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, idProjet);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // On utilise le même mapping que pour tes listes
+                    return new Projet(
+                            rs.getInt("id"),
+                            rs.getString("nom"),
+                            rs.getString("description"),
+                            rs.getDate("date_debut"),
+                            rs.getDate("date_fin"),
+                            rs.getDouble("budget"),
+                            rs.getString("statut"),
+                            rs.getInt("progression"),
+                            rs.getBoolean("is_archived")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la recherche du projet (ID: " + idProjet + ") : " + e.getMessage());
+        }
+        return null; // Retourne null si le projet n'existe pas
+    }
+
+    public List<Projet> rechercherProjets(String query, String statut) {
+        // On récupère d'abord tous les projets non archivés
+        List<Projet> tous = listerTousLesProjets();
+
+        return tous.stream()
+                .filter(p -> (statut.equals("Tous les projets") || p.getStatut().equals(statut)))
+                .filter(p -> p.getNom().toLowerCase().contains(query.toLowerCase()))
+                .collect(Collectors.toList());
     }
 }
