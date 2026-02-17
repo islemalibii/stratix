@@ -83,7 +83,6 @@ public class ListeProjetsController {
         HBox card = new HBox(15);
         card.getStyleClass().add("project-card");
 
-        // Application du style de bordure latérale selon le statut
         String s = p.getStatut();
         if ("Terminé".equals(s)) card.getStyleClass().add("card-termine");
         else if ("En cours".equals(s)) card.getStyleClass().add("card-en-cours");
@@ -111,7 +110,7 @@ public class ListeProjetsController {
         btnArch.getStyleClass().add("btn-archive");
         btnArch.setOnAction(e -> {
             projetService.archiverUnProjet(p.getId());
-            rafraichirDonnees(); // Rafraîchissement immédiat
+            rafraichirDonnees();
         });
 
         VBox actions = new VBox(8);

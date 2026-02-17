@@ -42,7 +42,6 @@ public class ModifierProjetController {
     @FXML
     private void handleEnregistrer() {
         try {
-            // Mise à jour des champs textes
             projetEnModification.setNom(txtNom.getText());
             projetEnModification.setDescription(txtDescription.getText());
             projetEnModification.setBudget(Double.parseDouble(txtBudget.getText()));
