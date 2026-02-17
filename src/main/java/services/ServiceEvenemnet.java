@@ -95,18 +95,18 @@ public class ServiceEvenemnet implements Services<Evenement> {
 
         String req = "update evenement set type_event=? , date_event=? , description=? , statut=? , lieu=? , titre=? where id=?";
         try{
-        PreparedStatement pst = cnx.prepareStatement(req);
+            PreparedStatement pst = cnx.prepareStatement(req);
 
-        pst.setString(1, evenement.getType_event().name());
-        pst.setDate(2, java.sql.Date.valueOf(evenement.getDate_event())); // LocalDate → DATE
-        pst.setString(3, evenement.getDescription());
-        pst.setString(4, evenement.getStatut().name());
-        pst.setString(5, evenement.getLieu());
-        pst.setString(6, evenement.getTitre());
-        pst.setInt(7, evenement.getId());
+            pst.setString(1, evenement.getType_event().name());
+            pst.setDate(2, java.sql.Date.valueOf(evenement.getDate_event())); // LocalDate → DATE
+            pst.setString(3, evenement.getDescription());
+            pst.setString(4, evenement.getStatut().name());
+            pst.setString(5, evenement.getLieu());
+            pst.setString(6, evenement.getTitre());
+            pst.setInt(7, evenement.getId());
 
-        pst.executeUpdate();
-        System.out.println("evenement modifie");
+            pst.executeUpdate();
+            System.out.println("evenement modifie");
         }catch(SQLException e){
             System.out.println(e.getMessage());
         }
@@ -146,5 +146,31 @@ public class ServiceEvenemnet implements Services<Evenement> {
         }
 
         return evenementsArchiver;
+    }
+
+    public List<Evenement> searchByTitle(String title) {
+        List<Evenement> newList = new ArrayList<>();
+        String req = "SELECT * FROM evenement WHERE titre LIKE ?";
+
+        try (PreparedStatement pst = cnx.prepareStatement(req)) {
+            pst.setString(1, "%" + title + "%");
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                Evenement e = new Evenement();
+                e.setId(rs.getInt("id"));
+                e.setTitre(rs.getString("titre"));
+                e.setDescription(rs.getString("description"));
+                e.setLieu(rs.getString("lieu"));
+                e.setDate_event(rs.getDate("date_event").toLocalDate());
+                e.setType_event(EventType.valueOf(rs.getString("type_event").toLowerCase()));
+                e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
+
+                newList.add(e);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return newList;
     }
 }

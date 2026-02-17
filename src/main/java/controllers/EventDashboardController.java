@@ -162,12 +162,9 @@ public class EventDashboardController {
     }
     @FXML
     private void search() {
-        String s = searchField.getText().toLowerCase();
+        String query = searchField.getText();
+        List<Evenement> results = service.searchByTitle(query);
 
-        List<Evenement> filtered = events.stream()
-                .filter(e -> e.getTitre().toLowerCase().contains(s))
-                .toList();
-
-        displayEvents(filtered);
+        displayEvents(results);
     }
 }
