@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.Evenement;
 import services.ServiceEvenemnet;
@@ -81,11 +82,29 @@ public class EventEmployeeController {
         Label dateLieu = new Label(e.getDate_event() + " | " + e.getLieu());
         dateLieu.getStyleClass().add("card-details");
 
+        HBox actions = new HBox(10);
+        actions.setAlignment(Pos.CENTER);
+
         Button participeBtn = new Button("Participer");
         participeBtn.getStyleClass().add("btn-modify-card");
+        Button moreBtn = new Button("Voir plus");
+        moreBtn.getStyleClass().add("btn-archive-card");
 
+        moreBtn.setOnAction(ev -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventDetailsEmployee.fxml"));
+                Parent root = loader.load();
 
-        infoBox.getChildren().addAll(title, desc, dateLieu, participeBtn);
+                EventDetailsEmployeeController controller = loader.getController();
+                controller.setEventData(e);
+                eventContainer.getScene().setRoot(root);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        actions.getChildren().addAll(participeBtn, moreBtn);
+        infoBox.getChildren().addAll(title, desc, dateLieu, actions);
         card.getChildren().addAll(imageView, infoBox);
 
         return card;

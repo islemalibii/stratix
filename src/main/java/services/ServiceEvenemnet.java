@@ -208,6 +208,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
                 e.setDate_event(rs.getDate("date_event").toLocalDate());
                 e.setImageUrl(rs.getString("image_url"));
                 e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
+                e.setType_event(EventType.valueOf(rs.getString("type_event").toLowerCase()));
 
                 list.add(e);
             }
@@ -226,7 +227,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
 
         try (PreparedStatement ps = cnx.prepareStatement(req)) {
 
-            ps.setString(1, EventStatus.planifier.name()); // PLANIFIER
+            ps.setString(1, EventStatus.planifier.name());
             ps.setString(2, "%" + title + "%");
             ResultSet rs = ps.executeQuery();
 
@@ -239,6 +240,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
                 e.setDate_event(rs.getDate("date_event").toLocalDate());
                 e.setImageUrl(rs.getString("image_url"));
                 e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
+                e.setType_event(EventType.valueOf(rs.getString("type_event").toLowerCase()));
 
                 list.add(e);
             }

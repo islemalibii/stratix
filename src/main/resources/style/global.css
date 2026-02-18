@@ -72,7 +72,14 @@
     -fx-padding: 10 25;
     -fx-cursor: hand;
 }
-
+.btn-primary1 {
+    -fx-background-color: #de8d21;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 10 25;
+    -fx-cursor: hand;
+}
 .btn-success {
     -fx-background-color: #10B981;
     -fx-text-fill: white;

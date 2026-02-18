@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+
+<HBox prefHeight="700.0" prefWidth="1100.0" styleClass="main-bg"
+      stylesheets="@/style/global.css" xmlns="http://javafx.com/javafx/20"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.EventDetailsEmployeeController">
+
+    <fx:include source="TableauBord.fxml" />
+
+    <VBox HBox.hgrow="ALWAYS" spacing="20" style="-fx-padding: 40;">
+        <Button text="Retour" onAction="#goBack" styleClass="btn-secondary" />
+
+        <HBox spacing="40" styleClass="card" style="-fx-padding: 30; -fx-background-radius: 20;">
+            <VBox alignment="TOP_CENTER">
+                <ImageView fx:id="eventImageView" fitHeight="350.0" fitWidth="450.0" pickOnBounds="true">
+                </ImageView>
+            </VBox>
+
+            <VBox spacing="15" HBox.hgrow="ALWAYS">
+                <Label fx:id="titleLabel" styleClass="heading-large" wrapText="true" />
+
+
+                <Separator />
+
+                <GridPane vgap="10" hgap="20">
+                    <Label text="Date:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="input-label" />
+                    <Label fx:id="dateLabel" styleClass="event-details" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <Label text="Lieu:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="input-label" />
+                    <Label fx:id="locationLabel" styleClass="event-details" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <Label text="Type:" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="input-label" />
+                    <Label fx:id="typeLabel" styleClass="event-details" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                </GridPane>
+
+                <VBox spacing="5" VBox.vgrow="ALWAYS">
+                    <Label text="Description:" styleClass="input-label" />
+                    <Label fx:id="descriptionLabel" styleClass="card-description" wrapText="true" />
+                </VBox>
+
+                <HBox spacing="15" alignment="BOTTOM_RIGHT">
+                    <Button text="Participer à l'événement" styleClass="btn-primary1" prefHeight="45" prefWidth="250" />
+                </HBox>
+            </VBox>
+        </HBox>
+    </VBox>
+</HBox>
