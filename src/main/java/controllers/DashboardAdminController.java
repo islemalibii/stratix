@@ -381,11 +381,19 @@ public class DashboardAdminController {
         roleCombo.setValue(user != null ? user.getRole() : Role.EMPLOYE);
 
         // Champs employé (optionnels)
+        Label departmentLabel = new Label("Département:");
         TextField departmentField = new TextField(user != null ? user.getDepartment() : "");
+        
+        Label posteLabel = new Label("Poste:");
         TextField posteField = new TextField(user != null ? user.getPoste() : "");
-        TextField salaireField = new TextField(user != null ? String.valueOf(user.getSalaire()) : "0");
+        
+        Label salaireLabel = new Label("Salaire:");
+        TextField salaireField = new TextField(user != null && user.getSalaire() > 0 ? String.valueOf(user.getSalaire()) : "");
+        
+        Label competencesLabel = new Label("Compétences:");
         TextField competencesField = new TextField(user != null ? user.getCompetences() : "");
 
+        // Ajouter les champs de base
         int row = 0;
         grid.add(new Label("Nom:"), 0, row);
         grid.add(nomField, 1, row++);
@@ -401,15 +409,54 @@ public class DashboardAdminController {
         grid.add(passwordField, 1, row++);
         grid.add(new Label("Rôle:"), 0, row);
         grid.add(roleCombo, 1, row++);
-        grid.add(new Label("Département:"), 0, row);
+
+        // Lignes pour les champs employé (initialement cachés si ADMIN/CEO)
+        int employeFieldsStartRow = row;
+        grid.add(departmentLabel, 0, row);
         grid.add(departmentField, 1, row++);
-        grid.add(new Label("Poste:"), 0, row);
+        grid.add(posteLabel, 0, row);
         grid.add(posteField, 1, row++);
-        grid.add(new Label("Salaire:"), 0, row);
+        grid.add(salaireLabel, 0, row);
         grid.add(salaireField, 1, row++);
-        grid.add(new Label("Compétences:"), 0, row);
+        grid.add(competencesLabel, 0, row);
         grid.add(competencesField, 1, row++);
 
+        // Fonction pour afficher/cacher les champs employé
+        Runnable updateFieldsVisibility = () -> {
+            Role selectedRole = roleCombo.getValue();
+            boolean isEmployeOrResponsable = selectedRole == Role.EMPLOYE || 
+                                            selectedRole == Role.RESPONSABLE_RH ||
+                                            selectedRole == Role.RESPONSABLE_PROJET ||
+                                            selectedRole == Role.RESPONSABLE_PRODUCTION;
+            
+            departmentLabel.setVisible(isEmployeOrResponsable);
+            departmentLabel.setManaged(isEmployeOrResponsable);
+            departmentField.setVisible(isEmployeOrResponsable);
+            departmentField.setManaged(isEmployeOrResponsable);
+            
+            posteLabel.setVisible(isEmployeOrResponsable);
+            posteLabel.setManaged(isEmployeOrResponsable);
+            posteField.setVisible(isEmployeOrResponsable);
+            posteField.setManaged(isEmployeOrResponsable);
+            
+            salaireLabel.setVisible(isEmployeOrResponsable);
+            salaireLabel.setManaged(isEmployeOrResponsable);
+            salaireField.setVisible(isEmployeOrResponsable);
+            salaireField.setManaged(isEmployeOrResponsable);
+            
+            competencesLabel.setVisible(isEmployeOrResponsable);
+            competencesLabel.setManaged(isEmployeOrResponsable);
+            competencesField.setVisible(isEmployeOrResponsable);
+            competencesField.setManaged(isEmployeOrResponsable);
+        };
+
+        // Initialiser la visibilité
+        updateFieldsVisibility.run();
+
+        // Écouter les changements de rôle
+        roleCombo.setOnAction(e -> updateFieldsVisibility.run());
+
+        // Stocker les références pour récupération ultérieure
         nomField.setUserData("nom");
         prenomField.setUserData("prenom");
         emailField.setUserData("email");
@@ -433,12 +480,20 @@ public class DashboardAdminController {
         int cin = Integer.parseInt(getFieldValue(grid, "cin"));
         String password = getFieldValue(grid, "password");
         Role role = getComboValue(grid, "role");
-        String department = getFieldValue(grid, "department");
-        String poste = getFieldValue(grid, "poste");
-        double salaire = Double.parseDouble(getFieldValue(grid, "salaire"));
-        String competences = getFieldValue(grid, "competences");
-
-        return new Utilisateur(nom, prenom, email, tel, cin, password, role, department, poste, salaire, competences);
+        
+        // Si le rôle est ADMIN ou CEO, créer sans les champs employé
+        if (role == Role.ADMIN || role == Role.CEO) {
+            return new Utilisateur(nom, prenom, email, tel, cin, password, role);
+        } else {
+            // Pour EMPLOYE et RESPONSABLES, inclure les champs employé
+            String department = getFieldValue(grid, "department");
+            String poste = getFieldValue(grid, "poste");
+            String salaireStr = getFieldValue(grid, "salaire");
+            double salaire = salaireStr.isEmpty() ? 0.0 : Double.parseDouble(salaireStr);
+            String competences = getFieldValue(grid, "competences");
+            
+            return new Utilisateur(nom, prenom, email, tel, cin, password, role, department, poste, salaire, competences);
+        }
     }
 
     private void updateUserFromForm(Utilisateur user, GridPane grid) {
@@ -449,10 +504,21 @@ public class DashboardAdminController {
         user.setCin(Integer.parseInt(getFieldValue(grid, "cin")));
         user.setPassword(getFieldValue(grid, "password"));
         user.setRole(getComboValue(grid, "role"));
-        user.setDepartment(getFieldValue(grid, "department"));
-        user.setPoste(getFieldValue(grid, "poste"));
-        user.setSalaire(Double.parseDouble(getFieldValue(grid, "salaire")));
-        user.setCompetences(getFieldValue(grid, "competences"));
+        
+        // Si le rôle est ADMIN ou CEO, mettre NULL pour les champs employé
+        if (user.getRole() == Role.ADMIN || user.getRole() == Role.CEO) {
+            user.setDepartment(null);
+            user.setPoste(null);
+            user.setSalaire(0.0);
+            user.setCompetences(null);
+        } else {
+            // Pour EMPLOYE et RESPONSABLES, récupérer les champs employé
+            user.setDepartment(getFieldValue(grid, "department"));
+            user.setPoste(getFieldValue(grid, "poste"));
+            String salaireStr = getFieldValue(grid, "salaire");
+            user.setSalaire(salaireStr.isEmpty() ? 0.0 : Double.parseDouble(salaireStr));
+            user.setCompetences(getFieldValue(grid, "competences"));
+        }
     }
 
     private String getFieldValue(GridPane grid, String userData) {
