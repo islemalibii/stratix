@@ -9,54 +9,8 @@
    
    <HBox prefHeight="700.0" prefWidth="1000.0">
       
-      <!-- Left Side: Logo + Feature Cards -->
-      <VBox alignment="TOP_CENTER" spacing="60.0" HBox.hgrow="ALWAYS">
-         <padding>
-            <Insets bottom="60.0" left="80.0" right="80.0" top="80.0" />
-         </padding>
-         <children>
-            <!-- Logo -->
-            <VBox styleClass="logo-container">
-               <ImageView styleClass="logo-image">
-                  <image>
-                     <Image url="@logo.png" />
-                  </image>
-               </ImageView>
-            </VBox>
-            
-            <!-- Feature Cards -->
-            <VBox styleClass="features-container" VBox.vgrow="ALWAYS">
-               <children>
-                  <HBox styleClass="feature-card">
-                     <Label styleClass="feature-icon" text="🚀" />
-                     <VBox spacing="4.0">
-                        <Label styleClass="feature-title" text="Accès instantané" />
-                        <Label styleClass="feature-subtitle" text="Commencez immédiatement" />
-                     </VBox>
-                  </HBox>
-                  
-                  <HBox styleClass="feature-card">
-                     <Label styleClass="feature-icon" text="🔒" />
-                     <VBox spacing="4.0">
-                        <Label styleClass="feature-title" text="Sécurité garantie" />
-                        <Label styleClass="feature-subtitle" text="Vos données sont protégées" />
-                     </VBox>
-                  </HBox>
-                  
-                  <HBox styleClass="feature-card">
-                     <Label styleClass="feature-icon" text="💼" />
-                     <VBox spacing="4.0">
-                        <Label styleClass="feature-title" text="Interface intuitive" />
-                        <Label styleClass="feature-subtitle" text="Facile à utiliser" />
-                     </VBox>
-                  </HBox>
-               </children>
-            </VBox>
-         </children>
-      </VBox>
-      
-      <!-- Right Side: Signup Form -->
-      <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
+      <!-- Signup Form - Centered -->
+      <VBox alignment="CENTER" prefWidth="1000.0" HBox.hgrow="ALWAYS">
          <padding>
             <Insets bottom="60.0" left="60.0" right="60.0" top="60.0" />
          </padding>
