@@ -186,12 +186,10 @@
    ======================================== */
 
 .signup-container {
-    -fx-background-color: 
-        linear-gradient(to bottom right, 
-            #0D2436 0%, 
-            #1A3A52 30%, 
-            #2A5A7A 70%, 
-            #3A7A9A 100%);
+    -fx-background-image: url('bb.png');
+    -fx-background-size: cover;
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
 }
 
 .signup-left-panel {
