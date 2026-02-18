@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox prefWidth="250.0" spacing="10" styleClass="sidebar"
+      stylesheets="@/style/global.css" xmlns="http://javafx.com/javafx/20"
+      xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets top="20" right="15" bottom="20" left="15"/>
+    </padding>
+
+    <VBox alignment="CENTER" spacing="10" style="-fx-padding: 0 0 30 0;">
+        <ImageView fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="@/images/logo.png" />
+        </ImageView>
+        <Label text="Strati X" styleClass="sidebar-brand" />
+    </VBox>
+
+    <Button text="Tableau de bord" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+    <Button text="Employés" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+    <Button text="Projets" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+    <Button text="Tâches et planning" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+
+    <Button text="Événements" styleClass="sidebar-btn, sidebar-btn-active" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+
+    <Button text="Produits et ressources" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+    <Button text="Services" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+</VBox>
