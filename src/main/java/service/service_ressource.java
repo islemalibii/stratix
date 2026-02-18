@@ -117,4 +117,16 @@ public class service_ressource implements service<ressource> {
             System.out.println("Erreur delete : " + e.getMessage());
         }
     }
+
+    public void deleteAll() throws SQLException {
+
+        String req = "DELETE FROM ressource";
+
+        Connection cnx = database.getInstance().getCnx();
+        Statement st = cnx.createStatement();
+        st.executeUpdate(req);
+
+        System.out.println("Table ressource vidée !");
+    }
+
 }

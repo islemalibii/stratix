@@ -8,7 +8,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import models.produit;
 import service.service_produit;
@@ -21,29 +20,11 @@ import java.util.ResourceBundle;
 
 public class ProduitController implements Initializable {
 
-    // ================= COMPOSANTS TABLEVIEW =================
+    // ================= LISTVIEW =================
     @FXML
-    private TableView<produit> tableViewProduits;
-    @FXML
-    private TableColumn<produit, Integer> colId;
-    @FXML
-    private TableColumn<produit, String> colNom;
-    @FXML
-    private TableColumn<produit, String> colDescription;
-    @FXML
-    private TableColumn<produit, String> colCategorie;
-    @FXML
-    private TableColumn<produit, Double> colPrix;
-    @FXML
-    private TableColumn<produit, Integer> colStockActuel;
-    @FXML
-    private TableColumn<produit, Integer> colStockMin;
-    @FXML
-    private TableColumn<produit, String> colDateCreation;
-    @FXML
-    private TableColumn<produit, String> colRessources;
+    private ListView<produit> listViewProduits;
 
-    // ================= COMPOSANTS STATISTIQUES =================
+    // ================= STATISTIQUES =================
     @FXML
     private Label statsTotal;
     @FXML
@@ -51,52 +32,30 @@ public class ProduitController implements Initializable {
     @FXML
     private Label statsValeurStock;
 
-    // ================= SERVICES =================
     private service_produit serviceProduit = new service_produit();
     private ObservableList<produit> observableList = FXCollections.observableArrayList();
 
-    // ================= INITIALISATION =================
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        System.out.println("Initialisation du contrôleur principal...");
+        System.out.println("Initialisation du contrôleur principal avec ListView...");
 
-        // Configuration des colonnes
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
-        colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
-        colCategorie.setCellValueFactory(new PropertyValueFactory<>("categorie"));
-        colPrix.setCellValueFactory(new PropertyValueFactory<>("prix"));
-        colStockActuel.setCellValueFactory(new PropertyValueFactory<>("stock_actuel"));
-        colStockMin.setCellValueFactory(new PropertyValueFactory<>("stock_min"));
-        colDateCreation.setCellValueFactory(new PropertyValueFactory<>("date_creation"));
-        colRessources.setCellValueFactory(new PropertyValueFactory<>("ressources_necessaires"));
+        // Configuration du ListView avec des cellules personnalisées
+        listViewProduits.setCellFactory(param -> new ProduitListCell());
 
-        // Formatage du prix
-        colPrix.setCellFactory(tc -> new TableCell<produit, Double>() {
-            @Override
-            protected void updateItem(Double price, boolean empty) {
-                super.updateItem(price, empty);
-                if (empty || price == null) {
-                    setText(null);
-                } else {
-                    setText(String.format("%.3f DT", price));
-                }
-            }
-        });
+        // Permettre la sélection
+        listViewProduits.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         // Charger les données
         chargerDonnees();
     }
 
-    // ================= CHARGEMENT DONNEES =================
     private void chargerDonnees() {
         List<produit> produits = serviceProduit.getAll();
         observableList.setAll(produits);
-        tableViewProduits.setItems(observableList);
+        listViewProduits.setItems(observableList);
         mettreAJourStatistiques();
     }
 
-    // ================= STATISTIQUES =================
     private void mettreAJourStatistiques() {
         int total = observableList.size();
         statsTotal.setText("Total produits: " + total);
@@ -117,8 +76,6 @@ public class ProduitController implements Initializable {
     @FXML
     private void ouvrirAjoutProduit() {
         try {
-            System.out.println("Ouverture du formulaire d'ajout...");
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ajouterProduit.fxml"));
             Parent root = loader.load();
 
@@ -133,17 +90,15 @@ public class ProduitController implements Initializable {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Erreur",
-                    "Impossible d'ouvrir le formulaire: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible d'ouvrir le formulaire");
         }
     }
 
     @FXML
     private void ouvrirModifierProduit() {
-        produit selected = tableViewProduits.getSelectionModel().getSelectedItem();
+        produit selected = listViewProduits.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showAlert(Alert.AlertType.WARNING, "Attention",
-                    "Veuillez sélectionner un produit à modifier");
+            showAlert(Alert.AlertType.WARNING, "Attention", "Veuillez sélectionner un produit");
             return;
         }
 
@@ -162,16 +117,15 @@ public class ProduitController implements Initializable {
 
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Erreur",
-                    "Impossible d'ouvrir le formulaire");
+            showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible d'ouvrir le formulaire");
         }
     }
 
     @FXML
     private void supprimerProduit() {
-        produit selected = tableViewProduits.getSelectionModel().getSelectedItem();
+        produit selected = listViewProduits.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showAlert(Alert.AlertType.WARNING, "Attention", "Veuillez sélectionner un produit à supprimer");
+            showAlert(Alert.AlertType.WARNING, "Attention", "Veuillez sélectionner un produit");
             return;
         }
 
@@ -184,7 +138,7 @@ public class ProduitController implements Initializable {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             serviceProduit.delete(selected);
             chargerDonnees();
-            showAlert(Alert.AlertType.INFORMATION, "Succès", "Produit supprimé avec succès !");
+            showAlert(Alert.AlertType.INFORMATION, "Succès", "Produit supprimé !");
         }
     }
 
@@ -194,36 +148,77 @@ public class ProduitController implements Initializable {
         showAlert(Alert.AlertType.INFORMATION, "Info", "Liste rafraîchie !");
     }
 
-    // ================= METHODES DE NAVIGATION =================
-    @FXML private void naviguerTableauBord() { /* Navigation */ }
-    @FXML private void naviguerEmployes() { /* Navigation */ }
-    @FXML private void naviguerProjets() { /* Navigation */ }
-    @FXML private void naviguerTaches() { /* Navigation */ }
-    @FXML private void naviguerProduits() { /* Déjà sur la page */ }
-    @FXML private void naviguerPrevoyance() { /* Navigation */ }
-    @FXML private void naviguerAnalyse() { /* Navigation */ }
+    // ================= METHODES DE NAVIGATION (AJOUTÉES) =================
 
-    // ================= METHODES UTILITAIRES =================
+    @FXML
+    private void naviguerTableauBord() {
+        System.out.println("Navigation vers Tableau de bord");
+        // Implémenter selon votre besoin
+    }
+
+    @FXML
+    private void naviguerEmployes() {
+        System.out.println("Navigation vers Employés");
+        // Implémenter selon votre besoin
+    }
+
+    @FXML
+    private void naviguerProjets() {
+        System.out.println("Navigation vers Projets");
+        // Implémenter selon votre besoin
+    }
+
+    @FXML
+    private void naviguerTaches() {
+        System.out.println("Navigation vers Tâches");
+        // Implémenter selon votre besoin
+    }
+
+    @FXML
+    private void naviguerProduits() {
+        System.out.println("Déjà sur la page Produits");
+        // Ne rien faire, on est déjà sur produits
+    }
+
+    @FXML
+    private void naviguerRessources() {
+        try {
+            System.out.println("Navigation vers la gestion des ressources...");
+
+            // Charger la page des ressources
+            Parent root = FXMLLoader.load(getClass().getResource("/ressource.fxml"));
+
+            // Récupérer la fenêtre actuelle et changer la scène
+            Stage stage = (Stage) listViewProduits.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Gestion des Ressources");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Impossible d'ouvrir la gestion des ressources: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void naviguerPrevoyance() {
+        System.out.println("Navigation vers Prévoyance");
+
+    }
+
+    @FXML
+    private void naviguerAnalyse() {
+        System.out.println("Navigation vers Analyse");
+
+    }
+
+
+
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-
-    @FXML
-    private void naviguerRessources() {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/ressource.fxml"));
-            Stage stage = (Stage) tableViewProduits.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Gestion des Ressources");
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Erreur",
-                    "Impossible d'ouvrir la gestion des ressources");
-        }
     }
 }

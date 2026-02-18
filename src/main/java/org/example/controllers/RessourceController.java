@@ -8,7 +8,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import models.ressource;
 import service.service_ressource;
@@ -21,18 +20,9 @@ import java.util.ResourceBundle;
 
 public class RessourceController implements Initializable {
 
+    // REMPLACER TableView par ListView
     @FXML
-    private TableView<ressource> tableViewRessources;
-    @FXML
-    private TableColumn<ressource, Integer> colId;
-    @FXML
-    private TableColumn<ressource, String> colNom;
-    @FXML
-    private TableColumn<ressource, String> colType;
-    @FXML
-    private TableColumn<ressource, Integer> colQuantite;
-    @FXML
-    private TableColumn<ressource, String> colFournisseur;
+    private ListView<ressource> listViewRessources;  // ← Changé ici
 
     @FXML
     private Label statsTotal;
@@ -46,14 +36,13 @@ public class RessourceController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        System.out.println("Initialisation du contrôleur des ressources...");
+        System.out.println("Initialisation du contrôleur des ressources avec ListView...");
 
-        // Configuration des colonnes
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
-        colType.setCellValueFactory(new PropertyValueFactory<>("type_ressource"));
-        colQuantite.setCellValueFactory(new PropertyValueFactory<>("quatite"));
-        colFournisseur.setCellValueFactory(new PropertyValueFactory<>("fournisseur"));
+        // Configuration du ListView avec des cellules personnalisées
+        listViewRessources.setCellFactory(param -> new RessourceListCell());
+
+        // Permettre la sélection (utile pour modifier/supprimer)
+        listViewRessources.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         // Charger les données
         chargerDonnees();
@@ -62,7 +51,7 @@ public class RessourceController implements Initializable {
     private void chargerDonnees() {
         List<ressource> ressources = serviceRessource.getAll();
         observableList.setAll(ressources);
-        tableViewRessources.setItems(observableList);
+        listViewRessources.setItems(observableList);
         mettreAJourStatistiques();
     }
 
@@ -108,7 +97,7 @@ public class RessourceController implements Initializable {
 
     @FXML
     private void ouvrirModifierRessource() {
-        ressource selected = tableViewRessources.getSelectionModel().getSelectedItem();
+        ressource selected = listViewRessources.getSelectionModel().getSelectedItem();  // ← Changé ici
         if (selected == null) {
             showAlert(Alert.AlertType.WARNING, "Attention",
                     "Veuillez sélectionner une ressource à modifier");
@@ -137,7 +126,7 @@ public class RessourceController implements Initializable {
 
     @FXML
     private void supprimerRessource() {
-        ressource selected = tableViewRessources.getSelectionModel().getSelectedItem();
+        ressource selected = listViewRessources.getSelectionModel().getSelectedItem();  // ← Changé ici
         if (selected == null) {
             showAlert(Alert.AlertType.WARNING, "Attention",
                     "Veuillez sélectionner une ressource à supprimer");
@@ -168,7 +157,7 @@ public class RessourceController implements Initializable {
     private void retourMenuPrincipal() {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/produit.fxml"));
-            Stage stage = (Stage) tableViewRessources.getScene().getWindow();
+            Stage stage = (Stage) listViewRessources.getScene().getWindow();  // ← Changé ici
             stage.setScene(new Scene(root));
             stage.setTitle("Gestion des Produits");
         } catch (IOException e) {

@@ -10,7 +10,7 @@
             prefHeight="650" prefWidth="550"
             style="-fx-background-color: white;">
 
-    <!-- En-tête -->
+
     <top>
         <VBox spacing="10" style="-fx-background-color: #2c3e50; -fx-padding: 20;">
             <Label fx:id="titreFormulaire" text="Ajouter un produit"
@@ -18,7 +18,7 @@
         </VBox>
     </top>
 
-    <!-- Centre avec formulaire -->
+
     <center>
         <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-border-color: transparent;">
             <VBox spacing="15" style="-fx-padding: 25;">

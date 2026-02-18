@@ -10,7 +10,7 @@ import java.util.List;
 
 public class service_produit implements service<produit> {
 
-    // ================= ADD =================
+
     @Override
     public void add(produit p) {
 
@@ -38,7 +38,7 @@ public class service_produit implements service<produit> {
         }
     }
 
-    // ================= GET ALL =================
+
     @Override
     public List<produit> getAll() {
 

@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -14,61 +13,61 @@
         <VBox spacing="10" style="-fx-background-color: #2c3e50; -fx-padding: 20;" prefWidth="200">
             <Label text="Tableau de Bord" style="-fx-text-fill: #ecf0f1; -fx-font-size: 16; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
 
-            <Button text="📊 Employés" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT;" onAction="#naviguerEmployes"/>
-            <Button text="📁 Projets" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT;" onAction="#naviguerProjets"/>
-            <Button text="✅ Tâches" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT;" onAction="#naviguerTaches"/>
-            <Button text="📦 Produits" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-alignment: CENTER_LEFT;" onAction="#naviguerProduits"/>
+            <Button text="📊 Employés" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
+                    onAction="#naviguerEmployes" prefWidth="180"/>
 
-            <!-- BOUTON RESSOURCES AJOUTÉ ICI -->
-            <Button text="🔧 Ressources" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT;" onAction="#naviguerRessources"/>
+            <Button text="📁 Projets" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
+                    onAction="#naviguerProjets" prefWidth="180"/>
 
-            <Button text="📅 Prévoyance" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT;" onAction="#naviguerPrevoyance"/>
-            <Button text="📈 Analyse" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT;" onAction="#naviguerAnalyse"/>
+            <Button text="✅ Tâches" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
+                    onAction="#naviguerTaches" prefWidth="180"/>
 
-            <Separator style="-fx-background: #7f8c8d;"/>
+            <Button text=" Produits" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
+                    onAction="#naviguerProduits" prefWidth="180"/>
+
+            <!-- BOUTON RESSOURCES AJOUTÉ -->
+            <Button text=" Ressources" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
+                    onAction="#naviguerRessources" prefWidth="180"/>
+
+            <Button text=" Prévoyance" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
+                    onAction="#naviguerPrevoyance" prefWidth="180"/>
+
+            <Button text=" Analyse" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
+                    onAction="#naviguerAnalyse" prefWidth="180"/>
+
+            <Separator style="-fx-background: #7f8c8d; -fx-padding: 10 0 10 0;"/>
 
             <Label text="L'ancienne à venir" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14; -fx-font-weight: bold;"/>
-            <Label text="📅 Produit 1 - 10/01/2025" style="-fx-text-fill: #bdc3c7;"/>
-            <Label text="📅 Produit 2 - 27/08/2025" style="-fx-text-fill: #bdc3c7;"/>
-            <Label text="📅 Produit 3 - 15/05/2025" style="-fx-text-fill: #bdc3c7;"/>
+            <Label text=" Produit 1 - 10/01/2025" style="-fx-text-fill: #bdc3c7; -fx-padding: 2 0 2 5;"/>
+            <Label text=" Produit 2 - 27/08/2025" style="-fx-text-fill: #bdc3c7; -fx-padding: 2 0 2 5;"/>
+            <Label text=" Produit 3 - 15/05/2025" style="-fx-text-fill: #bdc3c7; -fx-padding: 2 0 2 5;"/>
         </VBox>
     </left>
 
-    <!-- Centre avec TableView -->
+    <!-- Centre avec ListView -->
     <center>
         <VBox spacing="15" style="-fx-padding: 20;">
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="Gestion des Produits" style="-fx-font-size: 20; -fx-font-weight: bold;"/>
+                <Label text="Gestion des Produits" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="➕ Ajouter" style="-fx-background-color: #27ae60; -fx-text-fill: white;" onAction="#ouvrirAjoutProduit"/>
-                <Button text="✏️ Modifier" style="-fx-background-color: #f39c12; -fx-text-fill: white;" onAction="#ouvrirModifierProduit"/>
-                <Button text="🗑️ Supprimer" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" onAction="#supprimerProduit"/>
-                <Button text="🔄 Rafraîchir" style="-fx-background-color: #3498db; -fx-text-fill: white;" onAction="#rafraichirListe"/>
+                <Button text=" Ajouter" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;" onAction="#ouvrirAjoutProduit"/>
+                <Button text="✏ Modifier" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-cursor: hand;" onAction="#ouvrirModifierProduit"/>
+                <Button text="🗑 Supprimer" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;" onAction="#supprimerProduit"/>
+                <Button text=" Rafraîchir" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-cursor: hand;" onAction="#rafraichirListe"/>
             </HBox>
 
-            <TableView fx:id="tableViewProduits" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
-                    <TableColumn fx:id="colNom" text="Nom" prefWidth="120"/>
-                    <TableColumn fx:id="colDescription" text="Description" prefWidth="150"/>
-                    <TableColumn fx:id="colCategorie" text="Catégorie" prefWidth="100"/>
-                    <TableColumn fx:id="colPrix" text="Prix" prefWidth="80"/>
-                    <TableColumn fx:id="colStockActuel" text="Stock" prefWidth="70"/>
-                    <TableColumn fx:id="colStockMin" text="Stock Min" prefWidth="80"/>
-                    <TableColumn fx:id="colDateCreation" text="Date Création" prefWidth="100"/>
-                    <TableColumn fx:id="colRessources" text="Ressources" prefWidth="120"/>
-                </columns>
-            </TableView>
+            <!-- ListView pour les produits -->
+            <ListView fx:id="listViewProduits" VBox.vgrow="ALWAYS"/>
+
         </VBox>
     </center>
 
     <!-- Bas de page avec statistiques -->
     <bottom>
         <HBox spacing="20" style="-fx-background-color: #ecf0f1; -fx-padding: 15;" alignment="CENTER">
-            <Label fx:id="statsTotal" text="Total produits: 0" style="-fx-font-weight: bold;"/>
-            <Label fx:id="statsStockFaible" text="Stock faible: 0" style="-fx-text-fill: #e74c3c; -fx-font-weight: bold;"/>
-            <Label fx:id="statsValeurStock" text="Valeur stock: 0.00 DT" style="-fx-font-weight: bold;"/>
+            <Label fx:id="statsTotal" text="Total produits: 0" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+            <Label fx:id="statsStockFaible" text="Stock faible: 0" style="-fx-font-weight: bold; -fx-text-fill: #e74c3c;"/>
+            <Label fx:id="statsValeurStock" text="Valeur stock: 0.00 DT" style="-fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
         </HBox>
     </bottom>
-
 </BorderPane>
