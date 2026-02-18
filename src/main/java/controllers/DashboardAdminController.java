@@ -181,9 +181,103 @@ public class DashboardAdminController {
             return;
         }
 
-        for (Utilisateur user : users) {
-            cardsContainer.getChildren().add(createUserCard(user));
+        // Créer une grille avec 3 colonnes
+        int columns = 3;
+        int row = 0;
+        HBox currentRow = null;
+
+        for (int i = 0; i < users.size(); i++) {
+            if (i % columns == 0) {
+                currentRow = new HBox(20);
+                currentRow.setAlignment(Pos.TOP_LEFT);
+                cardsContainer.getChildren().add(currentRow);
+            }
+
+            VBox card = createUserCardGrid(users.get(i));
+            HBox.setHgrow(card, Priority.ALWAYS);
+            currentRow.getChildren().add(card);
         }
+    }
+
+    private VBox createUserCardGrid(Utilisateur user) {
+        VBox card = new VBox(12);
+        card.setAlignment(Pos.TOP_CENTER);
+        card.setPadding(new Insets(20));
+        card.getStyleClass().add("user-card-grid");
+        card.setPrefWidth(300);
+        card.setMaxWidth(350);
+
+        // Avatar/Icon section
+        StackPane avatarPane = new StackPane();
+        avatarPane.setPrefSize(80, 80);
+        avatarPane.getStyleClass().add("avatar-large");
+        
+        Label avatarLabel = new Label(user.getNom().substring(0, 1).toUpperCase());
+        avatarLabel.setFont(Font.font("System Bold", 32));
+        avatarLabel.setTextFill(javafx.scene.paint.Color.WHITE);
+        avatarPane.getChildren().add(avatarLabel);
+
+        // Name
+        Label nameLabel = new Label(user.getNom() + " " + user.getPrenom());
+        nameLabel.setFont(Font.font("System Bold", 16));
+        nameLabel.getStyleClass().add("card-name-label");
+        nameLabel.setMaxWidth(Double.MAX_VALUE);
+        nameLabel.setAlignment(Pos.CENTER);
+
+        // Role badge
+        Label roleLabel = new Label(user.getRole().toString());
+        roleLabel.setPadding(new Insets(6, 16, 6, 16));
+        roleLabel.getStyleClass().addAll("role-badge", getRoleBadgeClass(user.getRole()));
+
+        // Details
+        VBox detailsBox = new VBox(6);
+        detailsBox.setAlignment(Pos.CENTER_LEFT);
+        detailsBox.setPrefWidth(Double.MAX_VALUE);
+
+        Label emailLabel = new Label("📧 " + user.getEmail());
+        emailLabel.getStyleClass().add("card-detail-label-small");
+        emailLabel.setMaxWidth(Double.MAX_VALUE);
+
+        Label telLabel = new Label("📞 " + user.getTel());
+        telLabel.getStyleClass().add("card-detail-label-small");
+
+        detailsBox.getChildren().addAll(emailLabel, telLabel);
+
+        // Si employé, afficher poste et salaire
+        if (user.isEmploye() && user.getPoste() != null) {
+            Label posteLabel = new Label("💼 " + user.getPoste());
+            posteLabel.getStyleClass().add("card-detail-label-small");
+            detailsBox.getChildren().add(posteLabel);
+
+            if (user.getSalaire() > 0) {
+                Label salaireLabel = new Label("💰 " + user.getSalaire() + " €");
+                salaireLabel.getStyleClass().add("card-detail-label-small");
+                detailsBox.getChildren().add(salaireLabel);
+            }
+        }
+
+        // Actions
+        HBox actionsBox = new HBox(10);
+        actionsBox.setAlignment(Pos.CENTER);
+        actionsBox.setPrefWidth(Double.MAX_VALUE);
+
+        Button btnModifier = new Button("Modifier");
+        btnModifier.getStyleClass().addAll("button-warning", "card-action-button-small");
+        btnModifier.setOnAction(e -> handleModifier(user));
+        HBox.setHgrow(btnModifier, Priority.ALWAYS);
+        btnModifier.setMaxWidth(Double.MAX_VALUE);
+
+        Button btnSupprimer = new Button("Supprimer");
+        btnSupprimer.getStyleClass().addAll("button-danger", "card-action-button-small");
+        btnSupprimer.setOnAction(e -> handleSupprimer(user));
+        HBox.setHgrow(btnSupprimer, Priority.ALWAYS);
+        btnSupprimer.setMaxWidth(Double.MAX_VALUE);
+
+        actionsBox.getChildren().addAll(btnModifier, btnSupprimer);
+
+        card.getChildren().addAll(avatarPane, nameLabel, roleLabel, detailsBox, actionsBox);
+
+        return card;
     }
 
     private HBox createUserCard(Utilisateur user) {

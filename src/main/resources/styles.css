@@ -809,3 +809,34 @@
     -fx-padding: 8px 16px;
 }
 
+
+
+/* Grid Card Styles - Library Design */
+.user-card-grid {
+    -fx-background-color: white;
+    -fx-background-radius: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 12, 0, 0, 4);
+    -fx-cursor: hand;
+}
+
+.user-card-grid:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 20, 0, 0, 8);
+    -fx-translate-y: -4px;
+}
+
+.avatar-large {
+    -fx-background-color: linear-gradient(to bottom right, #0891D1, #0066CC);
+    -fx-background-radius: 50%;
+}
+
+.card-detail-label-small {
+    -fx-text-fill: #8F9BB3;
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
+}
+
+.card-action-button-small {
+    -fx-font-size: 11px;
+    -fx-padding: 8 16 8 16;
+    -fx-cursor: hand;
+}
