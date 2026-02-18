@@ -5,22 +5,23 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import models.Evenement;
 import models.enums.EventStatus;
 import services.ServiceEvenemnet;
 
-import javafx.scene.image.ImageView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventDashboardController {
+public class EventEmployeeController {
 
     @FXML private Label totalLabel;
     @FXML private Label plannedLabel;
@@ -36,7 +37,6 @@ public class EventDashboardController {
 
     @FXML
     public void initialize() {
-
         filterStatusCombo.getItems().add("Tous");
         for (EventStatus s : EventStatus.values()) {
             filterStatusCombo.getItems().add(s.name());
@@ -44,9 +44,8 @@ public class EventDashboardController {
         filterStatusCombo.setValue("Tous");
 
         events = service.getAll();
-        updateCounters();
+        updateCounters(); // Même méthode
         displayEvents(events);
-        search();
     }
 
     private void updateCounters() {
@@ -62,10 +61,9 @@ public class EventDashboardController {
 
         totalLabel.setText(String.valueOf(events.size()));
         plannedLabel.setText(String.valueOf(planned));
-        finishedLabel.setText(String.valueOf(finished));
-        cancelledLabel.setText(String.valueOf(cancelled));
+        if (finishedLabel != null) finishedLabel.setText(String.valueOf(finished));
+        if (cancelledLabel != null) cancelledLabel.setText(String.valueOf(cancelled));
     }
-
 
     private void displayEvents(List<Evenement> list) {
         eventContainer.getChildren().clear();
@@ -115,64 +113,16 @@ public class EventDashboardController {
         Label status = new Label(e.getStatut().name().toUpperCase());
         status.getStyleClass().addAll("status-badge", "status-" + e.getStatut().name().toLowerCase());
 
-        HBox actions = new HBox(10);
-        actions.setAlignment(Pos.CENTER);
 
-        Button modifyBtn = new Button("Modifier");
-        Button archiveBtn = new Button("Archiver");
-        modifyBtn.getStyleClass().add("btn-modify-card");
-        archiveBtn.getStyleClass().add("btn-archive-card");
-
-        modifyBtn.setOnAction(ev -> {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/ModifyEvent.fxml"));
-                Parent root = loader.load();
-                ModifyEventController controller = loader.getController();
-                controller.setEvent(e);
-
-                eventContainer.getScene().setRoot(root);
-            } catch (Exception ex) { ex.printStackTrace(); }
-        });
-
-        archiveBtn.setOnAction(ev -> {
-            service.archiver(e.getId());
-            events = service.getAll();
-            updateCounters();
-            displayEvents(events);
-        });
-
-        actions.getChildren().addAll(modifyBtn, archiveBtn);
-        infoBox.getChildren().addAll(title, desc, dateLieu, status, actions);
+        infoBox.getChildren().addAll(title, desc, dateLieu, status);
         card.getChildren().addAll(imageView, infoBox);
 
         return card;
     }
 
     @FXML
-    private void goToAddEvent() {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/addEvent.fxml"));
-            eventContainer.getScene().setRoot(root);
-
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-    }
-
-    @FXML
-    private void goToArchived() {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/ArchivedEvents.fxml"));
-            eventContainer.getScene().setRoot(root);
-
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-    }
-
-    @FXML
     private void search() {
-        String query = searchField.getText();
+        String query = searchField.getText().toLowerCase();
         String statusFilter = filterStatusCombo.getValue();
 
         List<Evenement> results = service.getAll().stream()
@@ -182,8 +132,6 @@ public class EventDashboardController {
 
         displayEvents(results);
     }
-
-
 
     @FXML
     private void handleFilter() {
@@ -195,22 +143,18 @@ public class EventDashboardController {
             EventStatus status = EventStatus.valueOf(selected);
             events = service.filterByStatus(status);
         }
-
         displayEvents(events);
-
     }
 
-    //temporaryyyy
+
+    //temporaryyy
     @FXML
-    private void switchToEmployeeView() {
+    private void switchToAdminView() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/EventEmployeeDashboard.fxml"));
-
+            Parent root = FXMLLoader.load(getClass().getResource("/EventDashboard.fxml"));
             eventContainer.getScene().setRoot(root);
-
         } catch (IOException e) {
-            System.err.println(e.getMessage());
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 }
