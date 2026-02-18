@@ -7,6 +7,9 @@ import models.Evenement;
 import models.enums.EventStatus;
 import models.enums.EventType;
 import services.ServiceEvenemnet;
+import javafx.stage.FileChooser;
+import java.io.File;
+
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -15,6 +18,7 @@ public class AddEventController {
     @FXML private TextField descriptionField;
     @FXML private TextField lieuField;
     @FXML private DatePicker datePicker;
+    @FXML private TextField imageUrlField;
 
     @FXML private ComboBox<EventType> typeCombo;
     @FXML private ComboBox<EventStatus> statusCombo;
@@ -66,8 +70,25 @@ public class AddEventController {
             showError("La date ne peut pas être dans le passé !");
             return false;
         }
-
+        if (imageUrlField.getText().isEmpty()) {
+            showError("Veuillez sélectionner une image pour l'événement");
+            return false;
+        }
         return true;
+    }
+    @FXML
+    private void chooseImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choisir une affiche");
+
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif")
+        );
+
+        File selectedFile = fileChooser.showOpenDialog(titreField.getScene().getWindow());
+        if (selectedFile != null) {
+            imageUrlField.setText(selectedFile.toURI().toString());
+        }
     }
 
     private void showError(String msg) {
@@ -89,6 +110,7 @@ public class AddEventController {
         e.setDate_event(datePicker.getValue());
         e.setType_event(typeCombo.getValue());
         e.setStatut(statusCombo.getValue());
+        e.setImageUrl(imageUrlField.getText());
 
         service.add(e);
 

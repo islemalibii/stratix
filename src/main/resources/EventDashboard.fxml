@@ -4,53 +4,49 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox prefHeight="600.0" prefWidth="1000.0" spacing="25" styleClass="main-bg"
+<VBox prefHeight="700.0" prefWidth="1100.0" spacing="25" styleClass="main-bg"
       stylesheets="@/style/global.css" xmlns="http://javafx.com/javafx/20"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="controllers.EventDashboardController">
 
     <HBox alignment="CENTER" spacing="20">
-        <VBox alignment="CENTER" prefHeight="100.0" prefWidth="160.0" styleClass="card">
+        <VBox alignment="CENTER" prefHeight="100.0" prefWidth="180.0" styleClass="stat-card">
             <Label text="Total Événements" styleClass="stat-label" />
             <Label fx:id="totalLabel" text="0" styleClass="stat-value" />
         </VBox>
 
-        <VBox alignment="CENTER" prefHeight="100.0" prefWidth="160.0" styleClass="card">
+        <VBox alignment="CENTER" prefHeight="100.0" prefWidth="180.0" styleClass="stat-card">
             <Label text="Planifiés" styleClass="stat-label, stat-planned" />
             <Label fx:id="plannedLabel" text="0" styleClass="stat-value, stat-planned" />
         </VBox>
 
-        <VBox alignment="CENTER" prefHeight="100.0" prefWidth="160.0" styleClass="card">
+        <VBox alignment="CENTER" prefHeight="100.0" prefWidth="180.0" styleClass="stat-card">
             <Label text="Terminés" styleClass="stat-label, stat-finished" />
             <Label fx:id="finishedLabel" text="0" styleClass="stat-value, stat-finished" />
         </VBox>
 
-        <VBox alignment="CENTER" prefHeight="100.0" prefWidth="160.0" styleClass="card">
+        <VBox alignment="CENTER" prefHeight="100.0" prefWidth="180.0" styleClass="stat-card">
             <Label text="Annulés" styleClass="stat-label, stat-cancelled" />
             <Label fx:id="cancelledLabel" text="0" styleClass="stat-value, stat-cancelled" />
         </VBox>
     </HBox>
 
-    <HBox alignment="CENTER_LEFT" spacing="15">
-        <TextField fx:id="searchField" onKeyReleased="#search" promptText="Rechercher un événement..." HBox.hgrow="ALWAYS" />
+    <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 0 20 0 20;">
+        <TextField fx:id="searchField" onKeyReleased="#search"
+                   promptText="🔍 Rechercher par titre..."
+                   styleClass="search-field" HBox.hgrow="ALWAYS" />
         <Button fx:id="addBtn" onAction="#goToAddEvent" text="Ajouter" styleClass="btn-primary" />
-        <Button fx:id="archivedBtn" onAction="#goToArchived" text="Voir Archives" styleClass="btn-secondary" />
+        <Button fx:id="archivedBtn" onAction="#goToArchived" text="Archives" styleClass="btn-secondary" />
     </HBox>
 
-    <HBox prefHeight="50.0" spacing="20" styleClass="table-header">
-        <Label prefWidth="150" text="TITRE" styleClass="table-header-label" />
-        <Label prefWidth="200" text="DESCRIPTION" styleClass="table-header-label" />
-        <Label prefWidth="100" text="DATE" styleClass="table-header-label" />
-        <Label prefWidth="100" text="TYPE" styleClass="table-header-label" />
-        <Label prefWidth="100" text="STATUT" styleClass="table-header-label" />
-        <Label prefWidth="150" text="LIEU" styleClass="table-header-label" />
-        <Region HBox.hgrow="ALWAYS" />
-        <Label alignment="CENTER" prefWidth="180" text="ACTIONS" styleClass="table-header-label" />
-    </HBox>
-
-    <ScrollPane fitToWidth="true" styleClass="scroll-pane">
-        <VBox fx:id="eventContainer" spacing="12">
-            <padding><Insets bottom="10" /></padding>
-        </VBox>
+    <ScrollPane fitToWidth="true" styleClass="custom-scroll-pane" VBox.vgrow="ALWAYS">
+        <content>
+            <FlowPane fx:id="eventContainer" hgap="25.0" vgap="25.0" prefWrapLength="1000.0">
+                <padding>
+                    <Insets bottom="30.0" left="30.0" right="30.0" top="10.0" />
+                </padding>
+            </FlowPane>
+        </content>
     </ScrollPane>
+
 </VBox>

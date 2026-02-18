@@ -1,5 +1,7 @@
 package controllers;
 
+import javafx.stage.FileChooser;
+import java.io.File;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -15,6 +17,7 @@ public class ModifyEventController {
     @FXML private TextField titreField;
     @FXML private TextField descriptionField;
     @FXML private TextField lieuField;
+    @FXML private TextField imageUrlField;
     @FXML private DatePicker datePicker;
     @FXML private ComboBox<EventType> typeCombo;
     @FXML private ComboBox<EventStatus> statusCombo;
@@ -38,6 +41,7 @@ public class ModifyEventController {
         datePicker.setValue(event.getDate_event());
         typeCombo.setValue(event.getType_event());
         statusCombo.setValue(event.getStatut());
+        imageUrlField.setText(event.getImageUrl());
     }
 
     private boolean validateInputs() {
@@ -75,6 +79,20 @@ public class ModifyEventController {
         alert.setContentText(msg);
         alert.showAndWait();
     }
+    @FXML
+    private void chooseImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Changer l'affiche");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif")
+        );
+
+        File selectedFile = fileChooser.showOpenDialog(titreField.getScene().getWindow());
+
+        if (selectedFile != null) {
+            imageUrlField.setText(selectedFile.toURI().toString());
+        }
+    }
 
     @FXML
     private void modifyEvent() {
@@ -86,6 +104,7 @@ public class ModifyEventController {
         currentEvent.setDate_event(datePicker.getValue());
         currentEvent.setType_event(typeCombo.getValue());
         currentEvent.setStatut(statusCombo.getValue());
+        currentEvent.setImageUrl(imageUrlField.getText());
 
         service.update(currentEvent);
 

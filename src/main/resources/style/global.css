@@ -268,3 +268,75 @@
 .btn-delete-permanent:hover {
     -fx-background-color: #DC2626;
 }
+
+
+/* Style de la carte principale */
+.event-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-border-radius: 15;
+    -fx-border-color: #f1f2f6;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 4);
+    -fx-cursor: hand;
+    -fx-transition: 0.3s;
+}
+
+.event-card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 15, 0, 0, 8);
+    -fx-translate-y: -5;
+}
+
+/* Texte de la carte */
+.card-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2f3542;
+}
+
+.card-description {
+    -fx-font-size: 13px;
+    -fx-text-fill: #747d8c;
+}
+
+.card-details {
+    -fx-font-size: 12px;
+    -fx-text-fill: #57606f;
+    -fx-font-style: italic;
+}
+
+/* Badges de statut */
+.status-badge {
+    -fx-padding: 4 12;
+    -fx-background-radius: 10;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+}
+
+.status-planifier { -fx-background-color: #2ed573; }
+.status-terminer { -fx-background-color: #1e90ff; }
+.status-annuler { -fx-background-color: #ff4757; }
+
+/* Boutons sur la carte */
+.btn-modify-card {
+    -fx-background-color: #ffa502;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+}
+
+.btn-archive-card {
+    -fx-background-color: #57606f;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+}
+
+.btn-delete-permanent {
+    -fx-background-color: #2f3542;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-padding: 5 15;
+}
+
+.btn-delete-permanent:hover {
+    -fx-background-color: #ff4757;
+}

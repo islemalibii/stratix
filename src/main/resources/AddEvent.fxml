@@ -4,8 +4,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
 
-<StackPane prefHeight="650.0" prefWidth="1000.0" styleClass="main-bg"
+<StackPane prefHeight="700.0" prefWidth="1000.0" styleClass="main-bg"
            stylesheets="@/style/global.css"
            xmlns="http://javafx.com/javafx/20"
            xmlns:fx="http://javafx.com/fxml/1"
@@ -15,19 +16,19 @@
 
         <VBox spacing="5" alignment="CENTER_LEFT">
             <Label text="Créer un nouvel événement" styleClass="heading-large" />
-            <Label text="Remplissez les détails ci dessous pour planifier votre événement" styleClass="subheading" />
+            <Label text="Remplissez les détails ci-dessous pour planifier votre événement" styleClass="subheading" />
         </VBox>
 
         <VBox spacing="15" styleClass="form-card">
 
             <VBox spacing="5">
                 <Label text="Titre de l'événement" styleClass="input-label" />
-                <TextField fx:id="titreField" promptText="nom" />
+                <TextField fx:id="titreField" promptText="Nom de l'événement" />
             </VBox>
 
             <VBox spacing="5">
                 <Label text="Description" styleClass="input-label" />
-                <TextField fx:id="descriptionField" promptText="Décrivezl'événement" />
+                <TextField fx:id="descriptionField" promptText="Décrivez l'événement..." />
             </VBox>
 
             <HBox spacing="15">
@@ -43,7 +44,16 @@
 
             <VBox spacing="5">
                 <Label text="Lieu" styleClass="input-label" />
-                <TextField fx:id="lieuField" promptText="lieu.." />
+                <TextField fx:id="lieuField" promptText="Lieu de l'événement..." />
+            </VBox>
+
+            <VBox spacing="8">
+                <Label text="Affiche de l'événement" styleClass="input-label" />
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <TextField fx:id="imageUrlField" promptText="Chemin de l'image..."
+                               HBox.hgrow="ALWAYS" editable="false" style="-fx-opacity: 0.8;"/>
+                    <Button text="Parcourir" onAction="#chooseImage" styleClass="btn-secondary" />
+                </HBox>
             </VBox>
 
             <VBox spacing="5">

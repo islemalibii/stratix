@@ -18,8 +18,8 @@ public class ServiceEvenemnet implements Services<Evenement> {
     }
     @Override
     public void add(Evenement evenement) {
-        String req = "INSERT INTO evenement(type_event, date_event, description, statut, lieu, titre) " +
-                "VALUES (?, ?, ?, ?, ?, ?)"; // l values ywalou treated as data mch sql ynajm yexecuta : protection contre l sql injection
+        String req = "INSERT INTO evenement(type_event, date_event, description, statut, lieu, titre, image_url) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)"; // l values ywalou treated as data mch sql ynajm yexecuta : protection contre l sql injection
 
         try (PreparedStatement pst = cnx.prepareStatement(req)) {
 
@@ -29,6 +29,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
             pst.setString(4, evenement.getStatut().name());
             pst.setString(5, evenement.getLieu());
             pst.setString(6, evenement.getTitre());
+            pst.setString(7, evenement.getImageUrl());
 
             pst.executeUpdate();
             System.out.println("Evenement added successfully");
@@ -41,7 +42,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
     @Override
     public void update(Evenement evenement) {
 
-        String req = "update evenement set type_event=? , date_event=? , description=? , statut=? , lieu=? , titre=? where id=?";
+        String req = "update evenement set type_event=? , date_event=? , description=? , statut=? , lieu=? , titre=?, image_url=? where id=?";
         try{
             PreparedStatement pst = cnx.prepareStatement(req);
 
@@ -51,7 +52,8 @@ public class ServiceEvenemnet implements Services<Evenement> {
             pst.setString(4, evenement.getStatut().name());
             pst.setString(5, evenement.getLieu());
             pst.setString(6, evenement.getTitre());
-            pst.setInt(7, evenement.getId());
+            pst.setString(7, evenement.getImageUrl());
+            pst.setInt(8, evenement.getId());
 
             pst.executeUpdate();
             System.out.println("evenement modifie");
@@ -97,6 +99,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
                 e.setType_event(EventType.valueOf(rs.getString("type_event").toLowerCase()));
                 e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
                 e.setArchived(rs.getInt("isArchived") == 1);
+                e.setImageUrl(rs.getString("image_url"));
 
                 list.add(e);
             }
@@ -143,6 +146,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
                 e.setType_event(EventType.valueOf(rs.getString("type_event").toLowerCase()));
                 e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
                 e.setArchived(false);
+                e.setImageUrl(rs.getString("image_url"));
 
                 newList.add(e);
             }
@@ -164,4 +168,6 @@ public class ServiceEvenemnet implements Services<Evenement> {
             System.out.println(e.getMessage());
         }
     }
+
+
 }

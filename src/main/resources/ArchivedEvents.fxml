@@ -2,36 +2,26 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox prefHeight="600.0" prefWidth="1000.0" spacing="25" styleClass="main-bg"
+<VBox prefHeight="600.0" prefWidth="1100.0" spacing="25" styleClass="main-bg"
       stylesheets="@/style/global.css" xmlns="http://javafx.com/javafx/20"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="controllers.ArchivedEventsController">
 
-    <HBox alignment="CENTER_LEFT" spacing="20">
-        <Button text="Retour" onAction="#goBack" styleClass="btn-dark"/>
+    <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-padding: 20 0 0 20;">
+        <Button text="← Retour" onAction="#goBack" styleClass="btn-dark"/>
         <Label text="Événements Archivés" styleClass="heading-medium"/>
     </HBox>
 
-    <HBox prefHeight="50.0" spacing="20" styleClass="table-header">
-        <Label prefWidth="150" text="TITRE" styleClass="table-header-label" />
-        <Label prefWidth="200" text="DESCRIPTION" styleClass="table-header-label" />
-        <Label prefWidth="100" text="DATE" styleClass="table-header-label" />
-        <Label prefWidth="100" text="TYPE" styleClass="table-header-label" />
-        <Label prefWidth="100" text="STATUT" styleClass="table-header-label" />
-        <Label prefWidth="150" text="LIEU" styleClass="table-header-label" />
-        <Region HBox.hgrow="ALWAYS" />
-        <Label prefWidth="180" text="ACTIONS" styleClass="table-header-label" alignment="CENTER"/>
-    </HBox>
-
-    <ScrollPane fitToWidth="true" styleClass="scroll-pane">
-        <VBox fx:id="archiveContainer" spacing="12" style="-fx-background-color: transparent;">
-            <padding>
-                <Insets bottom="10" />
-            </padding>
-        </VBox>
+    <ScrollPane fitToWidth="true" styleClass="custom-scroll-pane" VBox.vgrow="ALWAYS">
+        <content>
+            <FlowPane fx:id="archiveContainer" hgap="25.0" vgap="25.0">
+                <padding>
+                    <Insets bottom="30.0" left="30.0" right="30.0" top="10.0" />
+                </padding>
+            </FlowPane>
+        </content>
     </ScrollPane>
 
 </VBox>

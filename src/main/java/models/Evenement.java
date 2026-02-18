@@ -14,6 +14,7 @@ public class Evenement {
     private EventStatus statut;
     private List<Ressources> ressources = new ArrayList<>();
     private boolean isArchived;
+    private String image_url;
 
     public Evenement() {}
 
@@ -97,6 +98,13 @@ public class Evenement {
     public void setArchived(boolean archived) {
         isArchived = archived;
     }
+    public String getImageUrl() {
+        return image_url;
+    }
+    public void setImageUrl(String image_url) {
+        this.image_url = image_url;
+    }
+
     @Override
     public String toString() {
         return "evenement{" +

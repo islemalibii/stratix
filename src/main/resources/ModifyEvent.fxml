@@ -50,6 +50,16 @@
                 <ComboBox fx:id="statusCombo" maxWidth="Infinity" />
             </VBox>
 
+            <VBox spacing="8">
+                <Label text="Affiche de l'événement" styleClass="input-label" />
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <TextField fx:id="imageUrlField" promptText="Chemin de l'image..."
+                               HBox.hgrow="ALWAYS" editable="false" style="-fx-opacity: 0.8;"/>
+                    <Button text="Parcourir" onAction="#chooseImage" styleClass="btn-secondary" />
+                </HBox>
+            </VBox>
+
+
             <Separator style="-fx-padding: 10 0;" />
 
             <HBox spacing="15" alignment="CENTER_RIGHT">

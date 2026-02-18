@@ -8,17 +8,17 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import models.Evenement;
 import services.ServiceEvenemnet;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
+import javafx.scene.shape.Rectangle;
 
 import java.util.List;
 public class ArchivedEventsController {
     @FXML
-    private VBox archiveContainer;
+    private FlowPane archiveContainer;
 
     private ServiceEvenemnet service = new ServiceEvenemnet();
 
@@ -33,70 +33,77 @@ public class ArchivedEventsController {
         archiveContainer.getChildren().clear();
 
         for (Evenement e : archived) {
-            archiveContainer.getChildren().add(createRow(e));
+            archiveContainer.getChildren().add(createArchiveCard(e));
         }
     }
 
-    private HBox createRow(Evenement e) {
-        HBox row = new HBox(20);
-        row.setAlignment(Pos.CENTER_LEFT);
-        row.setPadding(new Insets(10, 25, 10, 25));
-        row.setPrefHeight(70);
+    private VBox createArchiveCard(Evenement e) {
+        VBox card = new VBox(12);
+        card.getStyleClass().add("event-card");
+        card.setPrefWidth(300);
+        card.setAlignment(Pos.TOP_CENTER);
+        card.setPadding(new Insets(0, 0, 15, 0));
 
-        row.getStyleClass().add("archive-row");
+        ImageView imageView = new ImageView();
+        try {
+            String path = (e.getImageUrl() == null || e.getImageUrl().isEmpty())
+                    ? "/images/placeholder.png" : e.getImageUrl();
+            Image img = new Image(path, 300, 180, true, true);
+            imageView.setImage(img);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        imageView.setFitWidth(300);
+        imageView.setFitHeight(180);
+
+        Rectangle clip = new Rectangle(300, 180);
+        clip.setArcWidth(30); clip.setArcHeight(30);
+        imageView.setClip(clip);
+
+        VBox infoBox = new VBox(8);
+        infoBox.setPadding(new Insets(0, 15, 0, 15));
 
         Label title = new Label(e.getTitre());
-        title.setPrefWidth(150);
-        title.getStyleClass().add("archive-title");
+        title.getStyleClass().add("card-title");
 
-        Label description = new Label(e.getDescription());
-        description.setPrefWidth(200);
-        description.getStyleClass().add("archive-description");
-
-        Label date = new Label(e.getDate_event().toString());
-        date.setPrefWidth(100);
-        date.getStyleClass().add("archive-text");
-
-        Label type = new Label(e.getType_event().name());
-        type.setPrefWidth(100);
-        type.getStyleClass().add("archive-text");
+        Label dateLieu = new Label(e.getDate_event() + " | " + e.getLieu());
+        dateLieu.getStyleClass().add("card-details");
 
         Label status = new Label(e.getStatut().name().toUpperCase());
-        status.setPrefWidth(100);
-        status.getStyleClass().add("archive-status-label");
+        status.getStyleClass().add("status-badge");
 
-        Label lieu = new Label(e.getLieu());
-        lieu.setPrefWidth(150);
-        lieu.getStyleClass().add("archive-text");
+        switch (e.getStatut()) {
+            case planifier: status.getStyleClass().add("bg-green"); break;
+            case terminer: status.getStyleClass().add("bg-blue"); break;
+            case annuler: status.getStyleClass().add("bg-red"); break;
+        }
 
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox actions = new HBox(10);
+        actions.setAlignment(Pos.CENTER);
+        actions.setPadding(new Insets(10, 0, 0, 0));
 
         Button restoreBtn = new Button("Restaurer");
-        restoreBtn.getStyleClass().add("btn-restore");
+        restoreBtn.getStyleClass().add("btn-modify-card");
         restoreBtn.setOnAction(event -> {
-            service.desarchiver(e.getId()); // Appelle votre nouvelle méthode
-            loadArchivedEvents(); // Rafraîchit la liste
+            service.desarchiver(e.getId());
+            loadArchivedEvents();
         });
 
-        // Bouton Supprimer (Définitivement)
         Button deleteBtn = new Button("Supprimer");
         deleteBtn.getStyleClass().add("btn-delete-permanent");
-
         deleteBtn.setOnAction(event -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Voulez-vous supprimer cet événement ?", ButtonType.YES, ButtonType.NO);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer définitivement ?", ButtonType.YES, ButtonType.NO);
             if (alert.showAndWait().get() == ButtonType.YES) {
                 service.supprimer(e.getId());
                 loadArchivedEvents();
             }
         });
 
-        HBox actionBox = new HBox(10, restoreBtn, deleteBtn);
-        actionBox.setAlignment(Pos.CENTER_RIGHT);
+        actions.getChildren().addAll(restoreBtn, deleteBtn);
+        infoBox.getChildren().addAll(title, dateLieu, status, actions);
+        card.getChildren().addAll(imageView, infoBox);
 
-        row.getChildren().addAll(title, description, date, type, status, lieu, spacer, actionBox);
-
-        return row;
+        return card;
     }
 
     @FXML
