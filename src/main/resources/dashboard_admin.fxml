@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.image.*?>
+
+<BorderPane prefHeight="700.0" prefWidth="1200.0" stylesheets="@styles.css" styleClass="dashboard-root" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.DashboardAdminController">
+   
+   <!-- Top Bar -->
+   <top>
+      <HBox alignment="CENTER_LEFT" prefHeight="70.0" spacing="20.0" styleClass="dashboard-top-bar">
+         <padding>
+            <Insets bottom="15.0" left="25.0" right="25.0" top="15.0" />
+         </padding>
+         <children>
+            <!-- Logo -->
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+               <ImageView fitHeight="40.0" fitWidth="40.0" preserveRatio="true">
+                  <image>
+                     <Image url="@logo.png" />
+                  </image>
+               </ImageView>
+               <Label text="Stratix" textFill="#1A1F36">
+                  <font>
+                     <Font name="System Bold" size="20.0" />
+                  </font>
+               </Label>
+            </HBox>
+            
+            <Region HBox.hgrow="ALWAYS" />
+            
+            <!-- User Info -->
+            <HBox alignment="CENTER_RIGHT" spacing="15.0">
+               <Label fx:id="welcomeLabel" text="Bienvenue, Admin" textFill="#1A1F36">
+                  <font>
+                     <Font name="System Bold" size="14.0" />
+                  </font>
+               </Label>
+               <StackPane>
+                  <Circle radius="20.0" styleClass="avatar-circle" />
+                  <Label text="A" textFill="#0066CC">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Label>
+               </StackPane>
+               <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#handleLogout" styleClass="logout-button" text="Déconnexion">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Button>
+            </HBox>
+         </children>
+      </HBox>
+   </top>
+   
+   <!-- Left Sidebar -->
+   <left>
+      <VBox prefWidth="240.0" spacing="8.0" styleClass="dashboard-sidebar">
+         <padding>
+            <Insets bottom="20.0" left="15.0" right="15.0" top="20.0" />
+         </padding>
+         <children>
+            <Label text="MENU PRINCIPAL" textFill="#8F9BB3">
+               <font>
+                  <Font name="System Bold" size="11.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" top="5.0" />
+               </VBox.margin>
+            </Label>
+            
+            <Button fx:id="btnUtilisateurs" mnemonicParsing="false" onAction="#showUtilisateurs" styleClass="sidebar-menu-button,sidebar-menu-button-active" text="👥  Utilisateurs">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Button>
+            
+            <Button fx:id="btnEmployes" mnemonicParsing="false" onAction="#showEmployes" styleClass="sidebar-menu-button" text="💼  Employés">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+            
+            <Button fx:id="btnAdmins" mnemonicParsing="false" onAction="#showAdmins" styleClass="sidebar-menu-button" text="🔐  Admins">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+            
+            <Button fx:id="btnCEOs" mnemonicParsing="false" onAction="#showCEOs" styleClass="sidebar-menu-button" text="⭐  CEOs">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+            
+            <Button fx:id="btnResponsables" mnemonicParsing="false" onAction="#showResponsables" styleClass="sidebar-menu-button" text="👔  Responsables">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Button>
+            
+            <Region VBox.vgrow="ALWAYS" />
+            
+            <VBox spacing="10.0" styleClass="tip-box">
+               <Label text="💡 Astuce" textFill="#1A1F36">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Label>
+               <Label text="Utilisez la recherche pour trouver rapidement un utilisateur" textFill="#8F9BB3" wrapText="true">
+                  <font>
+                     <Font size="11.0" />
+                  </font>
+               </Label>
+            </VBox>
+         </children>
+      </VBox>
+   </left>
+   
+   <!-- Center Content -->
+   <center>
+      <VBox spacing="20.0" styleClass="dashboard-content">
+         <padding>
+            <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+         </padding>
+         <children>
+            <!-- Header Section -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+               <children>
+                  <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                     <Label fx:id="titleLabel" text="Gestion des Utilisateurs" textFill="#1A1F36">
+                        <font>
+                           <Font name="System Bold" size="24.0" />
+                        </font>
+                     </Label>
+                     <Label text="Gérez et organisez vos utilisateurs" textFill="#8F9BB3">
+                        <font>
+                           <Font size="13.0" />
+                        </font>
+                     </Label>
+                  </VBox>
+                  <Button fx:id="btnAjouter" mnemonicParsing="false" onAction="#handleAjouter" styleClass="add-button" text="+ Ajouter">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+            
+            <!-- Search Bar -->
+            <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="search-bar">
+               <children>
+                  <Label text="🔍" textFill="#8F9BB3">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="searchField" promptText="Rechercher par nom, prénom ou email..." styleClass="login-text-field" HBox.hgrow="ALWAYS">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </TextField>
+                  <Button fx:id="btnSearch" mnemonicParsing="false" onAction="#handleSearch" styleClass="search-button" text="Rechercher">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+            
+            <!-- Cards Container -->
+            <ScrollPane fitToWidth="true" prefHeight="500.0" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
+               <content>
+                  <VBox fx:id="cardsContainer" spacing="15.0">
+                     <padding>
+                        <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </VBox>
+               </content>
+            </ScrollPane>
+         </children>
+      </VBox>
+   </center>
+</BorderPane>
