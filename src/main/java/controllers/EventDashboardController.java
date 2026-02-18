@@ -125,11 +125,11 @@ public class EventDashboardController {
             }
         });
 
+        updateCounters();
         archiveBtn.setOnAction(ev -> {
             service.archiver(e.getId());
-            events.remove(e);
+            events = service.getAll();
             displayEvents(events);
-            updateCounters();
         });
 
         HBox actions = new HBox(10, modifyBtn, archiveBtn);

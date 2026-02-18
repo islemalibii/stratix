@@ -13,6 +13,7 @@ public class Evenement {
     private EventType type_event;
     private EventStatus statut;
     private List<Ressources> ressources = new ArrayList<>();
+    private boolean isArchived;
 
     public Evenement() {}
 
@@ -90,6 +91,12 @@ public class Evenement {
         this.ressources = ressources;
     }
 
+    public boolean isArchived() {
+        return isArchived;
+    }
+    public void setArchived(boolean archived) {
+        isArchived = archived;
+    }
     @Override
     public String toString() {
         return "evenement{" +
