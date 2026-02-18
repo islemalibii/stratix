@@ -218,10 +218,6 @@ public class DashboardAdminController {
         roleLabel.setPadding(new Insets(6, 16, 6, 16));
         roleLabel.getStyleClass().addAll("role-badge", getRoleBadgeClass(user.getRole()));
 
-        // ID Label
-        Label idLabel = new Label("ID: " + user.getId());
-        idLabel.getStyleClass().add("card-id-label");
-
         // Actions
         HBox actionsBox = new HBox(10);
         actionsBox.setAlignment(Pos.CENTER_RIGHT);
@@ -239,7 +235,7 @@ public class DashboardAdminController {
         // Assemble card
         VBox rightBox = new VBox(10);
         rightBox.setAlignment(Pos.TOP_RIGHT);
-        rightBox.getChildren().addAll(roleLabel, idLabel);
+        rightBox.getChildren().add(roleLabel);
 
         card.getChildren().addAll(infoBox, rightBox, actionsBox);
 
