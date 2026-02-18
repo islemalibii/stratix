@@ -98,7 +98,7 @@
     -fx-border-radius: 8;
 }
 
-.login-input-container:focused-within {
+.login-input-container:focused {
     -fx-border-color: #0891D1;
     -fx-border-width: 2;
 }
@@ -368,8 +368,8 @@
 }
 
 .dashboard-top-bar {
-    -fx-background-color: white;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 12, 0, 0, 2);
+    -fx-background-color: linear-gradient(to right, #1A5F7A, #159895);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 12, 0, 0, 2);
 }
 
 .dashboard-sidebar {
@@ -440,13 +440,30 @@
 }
 
 .button-danger {
-    -fx-background-color: #EF4444;
-    -fx-effect: dropshadow(gaussian, rgba(239,68,68,0.25), 8, 0, 0, 2);
+    -fx-background-color: #EF5350;
+    -fx-effect: dropshadow(gaussian, rgba(239,83,80,0.25), 8, 0, 0, 2);
 }
 
 .button-danger:hover {
-    -fx-background-color: #DC2626;
-    -fx-effect: dropshadow(gaussian, rgba(239,68,68,0.35), 10, 0, 0, 3);
+    -fx-background-color: #E53935;
+    -fx-effect: dropshadow(gaussian, rgba(239,83,80,0.35), 10, 0, 0, 3);
+}
+
+.button-warning {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-padding: 10 20;
+    -fx-font-weight: bold;
+    -fx-font-size: 14;
+    -fx-effect: dropshadow(gaussian, rgba(255,152,0,0.25), 8, 0, 0, 2);
+}
+
+.button-warning:hover {
+    -fx-background-color: #FB8C00;
+    -fx-effect: dropshadow(gaussian, rgba(255,152,0,0.35), 10, 0, 0, 3);
+    -fx-translate-y: -1;
 }
 
 .button-warning {
@@ -688,8 +705,9 @@
 }
 
 .sidebar-menu-button-active {
-    -fx-background-color: #E6F2FF;
-    -fx-text-fill: #0066CC;
+    -fx-background-color: #159895;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
 }
 
 .logout-button {
@@ -707,17 +725,17 @@
 }
 
 .add-button {
-    -fx-background-color: #0066CC;
+    -fx-background-color: #159895;
     -fx-text-fill: white;
     -fx-background-radius: 10;
     -fx-cursor: hand;
     -fx-padding: 12 24;
-    -fx-effect: dropshadow(gaussian, rgba(0,102,204,0.3), 10, 0, 0, 3);
+    -fx-effect: dropshadow(gaussian, rgba(21,152,149,0.3), 10, 0, 0, 3);
 }
 
 .add-button:hover {
-    -fx-background-color: #0052A3;
-    -fx-effect: dropshadow(gaussian, rgba(0,102,204,0.4), 12, 0, 0, 4);
+    -fx-background-color: #127A78;
+    -fx-effect: dropshadow(gaussian, rgba(21,152,149,0.4), 12, 0, 0, 4);
     -fx-translate-y: -1;
 }
 
@@ -729,15 +747,15 @@
 }
 
 .search-button {
-    -fx-background-color: #E6F2FF;
-    -fx-text-fill: #0066CC;
+    -fx-background-color: #159895;
+    -fx-text-fill: white;
     -fx-background-radius: 10;
     -fx-cursor: hand;
     -fx-padding: 10 22;
 }
 
 .search-button:hover {
-    -fx-background-color: #D1E7FF;
+    -fx-background-color: #127A78;
 }
 
 .tip-box {
