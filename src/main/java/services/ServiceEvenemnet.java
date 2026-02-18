@@ -173,4 +173,35 @@ public class ServiceEvenemnet implements Services<Evenement> {
         }
         return newList;
     }
+
+    public void desarchiver(int id) {
+        try {
+            String req = "INSERT INTO evenement (id, type_event, date_event, description, statut, lieu, titre) " +
+                    "SELECT id, type_event, date_event, description, statut, lieu, titre " +
+                    "FROM archiveevent WHERE id = ?";
+            PreparedStatement ps = cnx.prepareStatement(req);
+            ps.setInt(1, id);
+            ps.executeUpdate();
+
+            String delete = "DELETE FROM archiveevent WHERE id = ?";
+            PreparedStatement psDelete = cnx.prepareStatement(delete);
+            psDelete.setInt(1, id);
+            psDelete.executeUpdate();
+
+            System.out.println("Événement restauré avec succès!!!");
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public void supprimer(int id) {
+        String sql = "DELETE FROM archiveevent WHERE id = ?";
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+            System.out.println("Événement supprimé définitivement de l'archive");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

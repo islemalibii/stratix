@@ -62,6 +62,11 @@ public class AddEventController {
             return false;
         }
 
+        if (datePicker.getValue().isBefore(LocalDate.now())) {
+            showError("La date ne peut pas être dans le passé !");
+            return false;
+        }
+
         return true;
     }
 

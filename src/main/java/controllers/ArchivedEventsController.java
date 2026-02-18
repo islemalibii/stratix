@@ -4,8 +4,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import models.Evenement;
 import services.ServiceEvenemnet;
@@ -64,7 +69,32 @@ public class ArchivedEventsController {
         lieu.setPrefWidth(150);
         lieu.getStyleClass().add("archive-text");
 
-        row.getChildren().addAll(title, description, date, type, status, lieu);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Button restoreBtn = new Button("Restaurer");
+        restoreBtn.getStyleClass().add("btn-restore");
+        restoreBtn.setOnAction(event -> {
+            service.desarchiver(e.getId()); // Appelle votre nouvelle méthode
+            loadArchivedEvents(); // Rafraîchit la liste
+        });
+
+        // Bouton Supprimer (Définitivement)
+        Button deleteBtn = new Button("Supprimer");
+        deleteBtn.getStyleClass().add("btn-delete-permanent");
+
+        deleteBtn.setOnAction(event -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Voulez-vous supprimer cet événement ?", ButtonType.YES, ButtonType.NO);
+            if (alert.showAndWait().get() == ButtonType.YES) {
+                service.supprimer(e.getId());
+                loadArchivedEvents();
+            }
+        });
+
+        HBox actionBox = new HBox(10, restoreBtn, deleteBtn);
+        actionBox.setAlignment(Pos.CENTER_RIGHT);
+
+        row.getChildren().addAll(title, description, date, type, status, lieu, spacer, actionBox);
 
         return row;
     }

@@ -22,6 +22,8 @@
         <Label prefWidth="100" text="TYPE" styleClass="table-header-label" />
         <Label prefWidth="100" text="STATUT" styleClass="table-header-label" />
         <Label prefWidth="150" text="LIEU" styleClass="table-header-label" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Label prefWidth="180" text="ACTIONS" styleClass="table-header-label" alignment="CENTER"/>
     </HBox>
 
     <ScrollPane fitToWidth="true" styleClass="scroll-pane">

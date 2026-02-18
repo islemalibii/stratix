@@ -243,3 +243,28 @@
     -fx-background-radius: 8;
     -fx-cursor: hand;
 }
+
+
+.btn-restore {
+    -fx-background-color: #10B981; /* Vert */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-restore:hover {
+    -fx-background-color: #059669;
+}
+
+.btn-delete-permanent {
+    -fx-background-color: #EF4444; /* Rouge */
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-delete-permanent:hover {
+    -fx-background-color: #DC2626;
+}
