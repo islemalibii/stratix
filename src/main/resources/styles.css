@@ -279,13 +279,13 @@
 }
 
 .signup-form-card {
-    -fx-spacing: 12;
-    -fx-max-width: 420;
-    -fx-min-width: 420;
-    -fx-pref-width: 420;
+    -fx-spacing: 10;
+    -fx-max-width: 480;
+    -fx-min-width: 480;
+    -fx-pref-width: 480;
     -fx-background-color: white;
-    -fx-background-radius: 28;
-    -fx-padding: 36 40;
+    -fx-background-radius: 20;
+    -fx-padding: 32 40;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 25, 0, 0, 5);
 }
 
@@ -721,17 +721,17 @@
 }
 
 .add-button {
-    -fx-background-color: #159895;
+    -fx-background-color: #FF5722;
     -fx-text-fill: white;
     -fx-background-radius: 10;
     -fx-cursor: hand;
     -fx-padding: 12 24;
-    -fx-effect: dropshadow(gaussian, rgba(21,152,149,0.3), 10, 0, 0, 3);
+    -fx-effect: dropshadow(gaussian, rgba(255,87,34,0.3), 10, 0, 0, 3);
 }
 
 .add-button:hover {
-    -fx-background-color: #127A78;
-    -fx-effect: dropshadow(gaussian, rgba(21,152,149,0.4), 12, 0, 0, 4);
+    -fx-background-color: #F4511E;
+    -fx-effect: dropshadow(gaussian, rgba(255,87,34,0.4), 12, 0, 0, 4);
     -fx-translate-y: -1;
 }
 

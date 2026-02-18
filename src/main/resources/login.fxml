@@ -18,7 +18,7 @@
          </padding>
          <children>
             <!-- Logo -->
-            <ImageView fitHeight="200.0" fitWidth="500.0" preserveRatio="true">
+            <ImageView fitHeight="300.0" fitWidth="600.0" preserveRatio="true">
                <image>
                   <Image url="@logo.png" />
                </image>

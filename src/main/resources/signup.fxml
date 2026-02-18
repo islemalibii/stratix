@@ -7,13 +7,22 @@
 
 <StackPane prefHeight="700.0" prefWidth="1000.0" styleClass="signup-container" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.SignupController">
    
-   <HBox prefHeight="700.0" prefWidth="1000.0">
+   <HBox prefHeight="700.0" prefWidth="1000.0" alignment="CENTER" spacing="40.0">
+      <padding>
+         <Insets left="60.0" right="60.0" />
+      </padding>
       
-      <!-- Signup Form - Centered -->
-      <VBox alignment="CENTER" prefWidth="1000.0" HBox.hgrow="ALWAYS">
-         <padding>
-            <Insets bottom="60.0" left="60.0" right="60.0" top="60.0" />
-         </padding>
+      <!-- Logo à gauche -->
+      <VBox alignment="CENTER" HBox.hgrow="NEVER">
+         <ImageView fitHeight="300.0" fitWidth="900.0" preserveRatio="true">
+            <image>
+               <Image url="@logo.png" />
+            </image>
+         </ImageView>
+      </VBox>
+      
+      <!-- Signup Form à droite -->
+      <VBox alignment="CENTER" HBox.hgrow="NEVER">
          <children>
             <VBox styleClass="signup-form-card">
                <children>
