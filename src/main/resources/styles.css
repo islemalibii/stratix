@@ -711,17 +711,17 @@
 }
 
 .logout-button {
-    -fx-background-color: #FF647C;
+    -fx-background-color: #8BC34A;
     -fx-text-fill: white;
     -fx-background-radius: 10;
     -fx-cursor: hand;
     -fx-padding: 10 18;
-    -fx-effect: dropshadow(gaussian, rgba(255,100,124,0.25), 8, 0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(139,195,74,0.25), 8, 0, 0, 2);
 }
 
 .logout-button:hover {
-    -fx-background-color: #EF4444;
-    -fx-effect: dropshadow(gaussian, rgba(255,100,124,0.35), 10, 0, 0, 3);
+    -fx-background-color: #7CB342;
+    -fx-effect: dropshadow(gaussian, rgba(139,195,74,0.35), 10, 0, 0, 3);
 }
 
 .add-button {

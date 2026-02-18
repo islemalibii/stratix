@@ -18,16 +18,11 @@
          <children>
             <!-- Logo -->
             <HBox alignment="CENTER_LEFT" spacing="12.0">
-               <ImageView fitHeight="40.0" fitWidth="40.0" preserveRatio="true">
+               <ImageView fitHeight="50.0" fitWidth="180.0" preserveRatio="true">
                   <image>
                      <Image url="@logo.png" />
                   </image>
                </ImageView>
-               <Label text="Stratix" textFill="#1A1F36">
-                  <font>
-                     <Font name="System Bold" size="20.0" />
-                  </font>
-               </Label>
             </HBox>
             
             <Region HBox.hgrow="ALWAYS" />
