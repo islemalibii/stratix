@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -28,12 +29,20 @@ public class EventDashboardController {
 
     @FXML private FlowPane eventContainer;
     @FXML private TextField searchField;
+    @FXML private ComboBox<String> filterStatusCombo;
 
     private ServiceEvenemnet service = new ServiceEvenemnet();
     private List<Evenement> events = new ArrayList<>();
 
     @FXML
     public void initialize() {
+
+        filterStatusCombo.getItems().add("Tous");
+        for (EventStatus s : EventStatus.values()) {
+            filterStatusCombo.getItems().add(s.name());
+        }
+        filterStatusCombo.setValue("Tous");
+
         events = service.getAll();
         updateCounters();
         displayEvents(events);
@@ -160,11 +169,34 @@ public class EventDashboardController {
             System.err.println(e.getMessage());
         }
     }
+
     @FXML
     private void search() {
         String query = searchField.getText();
-        List<Evenement> results = service.searchByTitle(query);
+        String statusFilter = filterStatusCombo.getValue();
+
+        List<Evenement> results = service.getAll().stream()
+                .filter(e -> e.getTitre().toLowerCase().contains(query))
+                .filter(e -> statusFilter == null || statusFilter.equals("Tous") || e.getStatut().name().equals(statusFilter))
+                .toList();
 
         displayEvents(results);
+    }
+
+
+
+    @FXML
+    private void handleFilter() {
+        String selected = filterStatusCombo.getValue();
+
+        if (selected == null || selected.equals("Tous")) {
+            events = service.getAll();
+        } else {
+            EventStatus status = EventStatus.valueOf(selected);
+            events = service.filterByStatus(status);
+        }
+
+        displayEvents(events);
+
     }
 }

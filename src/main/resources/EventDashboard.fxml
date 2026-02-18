@@ -33,8 +33,11 @@
 
     <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 0 20 0 20;">
         <TextField fx:id="searchField" onKeyReleased="#search"
-                   promptText="🔍 Rechercher par titre..."
-                   styleClass="search-field" HBox.hgrow="ALWAYS" />
+                   promptText="Rechercher par titre..." HBox.hgrow="ALWAYS" />
+
+        <ComboBox fx:id="filterStatusCombo" onAction="#handleFilter"
+                  promptText="Filtrer par Statut" prefWidth="150" />
+
         <Button fx:id="addBtn" onAction="#goToAddEvent" text="Ajouter" styleClass="btn-primary" />
         <Button fx:id="archivedBtn" onAction="#goToArchived" text="Archives" styleClass="btn-secondary" />
     </HBox>

@@ -169,5 +169,30 @@ public class ServiceEvenemnet implements Services<Evenement> {
         }
     }
 
+    public List<Evenement> filterByStatus(EventStatus status) {
+        List<Evenement> list = new ArrayList<>();
+        String req = "SELECT * FROM evenement WHERE statut = ? AND isArchived = 0";
+
+        try (PreparedStatement pst = cnx.prepareStatement(req)) {
+            pst.setString(1, status.name());
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                Evenement e = new Evenement();
+                e.setId(rs.getInt("id"));
+                e.setTitre(rs.getString("titre"));
+                e.setDescription(rs.getString("description"));
+                e.setLieu(rs.getString("lieu"));
+                e.setDate_event(rs.getDate("date_event").toLocalDate());
+                e.setType_event(EventType.valueOf(rs.getString("type_event").toLowerCase()));
+                e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
+                e.setImageUrl(rs.getString("image_url"));
+                list.add(e);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return list;
+    }
 
 }

@@ -340,3 +340,16 @@
 .btn-delete-permanent:hover {
     -fx-background-color: #ff4757;
 }
+
+.combo-box {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-border-color: #ced4da;
+    -fx-border-radius: 8;
+    -fx-padding: 2;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #2d3436;
+    -fx-padding: 5 10;
+}
