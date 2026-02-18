@@ -131,7 +131,7 @@ public class EventDashboardController {
                 controller.setEvent(e);
 
                 eventContainer.getScene().setRoot(root);
-            } catch (Exception ex) { ex.printStackTrace(); }
+            } catch (Exception ex) { ex.getMessage(); }
         });
 
         archiveBtn.setOnAction(ev -> {
@@ -170,34 +170,46 @@ public class EventDashboardController {
         }
     }
 
+    private void applyFilters() {
+        String query = searchField.getText();
+        String selected = filterStatusCombo.getValue();
+
+        List<Evenement> results;
+
+        boolean hasSearch = query != null && !query.isEmpty();
+        boolean hasFilter = selected != null && !selected.equals("Tous");
+
+        if (hasSearch && hasFilter) {
+            EventStatus status = EventStatus.valueOf(selected);
+            results = service.searchByTitle(query).stream()
+                    .filter(e -> e.getStatut() == status)
+                    .toList();
+        }
+        else if (hasSearch) {
+            results = service.searchByTitle(query);
+        }
+
+        else if (hasFilter) {
+            EventStatus status = EventStatus.valueOf(selected);
+            results = service.filterByStatus(status);
+        }
+        else {
+            results = service.getAll();
+        }
+        displayEvents(results);
+    }
+
+
     @FXML
     private void search() {
-        String query = searchField.getText();
-        String statusFilter = filterStatusCombo.getValue();
-
-        List<Evenement> results = service.getAll().stream()
-                .filter(e -> e.getTitre().toLowerCase().contains(query))
-                .filter(e -> statusFilter == null || statusFilter.equals("Tous") || e.getStatut().name().equals(statusFilter))
-                .toList();
-
-        displayEvents(results);
+        applyFilters();
     }
 
 
 
     @FXML
     private void handleFilter() {
-        String selected = filterStatusCombo.getValue();
-
-        if (selected == null || selected.equals("Tous")) {
-            events = service.getAll();
-        } else {
-            EventStatus status = EventStatus.valueOf(selected);
-            events = service.filterByStatus(status);
-        }
-
-        displayEvents(events);
-
+        applyFilters();
     }
 
     //temporaryyyy
@@ -210,7 +222,6 @@ public class EventDashboardController {
 
         } catch (IOException e) {
             System.err.println(e.getMessage());
-            e.printStackTrace();
         }
     }
 }

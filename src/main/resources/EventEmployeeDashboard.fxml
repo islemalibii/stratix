@@ -18,40 +18,17 @@
 
         <Label text="Catalogue des Événements" styleClass="heading-medium"/>
 
-        <HBox alignment="CENTER" spacing="20">
-            <VBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" styleClass="stat-card">
-                <Label text="Total Événements" styleClass="stat-label" />
-                <Label fx:id="totalLabel" text="0" styleClass="stat-value" />
-            </VBox>
-
-            <VBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" styleClass="stat-card">
-                <Label text="Planifiés" styleClass="stat-label, stat-planned" />
-                <Label fx:id="plannedLabel" text="0" styleClass="stat-value, stat-planned" />
-            </VBox>
-
-            <VBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" styleClass="stat-card">
-                <Label text="Terminés" styleClass="stat-label, stat-finished" />
-                <Label fx:id="finishedLabel" text="0" styleClass="stat-value, stat-finished" />
-            </VBox>
-
-            <VBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" styleClass="stat-card">
-                <Label text="Annulés" styleClass="stat-label, stat-cancelled" />
-                <Label fx:id="cancelledLabel" text="0" styleClass="stat-value, stat-cancelled" />
-            </VBox>
-        </HBox>
-
-        <HBox alignment="CENTER_LEFT" spacing="15" styleClass="action-bar">
+        <HBox alignment="CENTER_LEFT" spacing="15" >
             <TextField fx:id="searchField" onKeyReleased="#search"
                        promptText="Rechercher un événement..."
-                       HBox.hgrow="ALWAYS" styleClass="search-field" />
+                       HBox.hgrow="ALWAYS" />
 
-            <ComboBox fx:id="filterStatusCombo" onAction="#handleFilter"
-                      promptText="Filtrer par Statut" prefWidth="200" styleClass="filter-combo" />
+
 
             <Button onAction="#switchToAdminView" text="Vue Employé (Test)" styleClass="btn-ghost" />
         </HBox>
 
-        <ScrollPane fitToWidth="true" styleClass="custom-scroll-pane" VBox.vgrow="ALWAYS">
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
             <content>
                 <FlowPane fx:id="eventContainer" hgap="25.0" vgap="25.0">
                     <padding>

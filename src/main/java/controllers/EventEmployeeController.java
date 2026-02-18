@@ -5,16 +5,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.Evenement;
-import models.enums.EventStatus;
 import services.ServiceEvenemnet;
 
 import java.io.IOException;
@@ -23,46 +21,19 @@ import java.util.List;
 
 public class EventEmployeeController {
 
-    @FXML private Label totalLabel;
-    @FXML private Label plannedLabel;
-    @FXML private Label finishedLabel;
-    @FXML private Label cancelledLabel;
 
     @FXML private FlowPane eventContainer;
     @FXML private TextField searchField;
-    @FXML private ComboBox<String> filterStatusCombo;
 
     private ServiceEvenemnet service = new ServiceEvenemnet();
     private List<Evenement> events = new ArrayList<>();
 
     @FXML
     public void initialize() {
-        filterStatusCombo.getItems().add("Tous");
-        for (EventStatus s : EventStatus.values()) {
-            filterStatusCombo.getItems().add(s.name());
-        }
-        filterStatusCombo.setValue("Tous");
 
-        events = service.getAll();
-        updateCounters(); // Même méthode
+
+        events = service.getPlanifierOnly();
         displayEvents(events);
-    }
-
-    private void updateCounters() {
-        long planned = events.stream()
-                .filter(e -> e.getStatut() == EventStatus.planifier)
-                .count();
-        long finished = events.stream()
-                .filter(e -> e.getStatut() == EventStatus.terminer)
-                .count();
-        long cancelled = events.stream()
-                .filter(e -> e.getStatut() == EventStatus.annuler)
-                .count();
-
-        totalLabel.setText(String.valueOf(events.size()));
-        plannedLabel.setText(String.valueOf(planned));
-        if (finishedLabel != null) finishedLabel.setText(String.valueOf(finished));
-        if (cancelledLabel != null) cancelledLabel.setText(String.valueOf(cancelled));
     }
 
     private void displayEvents(List<Evenement> list) {
@@ -110,11 +81,11 @@ public class EventEmployeeController {
         Label dateLieu = new Label(e.getDate_event() + " | " + e.getLieu());
         dateLieu.getStyleClass().add("card-details");
 
-        Label status = new Label(e.getStatut().name().toUpperCase());
-        status.getStyleClass().addAll("status-badge", "status-" + e.getStatut().name().toLowerCase());
+        Button participeBtn = new Button("Participer");
+        participeBtn.getStyleClass().add("btn-modify-card");
 
 
-        infoBox.getChildren().addAll(title, desc, dateLieu, status);
+        infoBox.getChildren().addAll(title, desc, dateLieu, participeBtn);
         card.getChildren().addAll(imageView, infoBox);
 
         return card;
@@ -122,29 +93,11 @@ public class EventEmployeeController {
 
     @FXML
     private void search() {
-        String query = searchField.getText().toLowerCase();
-        String statusFilter = filterStatusCombo.getValue();
-
-        List<Evenement> results = service.getAll().stream()
-                .filter(e -> e.getTitre().toLowerCase().contains(query))
-                .filter(e -> statusFilter == null || statusFilter.equals("Tous") || e.getStatut().name().equals(statusFilter))
-                .toList();
-
+        String query = searchField.getText();
+        List<Evenement> results = service.searchPlanifierByTitle(query);
         displayEvents(results);
     }
 
-    @FXML
-    private void handleFilter() {
-        String selected = filterStatusCombo.getValue();
-
-        if (selected == null || selected.equals("Tous")) {
-            events = service.getAll();
-        } else {
-            EventStatus status = EventStatus.valueOf(selected);
-            events = service.filterByStatus(status);
-        }
-        displayEvents(events);
-    }
 
 
     //temporaryyy

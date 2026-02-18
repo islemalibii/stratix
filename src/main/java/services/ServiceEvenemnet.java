@@ -16,8 +16,10 @@ public class ServiceEvenemnet implements Services<Evenement> {
     public ServiceEvenemnet() {
         cnx = MyDataBase.getInstance().getCnx();
     }
+    //lladmin
     @Override
     public void add(Evenement evenement) {
+
         String req = "INSERT INTO evenement(type_event, date_event, description, statut, lieu, titre, image_url) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)"; // l values ywalou treated as data mch sql ynajm yexecuta : protection contre l sql injection
 
@@ -38,7 +40,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
             System.out.println(e.getMessage());
         }
     }
-
+    //lladmin
     @Override
     public void update(Evenement evenement) {
 
@@ -61,6 +63,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
             System.out.println(e.getMessage());
         }
     }
+    //lladmin
     public void deleteById(int id) {
         String sql = "DELETE FROM evenement WHERE id = ?";
         try (PreparedStatement ps = cnx.prepareStatement(sql)) {
@@ -71,16 +74,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
         }
     }
 
-
-    @Override
-    public List<Evenement> getAll() {
-        return getByArchiveStatus(0);
-    }
-
-    public List<Evenement> getAllArchieved() {
-        return getByArchiveStatus(1);
-    }
-
+    //lladmin
     private List<Evenement> getByArchiveStatus(int status) {
         List<Evenement> list = new ArrayList<>();
         String req = "SELECT * FROM evenement WHERE isArchived = ?";
@@ -104,19 +98,21 @@ public class ServiceEvenemnet implements Services<Evenement> {
                 list.add(e);
             }
         } catch (SQLException ex) {
-            System.out.println("Erreur de récupération (status " + status + ") : " + ex.getMessage());
+            System.out.println(ex.getMessage());
         }
         return list;
     }
-
-    public void archiver(int id) {
-        updateArchiveStatus(id, 1);
+    @Override
+    public List<Evenement> getAll() {
+        return getByArchiveStatus(0);
     }
 
-    public void desarchiver(int id) {
-        updateArchiveStatus(id, 0);
+    public List<Evenement> getAllArchieved() {
+        return getByArchiveStatus(1);
     }
 
+
+    //lladmin
     private void updateArchiveStatus(int id, int status) {
         String req = "UPDATE evenement SET isArchived = ? WHERE id = ?";
         try (PreparedStatement pst = cnx.prepareStatement(req)) {
@@ -127,8 +123,17 @@ public class ServiceEvenemnet implements Services<Evenement> {
             System.out.println(e.getMessage());
         }
     }
+    public void archiver(int id) {
+        updateArchiveStatus(id, 1);
+    }
+
+    public void desarchiver(int id) {
+        updateArchiveStatus(id, 0);
+    }
 
 
+
+    //lladmin
     public List<Evenement> searchByTitle(String title) {
         List<Evenement> newList = new ArrayList<>();
         String req = "SELECT * FROM evenement WHERE titre LIKE ? AND isArchived = 0";
@@ -156,19 +161,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
         return newList;
     }
 
-
-
-    public void supprimer(int id) {
-        String sql = "DELETE FROM evenement WHERE id = ?";
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-            System.out.println("Événement supprimé définitivement de la base de données");
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
+    //lladmin
     public List<Evenement> filterByStatus(EventStatus status) {
         List<Evenement> list = new ArrayList<>();
         String req = "SELECT * FROM evenement WHERE statut = ? AND isArchived = 0";
@@ -187,6 +180,66 @@ public class ServiceEvenemnet implements Services<Evenement> {
                 e.setType_event(EventType.valueOf(rs.getString("type_event").toLowerCase()));
                 e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
                 e.setImageUrl(rs.getString("image_url"));
+
+                list.add(e);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return list;
+    }
+
+    //llemployee
+    public List<Evenement> getPlanifierOnly() {
+        List<Evenement> list = new ArrayList<>();
+        String req = "SELECT * FROM evenement WHERE statut = ? AND isArchived = 0";
+
+        try (PreparedStatement ps = cnx.prepareStatement(req)) {
+
+            ps.setString(1, EventStatus.planifier.name());
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Evenement e = new Evenement();
+                e.setId(rs.getInt("id"));
+                e.setTitre(rs.getString("titre"));
+                e.setDescription(rs.getString("description"));
+                e.setLieu(rs.getString("lieu"));
+                e.setDate_event(rs.getDate("date_event").toLocalDate());
+                e.setImageUrl(rs.getString("image_url"));
+                e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
+
+                list.add(e);
+            }
+
+        } catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+        }
+        return list;
+    }
+
+    //llemplyee
+    public List<Evenement> searchPlanifierByTitle(String title) {
+        List<Evenement> list = new ArrayList<>();
+
+        String req = "SELECT * FROM evenement " + "WHERE statut = ? AND isArchived = 0 AND titre LIKE ?";
+
+        try (PreparedStatement ps = cnx.prepareStatement(req)) {
+
+            ps.setString(1, EventStatus.planifier.name()); // PLANIFIER
+            ps.setString(2, "%" + title + "%");
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Evenement e = new Evenement();
+                e.setId(rs.getInt("id"));
+                e.setTitre(rs.getString("titre"));
+                e.setDescription(rs.getString("description"));
+                e.setLieu(rs.getString("lieu"));
+                e.setDate_event(rs.getDate("date_event").toLocalDate());
+                e.setImageUrl(rs.getString("image_url"));
+                e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
+
                 list.add(e);
             }
         } catch (SQLException ex) {
