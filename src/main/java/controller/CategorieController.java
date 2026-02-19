@@ -54,6 +54,7 @@ public class CategorieController implements Initializable {
             row.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0; -fx-alignment: center-left;");
             row.setPrefHeight(50);
 
+            // PLUS DE COLONNE ID !!!
 
             Label nom = new Label(c.getNom());
             nom.setStyle("-fx-font-weight: bold; -fx-min-width: 200; -fx-text-fill: #2c3e50;");
