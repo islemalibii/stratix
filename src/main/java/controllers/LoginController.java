@@ -89,11 +89,8 @@ public class LoginController {
             } else {
                 showError("Email ou mot de passe incorrect");
             }
-        } catch (SQLException e) {
-            showError("Erreur de connexion: Impossible de se connecter à la base de données");
-            e.printStackTrace();
         } catch (Exception e) {
-            showError("Erreur de connexion: " + e.getMessage());
+            showError("Erreur de connexion");
             e.printStackTrace();
         }
     }

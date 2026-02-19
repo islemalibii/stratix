@@ -174,7 +174,7 @@ public class SignupController {
             // Retour au login
             handleBackToLogin(event);
         } catch (Exception e) {
-            showError("Erreur lors de l'inscription: " + e.getMessage());
+            showError("Erreur lors de l'inscription");
             e.printStackTrace();
         }
     }
