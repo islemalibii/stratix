@@ -26,7 +26,6 @@ public class ModifierProjetController {
             txtDescription.setText(projetEnModification.getDescription());
             txtBudget.setText(String.valueOf(projetEnModification.getBudget()));
 
-            // Correction ici : Utilisation du TextField txtProgression défini dans ton FXML
             txtProgression.setText(String.valueOf(projetEnModification.getProgression()));
 
             comboStatut.setValue(projetEnModification.getStatut());
@@ -47,7 +46,6 @@ public class ModifierProjetController {
             projetEnModification.setDescription(txtDescription.getText());
             projetEnModification.setBudget(Double.parseDouble(txtBudget.getText()));
 
-            // On récupère la valeur du TextField
             projetEnModification.setProgression(Integer.parseInt(txtProgression.getText()));
             projetEnModification.setStatut(comboStatut.getValue());
 
@@ -80,7 +78,6 @@ public class ModifierProjetController {
             return false;
         }
 
-        // NOUVELLE CONDITION : Interdire une date de début dans le passé
         if (debut.isBefore(aujourdhui)) {
             afficherAlerte(Alert.AlertType.WARNING, "Dates invalides", "La date de début ne peut pas être dans le passé.");
             return false;
@@ -96,7 +93,7 @@ public class ModifierProjetController {
     private void afficherAlerte(Alert.AlertType type, String titre, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(titre);
-        alert.setHeaderText(null); // Optionnel : mettez une String si vous voulez un sous-titre
+        alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }

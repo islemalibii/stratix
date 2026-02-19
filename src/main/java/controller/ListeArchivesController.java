@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ListeArchivesController {
 
-    @FXML private VBox containerArchives; // Le conteneur dans ton ScrollPane (ListeArchives.fxml)
+    @FXML private VBox containerArchives;
     @FXML private Label lblNbArchives;
 
     private ProjetService projetService;
@@ -25,16 +25,12 @@ public class ListeArchivesController {
         chargerArchives();
     }
 
-    /**
-     * Récupère les projets archivés (is_archived = 1) et les affiche
-     */
     private void chargerArchives() {
         if (containerArchives == null) return;
 
         containerArchives.getChildren().clear();
         List<Projet> archives = projetService.listerArchives();
 
-        // Mise à jour du compteur
         if (lblNbArchives != null) {
             lblNbArchives.setText(archives.size() + " projet(s) archivé(s)");
         }
@@ -51,12 +47,8 @@ public class ListeArchivesController {
         }
     }
 
-    /**
-     * Crée le design d'une carte pour un projet archivé
-     */
     private HBox creerCardArchive(Projet p) {
         HBox card = new HBox(15);
-        // Design spécifique pour l'archive (un peu plus grisé)
         card.setStyle("-fx-background-color: #f7fafc; -fx-padding: 15; -fx-border-color: #cbd5e0; " +
                 "-fx-border-radius: 8; -fx-background-radius: 8; -fx-alignment: CENTER_LEFT;");
 
@@ -70,16 +62,13 @@ public class ListeArchivesController {
         info.getChildren().addAll(nom, details);
         HBox.setHgrow(info, Priority.ALWAYS);
 
-        // --- Bouton de restauration ---
         Button btnRestaurer = new Button("Désarchiver");
         btnRestaurer.setStyle("-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
         btnRestaurer.setOnAction(e -> {
-            // On remet is_archived à 0
             projetService.desarchiverUnProjet(p.getId());
             chargerArchives(); // On rafraîchit la liste des archives
         });
 
-        // --- Bouton de suppression définitive (Optionnel) ---
         Button btnSupp = new Button("Supprimer");
         btnSupp.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-cursor: hand;");
         btnSupp.setOnAction(e -> {

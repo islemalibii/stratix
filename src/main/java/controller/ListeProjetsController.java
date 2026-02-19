@@ -22,6 +22,7 @@ public class ListeProjetsController {
     @FXML private Label lblTotal, lblEnCours, lblTermine, lblAnnule, lblPlanifie;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> comboFiltre;
+    @FXML private VBox projetsContainer;
 
     private ProjetService projetService;
     private List<Projet> listeCompleteProjets;
@@ -30,7 +31,6 @@ public class ListeProjetsController {
     public void initialize() {
         projetService = new ProjetService();
 
-        // Initialisation du ComboBox de filtrage
         if (comboFiltre != null) {
             comboFiltre.setItems(FXCollections.observableArrayList(
                     "Tous les projets", "Planifié", "En cours", "Terminé", "Annulé"
@@ -39,7 +39,6 @@ public class ListeProjetsController {
             comboFiltre.setOnAction(e -> filtrerEtAfficher());
         }
 
-        // Recherche dynamique
         if (searchField != null) {
             searchField.textProperty().addListener((obs, oldVal, newVal) -> filtrerEtAfficher());
         }
@@ -48,7 +47,6 @@ public class ListeProjetsController {
     }
 
     public void rafraichirDonnees() {
-        // Le service doit retourner uniquement is_archived = 0
         listeCompleteProjets = projetService.listerTousLesProjets();
         updateStatistics(listeCompleteProjets);
         filtrerEtAfficher();
@@ -74,7 +72,6 @@ public class ListeProjetsController {
         String statut = (comboFiltre != null) ? comboFiltre.getValue() : "Tous les projets";
         String recherche = (searchField != null) ? searchField.getText() : "";
 
-        // APPEL AU SERVICE
         List<Projet> filtree = projetService.rechercherProjets(recherche, statut);
 
         for (Projet p : filtree) {
@@ -86,7 +83,6 @@ public class ListeProjetsController {
         HBox card = new HBox(15);
         card.getStyleClass().add("project-card");
 
-        // Application de la couleur de bordure selon le statut (via ton CSS)
         switch (p.getStatut()) {
             case "Terminé" -> card.getStyleClass().add("card-termine");
             case "En cours" -> card.getStyleClass().add("card-en-cours");
@@ -108,7 +104,6 @@ public class ListeProjetsController {
         info.getChildren().addAll(nom, desc, footer);
         HBox.setHgrow(info, Priority.ALWAYS);
 
-        // Boutons
         Button btnMod = new Button("Modifier");
         btnMod.getStyleClass().add("btn-secondary");
         btnMod.setOnAction(e -> ouvrirFenetreModification(p));
@@ -140,7 +135,6 @@ public class ListeProjetsController {
 
     private void ouvrirFenetreModification(Projet p) {
         try {
-            // Utilisation du chemin relatif à la racine de resources
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ModifierProjet.fxml"));
             Parent root = loader.load();
 
@@ -182,4 +176,21 @@ public class ListeProjetsController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    @FXML
+    private void allerFrontOffice() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FrontOffice.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) containerProjets.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Front Office");
+
+        } catch (IOException e) {
+            afficherErreur("Erreur", "Impossible d'ouvrir le Front Office");
+            e.printStackTrace();
+        }
+    }
+
 }

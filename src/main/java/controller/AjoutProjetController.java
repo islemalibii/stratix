@@ -32,7 +32,6 @@ public class AjoutProjetController {
             Date dateFin = java.sql.Date.valueOf(dpDateFin.getValue());
             double budget = Double.parseDouble(tfBudget.getText());
 
-            // Correction ici : ajout du paramètre 'false' pour isArchived
             Projet p = new Projet(0, tfNom.getText(), taDescription.getText(),
                     dateDebut, dateFin, budget, "Planifié", 0, false);
 
@@ -55,7 +54,6 @@ public class AjoutProjetController {
             return true;
         }
 
-        // NOUVELLE CONDITION : Date de début >= aujourd'hui
         if (debut.isBefore(aujourdhui)) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "La date de début ne peut pas être antérieure à aujourd'hui.");
             return true;
