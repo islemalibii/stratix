@@ -54,9 +54,6 @@ public class CategorieController implements Initializable {
             row.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0; -fx-alignment: center-left;");
             row.setPrefHeight(50);
 
-            Label id = new Label(String.valueOf(c.getId()));
-            id.setStyle("-fx-font-weight: bold; -fx-min-width: 50; -fx-text-fill: #7f8c8d;");
-            id.setPrefWidth(50);
 
             Label nom = new Label(c.getNom());
             nom.setStyle("-fx-font-weight: bold; -fx-min-width: 200; -fx-text-fill: #2c3e50;");
@@ -86,7 +83,7 @@ public class CategorieController implements Initializable {
 
             actions.getChildren().addAll(btnModifier, btnSupprimer);
 
-            row.getChildren().addAll(id, nom, description, spacer, actions);
+            row.getChildren().addAll(nom, description, spacer, actions);
             categoriesContainer.getChildren().add(row);
         }
     }
