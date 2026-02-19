@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TabPane tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+
+    <Tab text="Services">
+        <fx:include source="service-tab.fxml"/>
+    </Tab>
+
+    <Tab text="Catégories">
+        <fx:include source="categorie-tab.fxml"/>
+    </Tab>
+
+</TabPane>
