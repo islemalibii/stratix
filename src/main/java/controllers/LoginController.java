@@ -9,8 +9,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import models.Utilisateur;
+import utils.SessionManager;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 public class LoginController {
@@ -78,6 +80,8 @@ public class LoginController {
             if (user != null) {
                 // Connexion réussie
                 if (user.getRole().name().equals("ADMIN")) {
+                    // Sauvegarder la session
+                    SessionManager.getInstance().saveSession(user.getId(), user.getEmail(), user.getRole().name());
                     openDashboard(user);
                 } else {
                     showError("Accès réservé aux administrateurs");
@@ -85,6 +89,9 @@ public class LoginController {
             } else {
                 showError("Email ou mot de passe incorrect");
             }
+        } catch (SQLException e) {
+            showError("Erreur de connexion: Impossible de se connecter à la base de données");
+            e.printStackTrace();
         } catch (Exception e) {
             showError("Erreur de connexion: " + e.getMessage());
             e.printStackTrace();

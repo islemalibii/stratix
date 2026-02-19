@@ -15,6 +15,9 @@ public class UtilisateurService {
 
     private UtilisateurService() {
         connection = MyDataBase.getInstance().getConnection();
+        if (connection == null) {
+            System.err.println("ATTENTION: Connexion à la base de données non disponible");
+        }
     }
 
     public static UtilisateurService getInstance() {
@@ -26,6 +29,10 @@ public class UtilisateurService {
 
     // Ajouter un utilisateur
     public void ajouter(Utilisateur utilisateur) throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Connexion à la base de données non disponible");
+        }
+        
         String query = "INSERT INTO utilisateur (nom, prenom, email, tel, cin, password, role, date_ajout, " +
                       "department, poste, date_embauche, competences, salaire) " +
                       "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -58,6 +65,10 @@ public class UtilisateurService {
 
     // Récupérer tous les utilisateurs
     public List<Utilisateur> getAll() throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Connexion à la base de données non disponible");
+        }
+        
         List<Utilisateur> utilisateurs = new ArrayList<>();
         String query = "SELECT * FROM utilisateur";
         
@@ -89,6 +100,10 @@ public class UtilisateurService {
 
     // Récupérer par ID
     public Utilisateur getById(int id) throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Connexion à la base de données non disponible");
+        }
+        
         String query = "SELECT * FROM utilisateur WHERE id = ?";
         PreparedStatement ps = connection.prepareStatement(query);
         ps.setInt(1, id);

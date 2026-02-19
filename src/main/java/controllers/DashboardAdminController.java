@@ -13,6 +13,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import models.*;
+import utils.SessionManager;
 
 import java.io.IOException;
 import java.util.List;
@@ -111,6 +112,9 @@ public class DashboardAdminController {
 
     @FXML
     void handleLogout(ActionEvent event) {
+        // Supprimer la session
+        SessionManager.getInstance().logout();
+        
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
             Stage stage = (Stage) logoutButton.getScene().getWindow();

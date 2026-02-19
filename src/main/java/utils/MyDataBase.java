@@ -16,13 +16,13 @@ public class MyDataBase {
     private MyDataBase() {
         try {
             this.connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-
             System.out.println("Connected to database successfully");
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            throw new RuntimeException(e);
+            System.err.println("Erreur de connexion à la base de données: " + e.getMessage());
+            System.err.println("Vérifiez que MySQL est démarré et que la base 'stratix' existe.");
+            // Ne pas lancer d'exception, juste logger l'erreur
+            this.connection = null;
         }
-
     }
 
     public static MyDataBase getInstance() {
