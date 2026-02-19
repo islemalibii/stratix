@@ -34,6 +34,27 @@ public class LoginController {
 
     public void initialize() {
         utilisateurService = UtilisateurService.getInstance();
+        
+        // Contrôle de saisie pour l'email
+        emailField.textProperty().addListener((observable, oldValue, newValue) -> {
+            errorLabel.setVisible(false);
+        });
+        
+        // Validation email au focus perdu
+        emailField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue && !emailField.getText().isEmpty()) {
+                if (!emailField.getText().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+                    emailField.setStyle("-fx-border-color: #EF4444; -fx-border-width: 2;");
+                } else {
+                    emailField.setStyle("");
+                }
+            }
+        });
+        
+        // Masquer l'erreur quand on tape le mot de passe
+        passwordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            errorLabel.setVisible(false);
+        });
     }
 
     @FXML

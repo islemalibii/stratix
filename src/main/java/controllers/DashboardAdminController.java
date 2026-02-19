@@ -469,6 +469,62 @@ public class DashboardAdminController {
         PasswordField passwordField = new PasswordField();
         if (user != null) passwordField.setText(user.getPassword());
 
+        // Contrôles de saisie pour nom (lettres uniquement)
+        nomField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("[a-zA-ZÀ-ÿ\\s]*")) {
+                nomField.setText(oldValue);
+            }
+        });
+
+        // Contrôles de saisie pour prénom (lettres uniquement)
+        prenomField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("[a-zA-ZÀ-ÿ\\s]*")) {
+                prenomField.setText(oldValue);
+            }
+        });
+
+        // Validation email
+        emailField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue && !emailField.getText().isEmpty()) {
+                if (!emailField.getText().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+                    emailField.setStyle("-fx-border-color: #EF4444; -fx-border-width: 2;");
+                } else {
+                    emailField.setStyle("");
+                }
+            }
+        });
+
+        // Contrôle téléphone (chiffres et + uniquement, max 12)
+        telField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("[0-9+\\s]*")) {
+                telField.setText(oldValue);
+            }
+            if (newValue.length() > 12) {
+                telField.setText(oldValue);
+            }
+        });
+
+        // Contrôle CIN (8 chiffres uniquement)
+        cinField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                cinField.setText(oldValue);
+            }
+            if (newValue.length() > 8) {
+                cinField.setText(oldValue);
+            }
+        });
+
+        // Validation mot de passe (minimum 6 caractères)
+        passwordField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue && !passwordField.getText().isEmpty()) {
+                if (passwordField.getText().length() < 6) {
+                    passwordField.setStyle("-fx-border-color: #EF4444; -fx-border-width: 2;");
+                } else {
+                    passwordField.setStyle("-fx-border-color: #10B981; -fx-border-width: 2;");
+                }
+            }
+        });
+
         // Role
         ComboBox<Role> roleCombo = new ComboBox<>();
         roleCombo.getItems().addAll(Role.values());
@@ -486,6 +542,13 @@ public class DashboardAdminController {
         
         Label competencesLabel = new Label("Compétences:");
         TextField competencesField = new TextField(user != null ? user.getCompetences() : "");
+
+        // Contrôle salaire (chiffres et point décimal uniquement)
+        salaireField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*\\.?\\d*")) {
+                salaireField.setText(oldValue);
+            }
+        });
 
         // Ajouter les champs de base
         int row = 0;
