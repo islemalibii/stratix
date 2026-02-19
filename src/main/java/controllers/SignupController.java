@@ -49,6 +49,75 @@ public class SignupController {
 
     public void initialize() {
         utilisateurService = UtilisateurService.getInstance();
+        
+        // Contrôle de saisie pour le nom (lettres uniquement)
+        nomField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("[a-zA-ZÀ-ÿ\\s]*")) {
+                nomField.setText(oldValue);
+            }
+        });
+        
+        // Contrôle de saisie pour le prénom (lettres uniquement)
+        prenomField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("[a-zA-ZÀ-ÿ\\s]*")) {
+                prenomField.setText(oldValue);
+            }
+        });
+        
+        // Contrôle de saisie pour l'email (format email)
+        emailField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue && !emailField.getText().isEmpty()) {
+                if (!emailField.getText().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+                    emailField.setStyle("-fx-border-color: #EF4444; -fx-border-width: 2;");
+                } else {
+                    emailField.setStyle("");
+                }
+            }
+        });
+        
+        // Contrôle de saisie pour le téléphone (chiffres et + uniquement, max 12 caractères)
+        telField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("[0-9+\\s]*")) {
+                telField.setText(oldValue);
+            }
+            if (newValue.length() > 12) {
+                telField.setText(oldValue);
+            }
+        });
+        
+        // Contrôle de saisie pour le CIN (8 chiffres uniquement)
+        cinField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                cinField.setText(oldValue);
+            }
+            if (newValue.length() > 8) {
+                cinField.setText(oldValue);
+            }
+        });
+        
+        // Contrôle de saisie pour la confirmation du mot de passe
+        confirmPasswordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isEmpty() && !passwordField.getText().isEmpty()) {
+                if (!newValue.equals(passwordField.getText())) {
+                    confirmPasswordField.setStyle("-fx-border-color: #EF4444; -fx-border-width: 2;");
+                } else {
+                    confirmPasswordField.setStyle("-fx-border-color: #10B981; -fx-border-width: 2;");
+                }
+            } else {
+                confirmPasswordField.setStyle("");
+            }
+        });
+        
+        // Validation du mot de passe (minimum 6 caractères)
+        passwordField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue && !passwordField.getText().isEmpty()) {
+                if (passwordField.getText().length() < 6) {
+                    passwordField.setStyle("-fx-border-color: #EF4444; -fx-border-width: 2;");
+                } else {
+                    passwordField.setStyle("-fx-border-color: #10B981; -fx-border-width: 2;");
+                }
+            }
+        });
     }
 
     @FXML
