@@ -131,7 +131,8 @@ public class DashboardAdminController {
             currentData = utilisateurService.getAll();
             displayCards(currentData);
         } catch (Exception e) {
-            showAlert("Erreur", "Erreur lors du chargement: " + e.getMessage());
+            showAlert("Erreur", "Impossible de charger les utilisateurs");
+            e.printStackTrace();
         }
     }
 
@@ -140,7 +141,8 @@ public class DashboardAdminController {
             currentData = utilisateurService.getByRole(Role.EMPLOYE);
             displayCards(currentData);
         } catch (Exception e) {
-            showAlert("Erreur", "Erreur lors du chargement: " + e.getMessage());
+            showAlert("Erreur", "Impossible de charger les employés");
+            e.printStackTrace();
         }
     }
 
@@ -149,7 +151,8 @@ public class DashboardAdminController {
             currentData = utilisateurService.getByRole(Role.ADMIN);
             displayCards(currentData);
         } catch (Exception e) {
-            showAlert("Erreur", "Erreur lors du chargement: " + e.getMessage());
+            showAlert("Erreur", "Impossible de charger les administrateurs");
+            e.printStackTrace();
         }
     }
 
@@ -158,7 +161,8 @@ public class DashboardAdminController {
             currentData = utilisateurService.getByRole(Role.CEO);
             displayCards(currentData);
         } catch (Exception e) {
-            showAlert("Erreur", "Erreur lors du chargement: " + e.getMessage());
+            showAlert("Erreur", "Impossible de charger les CEOs");
+            e.printStackTrace();
         }
     }
 
@@ -171,7 +175,8 @@ public class DashboardAdminController {
             currentData = allResponsables;
             displayCards(currentData);
         } catch (Exception e) {
-            showAlert("Erreur", "Erreur lors du chargement: " + e.getMessage());
+            showAlert("Erreur", "Impossible de charger les responsables");
+            e.printStackTrace();
         }
     }
 
@@ -380,7 +385,8 @@ public class DashboardAdminController {
                 refreshCurrentView();
                 showAlert("Succès", "Utilisateur modifié avec succès");
             } catch (Exception e) {
-                showAlert("Erreur", "Erreur lors de la modification: " + e.getMessage());
+                showAlert("Erreur", "Impossible de modifier l'utilisateur");
+                e.printStackTrace();
             }
         }
     }
@@ -399,7 +405,8 @@ public class DashboardAdminController {
                 refreshCurrentView();
                 showAlert("Succès", "Utilisateur supprimé avec succès");
             } catch (Exception e) {
-                showAlert("Erreur", "Erreur lors de la suppression: " + e.getMessage());
+                showAlert("Erreur", "Impossible de supprimer l'utilisateur");
+                e.printStackTrace();
             }
         }
     }
@@ -453,7 +460,8 @@ public class DashboardAdminController {
                 refreshCurrentView();
                 showAlert("Succès", "Utilisateur ajouté avec succès");
             } catch (Exception e) {
-                showAlert("Erreur", "Erreur lors de l'ajout: " + e.getMessage());
+                showAlert("Erreur", "Impossible d'ajouter l'utilisateur");
+                e.printStackTrace();
             }
         }
     }
