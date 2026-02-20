@@ -242,10 +242,19 @@ public class ProduitController {
         statsValeurStock.setText(String.format("Valeur stock: %.2f DT", valeurStock));
     }
 
+
     @FXML
     private void ouvrirAjoutProduit() {
         try {
+            // CORRECTION: Vérifiez le chemin exact de votre fichier FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/FormulaireProduit.fxml"));
+
+            // Alternative: si le fichier est dans le même package
+            // FXMLLoader loader = new FXMLLoader(getClass().getResource("FormulaireProduit.fxml"));
+
+            // Alternative: chemin absolu depuis la racine des ressources
+            // FXMLLoader loader = new FXMLLoader(getClass().getResource("/FormulaireProduit.fxml"));
+
             Parent root = loader.load();
 
             FormulaireProduitController controller = loader.getController();
@@ -260,6 +269,10 @@ public class ProduitController {
 
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible d'ouvrir le formulaire: " + e.getMessage());
+            e.printStackTrace(); // Pour voir le détail de l'erreur
+        } catch (NullPointerException e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur", "Fichier FXML introuvable. Vérifiez le chemin: /fxml/FormulaireProduit.fxml");
+            e.printStackTrace();
         }
     }
 
