@@ -42,3 +42,4 @@ public class Planning {
     public String getTypeShift() { return typeShift; }
     public void setTypeShift(String typeShift) { this.typeShift = typeShift; }
 }
+//
