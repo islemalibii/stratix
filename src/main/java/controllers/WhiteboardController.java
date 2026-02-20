@@ -35,8 +35,15 @@ public class WhiteboardController {
 
     @FXML
     public void initialize() {
+        System.out.println("=== Initialisation WhiteboardController ===");
+
         tacheService = new SERVICETache();
         employeService = new EmployeeService();
+
+        // Vérifier que les composants ne sont pas null
+        System.out.println("   columnAFaire: " + (columnAFaire != null ? "✅" : "❌"));
+        System.out.println("   columnEnCours: " + (columnEnCours != null ? "✅" : "❌"));
+        System.out.println("   columnTerminee: " + (columnTerminee != null ? "✅" : "❌"));
 
         // Vider les colonnes
         columnAFaire.getChildren().clear();
@@ -75,6 +82,7 @@ public class WhiteboardController {
         int countTerminee = 0;
 
         List<Tache> toutesTaches = tacheService.getAllTaches();
+        System.out.println("   Nombre de tâches chargées: " + toutesTaches.size());
 
         for (Tache t : toutesTaches) {
             VBox card = createTaskCard(t);
@@ -92,12 +100,16 @@ public class WhiteboardController {
                     columnTerminee.getChildren().add(card);
                     countTerminee++;
                     break;
+                default:
+                    System.out.println("   Statut inconnu: " + t.getStatut());
             }
         }
 
         lblCountAFaire.setText(String.valueOf(countAFaire));
         lblCountEnCours.setText(String.valueOf(countEnCours));
         lblCountTerminee.setText(String.valueOf(countTerminee));
+
+        System.out.println("   À faire: " + countAFaire + ", En cours: " + countEnCours + ", Terminées: " + countTerminee);
     }
 
     private VBox createTaskCard(Tache t) {
@@ -136,6 +148,9 @@ public class WhiteboardController {
                 prioriteColor = "#10b981";
                 prioriteEmoji = "🟢";
                 break;
+            default:
+                prioriteColor = "#6b7280";
+                prioriteEmoji = "⚪";
         }
 
         HBox prioriteBar = new HBox();
@@ -156,17 +171,23 @@ public class WhiteboardController {
         titleBox.getChildren().addAll(lblPrioriteEmoji, lblTitre);
 
         // Description (tronquée)
-        Label lblDescription = new Label(t.getDescription());
+        Label lblDescription = new Label(t.getDescription() != null ? t.getDescription() : "");
         lblDescription.setFont(Font.font("Arial", 12));
         lblDescription.setWrapText(true);
         lblDescription.setStyle("-fx-text-fill: #6b7280;");
-        if (t.getDescription().length() > 50) {
+        if (t.getDescription() != null && t.getDescription().length() > 50) {
             lblDescription.setText(t.getDescription().substring(0, 50) + "...");
         }
 
         // Informations employé
         Employe emp = employeService.getEmployeById(t.getEmployeId());
-        String empInfo = (emp != null) ? emp.getUsername() + " - " + emp.getPoste() : "Employé " + t.getEmployeId();
+        String empInfo;
+        if (emp != null) {
+            String poste = (emp.getPoste() != null && !emp.getPoste().isEmpty()) ? " - " + emp.getPoste() : "";
+            empInfo = emp.getUsername() + poste;
+        } else {
+            empInfo = "Employé " + t.getEmployeId();
+        }
 
         HBox empBox = new HBox(5);
         empBox.setAlignment(Pos.CENTER_LEFT);
@@ -233,12 +254,14 @@ public class WhiteboardController {
 
     private void editSelectedTache() {
         if (selectedTache != null) {
-            // Ouvrir la fenêtre de modification
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Modifier");
             alert.setHeaderText("Modifier la tâche: " + selectedTache.getTitre());
-            alert.setContentText("Fonctionnalité à implémenter");
+            alert.setContentText("Redirection vers l'interface de modification...");
             alert.showAndWait();
+
+            // Ici tu peux appeler TacheController avec la tâche sélectionnée
+            // Par exemple: MainController.showTachesWithTache(selectedTache);
         }
     }
 
