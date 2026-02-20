@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.WhiteboardController">
+
+    <top>
+        <VBox styleClass="header" spacing="10">
+            <padding>
+                <Insets top="20" right="30" bottom="10" left="30"/>
+            </padding>
+            <Label text="Tableau Kanban" styleClass="title"/>
+        </VBox>
+    </top>
+
+    <center>
+        <HBox spacing="20" styleClass="kanban-board">
+            <padding>
+                <Insets top="20" right="30" bottom="30" left="30"/>
+            </padding>
+
+            <!-- Colonne À FAIRE -->
+            <VBox spacing="10" styleClass="kanban-column" HBox.hgrow="ALWAYS">
+                <Label text="📌 À FAIRE" styleClass="column-title"/>
+                <Label fx:id="lblCountAFaire" text="0" styleClass="column-count"/>
+                <ScrollPane fitToWidth="true" styleClass="column-scroll">
+                    <VBox fx:id="columnAFaire" spacing="10">
+                        <!-- Les cartes seront ajoutées dynamiquement -->
+                    </VBox>
+                </ScrollPane>
+            </VBox>
+
+            <!-- Colonne EN COURS -->
+            <VBox spacing="10" styleClass="kanban-column" HBox.hgrow="ALWAYS">
+                <Label text="⚡ EN COURS" styleClass="column-title"/>
+                <Label fx:id="lblCountEnCours" text="0" styleClass="column-count"/>
+                <ScrollPane fitToWidth="true" styleClass="column-scroll">
+                    <VBox fx:id="columnEnCours" spacing="10">
+                        <!-- Les cartes seront ajoutées dynamiquement -->
+                    </VBox>
+                </ScrollPane>
+            </VBox>
+
+            <!-- Colonne TERMINÉE -->
+            <VBox spacing="10" styleClass="kanban-column" HBox.hgrow="ALWAYS">
+                <Label text="✅ TERMINÉE" styleClass="column-title"/>
+                <Label fx:id="lblCountTerminee" text="0" styleClass="column-count"/>
+                <ScrollPane fitToWidth="true" styleClass="column-scroll">
+                    <VBox fx:id="columnTerminee" spacing="10">
+                        <!-- Les cartes seront ajoutées dynamiquement -->
+                    </VBox>
+                </ScrollPane>
+            </VBox>
+        </HBox>
+    </center>
+</BorderPane>

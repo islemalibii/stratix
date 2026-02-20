@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="800" prefWidth="1200" style="-fx-background-color: #f0f4f8;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PlanningController">
+
+    <!-- Header -->
+    <VBox layoutX="0" layoutY="0" prefWidth="1200">
+        <HBox style="-fx-background-color: #1e293b; -fx-padding: 20;">
+            <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" text="GESTION DU PLANNING" />
+        </HBox>
+    </VBox>
+
+    <!-- Stats Cards -->
+    <HBox layoutX="20" layoutY="80" spacing="20">
+        <VBox prefWidth="180" style="-fx-background-color: #eff6ff; -fx-padding: 15; -fx-background-radius: 10;">
+            <Label fx:id="lblTotalEmployes" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e40af;" text="0" />
+            <Label text="Employés total" />
+        </VBox>
+
+        <VBox prefWidth="180" style="-fx-background-color: #f0fdf4; -fx-padding: 15; -fx-background-radius: 10;">
+            <Label fx:id="lblEnPoste" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #166534;" text="0" />
+            <Label text="En poste" />
+        </VBox>
+
+        <VBox prefWidth="180" style="-fx-background-color: #fef2f2; -fx-padding: 15; -fx-background-radius: 10;">
+            <Label fx:id="lblAbsents" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #991b1b;" text="0" />
+            <Label text="Absents" />
+        </VBox>
+    </HBox>
+
+    <!-- Liste des plannings (à GAUCHE) -->
+    <VBox layoutX="20" layoutY="180" prefWidth="350" spacing="10">
+        <Label style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="LISTE DES PLANNINGS" />
+        <ListView fx:id="listViewPlannings" prefHeight="450" style="-fx-background-radius: 10;" />
+    </VBox>
+
+    <!-- Formulaire (à DROITE) -->
+    <VBox layoutX="400" layoutY="180" prefWidth="450" spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+
+        <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="AJOUTER UN PLANNING" />
+
+        <!-- Employé ComboBox -->
+        <Label text="Employé :" style="-fx-font-weight: bold;" />
+        <ComboBox fx:id="cmbEmploye" promptText="Sélectionner un employé" prefHeight="35" />
+
+        <!-- Date -->
+        <Label text="Date :" style="-fx-font-weight: bold;" />
+        <DatePicker fx:id="dpDate" promptText="Sélectionner une date" prefHeight="35" />
+
+        <!-- Heures -->
+        <HBox spacing="10">
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Heure début :" style="-fx-font-weight: bold;" />
+                <TextField fx:id="txtHeureDebut" promptText="HH:MM" prefHeight="35" />
+            </VBox>
+            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                <Label text="Heure fin :" style="-fx-font-weight: bold;" />
+                <TextField fx:id="txtHeureFin" promptText="HH:MM" prefHeight="35" />
+            </VBox>
+        </HBox>
+
+        <!-- Type Shift -->
+        <Label text="Type de shift :" style="-fx-font-weight: bold;" />
+        <ComboBox fx:id="cbTypeShift" promptText="Sélectionner un type" prefHeight="35" />
+
+        <!-- Boutons -->
+        <HBox alignment="CENTER" spacing="15" layoutX="10" layoutY="350">
+            <Button onAction="#ajouterPlanning" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-padding: 8 20; -fx-background-radius: 5; -fx-font-size: 14px;" text="Ajouter" prefWidth="100" />
+            <Button onAction="#modifierPlanning" style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-padding: 8 20; -fx-background-radius: 5; -fx-font-size: 14px;" text="Modifier" prefWidth="100" />
+            <Button onAction="#supprimerPlanning" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-padding: 8 20; -fx-background-radius: 5; -fx-font-size: 14px;" text="Supprimer" prefWidth="100" />
+        </HBox>
+    </VBox>
+
+</AnchorPane>
