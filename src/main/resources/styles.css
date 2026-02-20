@@ -171,3 +171,19 @@
     -fx-padding: 12 15;
     -fx-opacity: 0.6;
 }
+.btn-icon {
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 8;
+    -fx-min-width: 35;
+    -fx-min-height: 35;
+    -fx-cursor: hand;
+}
+
+.btn-icon:hover {
+    -fx-background-color: #e2e8f0;
+}
+
+.btn-delete:hover {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: #ef4444;
+}

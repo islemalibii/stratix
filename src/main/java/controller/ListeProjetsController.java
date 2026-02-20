@@ -8,6 +8,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -19,10 +21,11 @@ import java.util.List;
 
 public class ListeProjetsController {
 
-    @FXML private FlowPane containerProjets; // Changé de VBox en FlowPane
-    @FXML private Label lblTotal, lblEnCours, lblTermine, lblAnnule, lblPlanifie;
+    @FXML private FlowPane containerProjets;
+    @FXML private Label lblTotal, lblEnCours, lblTermine, lblAnnule;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> comboFiltre;
+    @FXML private ImageView logoImageView; // Pour gérer le logo dynamiquement si besoin
 
     private ProjetService projetService;
     private List<Projet> listeCompleteProjets;
@@ -30,6 +33,16 @@ public class ListeProjetsController {
     @FXML
     public void initialize() {
         projetService = new ProjetService();
+
+        // Chargement du logo stratix.png
+        if (logoImageView != null) {
+            try {
+                Image logo = new Image(getClass().getResourceAsStream("/stratix.png"));
+                logoImageView.setImage(logo);
+            } catch (Exception e) {
+                System.out.println("Logo stratix.png introuvable dans /resources");
+            }
+        }
 
         if (comboFiltre != null) {
             comboFiltre.setItems(FXCollections.observableArrayList(
@@ -53,24 +66,15 @@ public class ListeProjetsController {
     }
 
     private void updateStatistics(List<Projet> projets) {
-        // On vérifie si l'objet injecté par FXML n'est pas null
-        if (lblTotal != null) {
-            lblTotal.setText(String.valueOf(projets.size()));
-        }
-
+        if (lblTotal != null) lblTotal.setText(String.valueOf(projets.size()));
         if (lblEnCours != null) {
-            long count = projets.stream().filter(p -> "En cours".equals(p.getStatut())).count();
-            lblEnCours.setText(String.valueOf(count));
+            lblEnCours.setText(String.valueOf(projets.stream().filter(p -> "En cours".equals(p.getStatut())).count()));
         }
-
         if (lblTermine != null) {
-            long count = projets.stream().filter(p -> "Terminé".equals(p.getStatut())).count();
-            lblTermine.setText(String.valueOf(count));
+            lblTermine.setText(String.valueOf(projets.stream().filter(p -> "Terminé".equals(p.getStatut())).count()));
         }
-
         if (lblAnnule != null) {
-            long count = projets.stream().filter(p -> "Annulé".equals(p.getStatut())).count();
-            lblAnnule.setText(String.valueOf(count));
+            lblAnnule.setText(String.valueOf(projets.stream().filter(p -> "Annulé".equals(p.getStatut())).count()));
         }
     }
 
@@ -89,55 +93,46 @@ public class ListeProjetsController {
     }
 
     private VBox creerCardProjet(Projet p) {
-        // Création de la carte verticale
         VBox card = new VBox(15);
-        card.setPrefWidth(300);
+        card.setPrefWidth(320); // Légèrement plus large pour Stratix
         card.setPadding(new Insets(20));
-        card.getStyleClass().add("project-card"); // Utilise le style avec ombre portée
+        card.getStyleClass().add("project-card");
 
-        // Badge de Statut
         Label statutBadge = new Label(p.getStatut());
         statutBadge.getStyleClass().addAll("statut-badge", getStatutClass(p.getStatut()));
 
-        // Titre
         Label nom = new Label(p.getNom());
-        nom.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+        nom.getStyleClass().add("project-title"); // Utilise la classe CSS
         nom.setWrapText(true);
 
-        // Description (limitée en hauteur)
         Label desc = new Label(p.getDescription());
-        desc.setStyle("-fx-text-fill: #718096; -fx-font-size: 13px;");
+        desc.getStyleClass().add("project-desc"); // Utilise la classe CSS
         desc.setWrapText(true);
-        desc.setMinHeight(40);
+        desc.setMinHeight(50);
 
-        // Progression
-        VBox progBox = new VBox(5);
+        VBox progBox = new VBox(8);
         Label lblProg = new Label("Progression: " + p.getProgression() + "%");
-        lblProg.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
+        lblProg.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #4a5568;");
         ProgressBar pb = new ProgressBar(p.getProgression() / 100.0);
         pb.setPrefWidth(Double.MAX_VALUE);
         progBox.getChildren().addAll(lblProg, pb);
 
-        // Boutons d'actions
         HBox actions = new HBox(10);
         actions.setAlignment(Pos.CENTER);
 
         Button btnMod = new Button("Modifier");
         btnMod.getStyleClass().add("btn-secondary");
-        btnMod.setPrefWidth(100);
         btnMod.setOnAction(e -> ouvrirFenetreModification(p));
 
         Button btnArch = new Button("Archiver");
         btnArch.getStyleClass().add("btn-primary");
-        btnArch.setStyle("-fx-background-color: #f59e0b;");
-        btnArch.setPrefWidth(100);
+        btnArch.setStyle("-fx-background-color: #f59e0b;"); // Orange pour l'archive
         btnArch.setOnAction(e -> {
             projetService.archiverUnProjet(p.getId());
             rafraichirDonnees();
         });
 
         actions.getChildren().addAll(btnMod, btnArch);
-
         card.getChildren().addAll(statutBadge, nom, desc, progBox, new Separator(), actions);
         return card;
     }
@@ -151,8 +146,8 @@ public class ListeProjetsController {
         };
     }
 
-    @FXML private void allerAjouterProjet() { chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet"); }
-    @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Projets Archivés"); }
+    @FXML private void allerAjouterProjet() { chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet - Stratix"); }
+    @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Archives Stratix"); }
 
     private void ouvrirFenetreModification(Projet p) {
         try {
@@ -161,13 +156,13 @@ public class ListeProjetsController {
             ModifierProjetController controller = loader.getController();
             controller.chargerDonnees(p.getId());
             Stage stage = new Stage();
-            stage.setTitle("Modifier Projet");
+            stage.setTitle("Modifier Projet - Stratix");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
             stage.showAndWait();
             rafraichirDonnees();
         } catch (IOException e) {
-            afficherErreur("Fichier introuvable", "Erreur de chargement de ModifierProjet.fxml");
+            afficherErreur("Erreur", "Impossible d'ouvrir la modification.");
         }
     }
 
@@ -182,7 +177,7 @@ public class ListeProjetsController {
             stage.showAndWait();
             rafraichirDonnees();
         } catch (IOException e) {
-            afficherErreur("Erreur de chargement", "Impossible de charger : " + fxmlPath);
+            afficherErreur("Erreur", "Fichier FXML non trouvé.");
         }
     }
 
@@ -198,14 +193,9 @@ public class ListeProjetsController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/EmployeListeProjets.fxml"));
             Parent root = loader.load();
-
             Stage stage = (Stage) containerProjets.getScene().getWindow();
             Scene scene = new Scene(root, 1100, 800);
-
-            // FORCER le CSS sur la nouvelle scène
-            String css = getClass().getResource("/styles.css").toExternalForm();
-            scene.getStylesheets().add(css);
-
+            scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
             stage.setScene(scene);
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,64 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.Insets?>
 <?import java.net.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="controller.ListeProjetsController" styleClass="root-container"
-            prefWidth="1200" prefHeight="800">
+            fx:controller="controller.ListeProjetsController" styleClass="root-container">
 
     <stylesheets>
         <URL value="@styles.css" />
     </stylesheets>
 
     <left>
-        <VBox spacing="10" styleClass="sidebar" prefWidth="250">
-            <padding><Insets top="40" right="20" bottom="20" left="20"/></padding>
+        <VBox spacing="10" styleClass="sidebar" prefWidth="260">
+            <padding><Insets top="30" right="20" bottom="20" left="20"/></padding>
 
-            <Label text="GESTIONNAIRE" styleClass="sidebar-logo"/>
-            <Separator style="-fx-opacity: 0.3; -fx-padding: 10 0;"/>
+            <VBox alignment="CENTER" spacing="10">
+                <ImageView fitWidth="80" preserveRatio="true">
+                    <image>
+                        <Image url="@stratix.png" />
+                    </image>
+                </ImageView>
+                <Label text="Stratix" styleClass="logo-text"/>
+            </VBox>
 
-            <Button text="📊 Tableau de bord" styleClass="sidebar-btn-disabled" />
-            <Button text="👥 Employés" styleClass="sidebar-btn-disabled" />
+            <Separator style="-fx-opacity: 0.1; -fx-padding: 15 0;"/>
 
-            <Button text="📂 Projets" onAction="#rafraichirDonnees" styleClass="sidebar-btn-active" />
-
-            <Button text="✅ Tâches" styleClass="sidebar-btn-disabled" />
-            <Button text="📦 Ressources" styleClass="sidebar-btn-disabled" />
-            <Button text="📈 Analyse" styleClass="sidebar-btn-disabled" />
+            <Button text="📊  Tableau de bord" styleClass="sidebar-btn-disabled" />
+            <Button text="👥  Employés" styleClass="sidebar-btn-disabled" />
+            <Button text="📂  Projets" styleClass="sidebar-btn-active" onAction="#rafraichirDonnees" />
+            <Button text="✅  Tâches" styleClass="sidebar-btn-disabled" />
+            <Button text="📦  Ressources" styleClass="sidebar-btn-disabled" />
+            <Button text="📈  Analyse" styleClass="sidebar-btn-disabled" />
 
             <Region VBox.vgrow="ALWAYS" />
 
-            <Button text="👤 Mode Employé" onAction="#allerAuFront" styleClass="btn-switch-mode" />
+            <Button text="👤  Mode Employé" onAction="#allerAuFront" styleClass="btn-switch-mode" prefWidth="220" />
         </VBox>
     </left>
 
     <center>
         <VBox spacing="25">
-            <padding><Insets top="30" right="30" bottom="30" left="30"/></padding>
+            <padding><Insets top="30" right="40" bottom="30" left="40"/></padding>
 
-            <Label text="Gestion des Projets" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+            <Label text="Gestion des Projets" styleClass="page-title"/>
 
-            <HBox spacing="15">
-                <VBox styleClass="summary-card" HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="100">
+            <HBox spacing="20">
+                <VBox styleClass="summary-card" HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="110">
                     <Label fx:id="lblTotal" text="0" styleClass="summary-value"/>
                     <Label text="Total Projets" styleClass="summary-label"/>
                 </VBox>
-                <VBox styleClass="summary-card" HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="100">
-                    <Label fx:id="lblEnCours" text="0" styleClass="summary-value"/>
+                <VBox styleClass="summary-card, border-en-cours" HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="110">
+                    <Label fx:id="lblEnCours" text="0" styleClass="summary-value" style="-fx-text-fill: #f59e0b;"/>
                     <Label text="En cours" styleClass="summary-label"/>
                 </VBox>
-                <VBox styleClass="summary-card" HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="100">
-                    <Label fx:id="lblTermine" text="0" styleClass="summary-value"/>
+                <VBox styleClass="summary-card, border-termine" HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="110">
+                    <Label fx:id="lblTermine" text="0" styleClass="summary-value" style="-fx-text-fill: #10b981;"/>
                     <Label text="Terminés" styleClass="summary-label"/>
+                </VBox>
+                <VBox styleClass="summary-card, border-annule" HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="110">
+                    <Label fx:id="lblAnnule" text="0" styleClass="summary-value" style="-fx-text-fill: #ef4444;"/>
+                    <Label text="Annulés" styleClass="summary-label"/>
                 </VBox>
             </HBox>
 
             <HBox spacing="15" alignment="CENTER_LEFT">
-                <TextField fx:id="searchField" promptText="Rechercher un projet..." styleClass="modern-input" HBox.hgrow="ALWAYS"/>
-                <ComboBox fx:id="comboFiltre" styleClass="modern-input" prefWidth="150"/>
-                <Button text="+ Nouveau Projet" onAction="#allerAjouterProjet" styleClass="btn-primary"/>
+                <TextField fx:id="searchField" promptText="🔍 Rechercher un projet..." styleClass="modern-input" HBox.hgrow="ALWAYS"/>
+                <ComboBox fx:id="comboFiltre" styleClass="modern-input" prefWidth="180" promptText="Filtrer par..."/>
+
+                <Button text="➕ Nouveau" onAction="#allerAjouterProjet" styleClass="btn-primary"/>
+                <Button text="📁 Archives" onAction="#voirArchives" styleClass="btn-secondary"/>
             </HBox>
 
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="modern-scroll">
