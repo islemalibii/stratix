@@ -26,13 +26,8 @@ public class MainController {
     public void initialize() {
         instance = this;
 
-        System.out.println("=== DÉBOGAGE COMPLET ===");
-        System.out.println("1. Répertoire de travail: " + System.getProperty("user.dir"));
-        System.out.println("2. Classpath: " + System.getProperty("java.class.path"));
-
-        // Vérifier le contenu du dossier resources
-        URL resourceUrl = getClass().getResource("/");
-        System.out.println("3. Dossier resources: " + resourceUrl);
+        System.out.println("=== DÉBOGAGE CHARGEMENT DES FICHIERS FXML ===");
+        System.out.println("Répertoire de travail: " + System.getProperty("user.dir"));
 
         try {
             // Dashboard
@@ -57,37 +52,15 @@ public class MainController {
                 System.out.println("   ❌ PlanningView.fxml non trouvé!");
             }
 
-            // Tâches - DÉBOGAGE APPROFONDI
+            // Tâches
             System.out.println("\n--- Chargement TacheView.fxml ---");
-
-            // Essai 1: Avec slash
-            URL tacheUrl1 = getClass().getResource("/TacheView.fxml");
-            System.out.println("   Essai 1 (/TacheView.fxml): " + tacheUrl1);
-
-            // Essai 2: Sans slash
-            URL tacheUrl2 = getClass().getResource("TacheView.fxml");
-            System.out.println("   Essai 2 (TacheView.fxml): " + tacheUrl2);
-
-            // Essai 3: Avec views/
-            URL tacheUrl3 = getClass().getResource("/views/TacheView.fxml");
-            System.out.println("   Essai 3 (/views/TacheView.fxml): " + tacheUrl3);
-
-            // Essai 4: Avec T majuscule/minuscule
-            URL tacheUrl4 = getClass().getResource("/tache-view.fxml");
-            System.out.println("   Essai 4 (/tache-view.fxml): " + tacheUrl4);
-
-            // Utiliser le premier trouvé
-            if (tacheUrl1 != null) {
-                tacheView = FXMLLoader.load(tacheUrl1);
-                System.out.println("   ✅ Tâches chargé avec Essai 1");
-            } else if (tacheUrl3 != null) {
-                tacheView = FXMLLoader.load(tacheUrl3);
-                System.out.println("   ✅ Tâches chargé avec Essai 3");
-            } else if (tacheUrl4 != null) {
-                tacheView = FXMLLoader.load(tacheUrl4);
-                System.out.println("   ✅ Tâches chargé avec Essai 4");
+            URL tacheUrl = getClass().getResource("/TacheView.fxml");
+            System.out.println("   URL: " + tacheUrl);
+            if (tacheUrl != null) {
+                tacheView = FXMLLoader.load(tacheUrl);
+                System.out.println("   ✅ Tâches chargé");
             } else {
-                System.out.println("   ❌ TacheView.fxml introuvable dans tous les emplacements!");
+                System.out.println("   ❌ TacheView.fxml non trouvé!");
             }
 
             // Calendar
@@ -101,15 +74,41 @@ public class MainController {
                 System.out.println("   ❌ calendar-view.fxml non trouvé!");
             }
 
-            // Whiteboard
-            System.out.println("\n--- Chargement whiteboard-view.fxml ---");
-            URL whiteboardUrl = getClass().getResource("/whiteboard-view.fxml");
-            System.out.println("   URL: " + whiteboardUrl);
-            if (whiteboardUrl != null) {
-                whiteboardView = FXMLLoader.load(whiteboardUrl);
-                System.out.println("   ✅ Whiteboard chargé");
+            // Whiteboard - TESTS MULTIPLES
+            System.out.println("\n--- RECHERCHE WHITEBOARD ---");
+
+            // Essai 1: /whiteboard-view.fxml
+            URL whiteboardUrl1 = getClass().getResource("/whiteboard-view.fxml");
+            System.out.println("   Essai 1 (/whiteboard-view.fxml): " + whiteboardUrl1);
+
+            // Essai 2: /WhiteboardView.fxml (avec majuscule)
+            URL whiteboardUrl2 = getClass().getResource("/WhiteboardView.fxml");
+            System.out.println("   Essai 2 (/WhiteboardView.fxml): " + whiteboardUrl2);
+
+            // Essai 3: /views/whiteboard-view.fxml
+            URL whiteboardUrl3 = getClass().getResource("/views/whiteboard-view.fxml");
+            System.out.println("   Essai 3 (/views/whiteboard-view.fxml): " + whiteboardUrl3);
+
+            // Essai 4: /views/WhiteboardView.fxml
+            URL whiteboardUrl4 = getClass().getResource("/views/WhiteboardView.fxml");
+            System.out.println("   Essai 4 (/views/WhiteboardView.fxml): " + whiteboardUrl4);
+
+            // Prendre le premier trouvé
+            if (whiteboardUrl1 != null) {
+                whiteboardView = FXMLLoader.load(whiteboardUrl1);
+                System.out.println("   ✅ Whiteboard chargé avec Essai 1");
+            } else if (whiteboardUrl2 != null) {
+                whiteboardView = FXMLLoader.load(whiteboardUrl2);
+                System.out.println("   ✅ Whiteboard chargé avec Essai 2");
+            } else if (whiteboardUrl3 != null) {
+                whiteboardView = FXMLLoader.load(whiteboardUrl3);
+                System.out.println("   ✅ Whiteboard chargé avec Essai 3");
+            } else if (whiteboardUrl4 != null) {
+                whiteboardView = FXMLLoader.load(whiteboardUrl4);
+                System.out.println("   ✅ Whiteboard chargé avec Essai 4");
             } else {
-                System.out.println("   ❌ whiteboard-view.fxml non trouvé!");
+                System.out.println("   ❌ Whiteboard non trouvé dans tous les emplacements!");
+                System.out.println("   Vérifie que le fichier whiteboard-view.fxml est dans target/classes/");
             }
 
             System.out.println("\n=== RÉSULTAT FINAL ===");
@@ -155,7 +154,7 @@ public class MainController {
             instance.mainPane.getChildren().add(instance.tacheView);
             System.out.println("🔄 Navigation vers Tâches");
         } else {
-            System.err.println("❌ Impossible d'afficher Tâches - tacheView est null");
+            System.err.println("❌ Impossible d'afficher Tâches");
         }
     }
 
@@ -175,7 +174,7 @@ public class MainController {
             instance.mainPane.getChildren().add(instance.whiteboardView);
             System.out.println("🔄 Navigation vers Whiteboard");
         } else {
-            System.err.println("❌ Impossible d'afficher Whiteboard");
+            System.err.println("❌ Impossible d'afficher Whiteboard - whiteboardView est null");
         }
     }
 

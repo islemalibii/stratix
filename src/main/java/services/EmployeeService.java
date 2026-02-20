@@ -11,9 +11,8 @@ public class EmployeeService {
 
     public List<Employe> getAllEmployes() {
         List<Employe> list = new ArrayList<>();
-        String sql = "SELECT e.*, u.username, u.email, u.tel, u.role " +
-                "FROM employe e " +
-                "JOIN utilisateur u ON e.utilisateur_id = u.id";
+        // Récupérer tous les utilisateurs avec rôle employé ou responsable
+        String sql = "SELECT * FROM utilisateur WHERE role = 'employe' OR role = 'EMPLOYE' OR role LIKE 'responsable%'";
 
         try (Connection conn = DBConnection.getConnection();
              Statement st = conn.createStatement();
@@ -22,16 +21,19 @@ public class EmployeeService {
             while (rs.next()) {
                 Employe e = new Employe();
                 e.setId(rs.getInt("id"));
-                e.setUtilisateurId(rs.getInt("utilisateur_id"));
-                e.setDepartment(rs.getString("department"));
-                e.setPoste(rs.getString("poste"));
-                e.setDateEmbauche(rs.getString("date_embauche"));
-                e.setSalaire(rs.getDouble("salaire"));
-                e.setCompetences(rs.getString("competences"));
                 e.setUsername(rs.getString("username"));
                 e.setEmail(rs.getString("email"));
                 e.setTel(rs.getString("tel"));
+                e.setPassword(rs.getString("password"));
                 e.setRole(rs.getString("role"));
+                e.setDateAjout(rs.getString("date_ajout"));
+
+                // Ces champs peuvent être null dans ta table
+                e.setDepartment(null);
+                e.setPoste(null);
+                e.setDateEmbauche(null);
+                e.setSalaire(0);
+                e.setCompetences(null);
 
                 list.add(e);
             }
@@ -43,10 +45,7 @@ public class EmployeeService {
     }
 
     public Employe getEmployeById(int id) {
-        String sql = "SELECT e.*, u.username, u.email, u.tel, u.role " +
-                "FROM employe e " +
-                "JOIN utilisateur u ON e.utilisateur_id = u.id " +
-                "WHERE e.id = ?";
+        String sql = "SELECT * FROM utilisateur WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -57,16 +56,20 @@ public class EmployeeService {
             if (rs.next()) {
                 Employe e = new Employe();
                 e.setId(rs.getInt("id"));
-                e.setUtilisateurId(rs.getInt("utilisateur_id"));
-                e.setDepartment(rs.getString("department"));
-                e.setPoste(rs.getString("poste"));
-                e.setDateEmbauche(rs.getString("date_embauche"));
-                e.setSalaire(rs.getDouble("salaire"));
-                e.setCompetences(rs.getString("competences"));
                 e.setUsername(rs.getString("username"));
                 e.setEmail(rs.getString("email"));
                 e.setTel(rs.getString("tel"));
+                e.setPassword(rs.getString("password"));
                 e.setRole(rs.getString("role"));
+                e.setDateAjout(rs.getString("date_ajout"));
+
+                // Champs optionnels
+                e.setDepartment(null);
+                e.setPoste(null);
+                e.setDateEmbauche(null);
+                e.setSalaire(0);
+                e.setCompetences(null);
+
                 return e;
             }
 
@@ -74,5 +77,25 @@ public class EmployeeService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // Méthode pour vérifier si un ID existe
+    public boolean employeExiste(int id) {
+        String sql = "SELECT COUNT(*) FROM utilisateur WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

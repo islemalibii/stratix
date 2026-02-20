@@ -27,16 +27,17 @@ public class SERVICEPlanning {
             ps.setString(5, p.getTypeShift());
 
             ps.executeUpdate();
-            System.out.println(" Planning ajouté");
+            System.out.println("✅ Planning ajouté (ID employé: " + p.getEmployeId() + ")");
 
         } catch (SQLException e) {
+            System.err.println("❌ Erreur ajout planning: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     public List<Planning> getAllPlannings() {
         List<Planning> list = new ArrayList<>();
-        String sql = "SELECT * FROM planning";
+        String sql = "SELECT * FROM planning ORDER BY date DESC, heure_debut ASC";
 
         try (Connection c = DBConnection.getConnection();
              Statement st = c.createStatement();
@@ -54,10 +55,41 @@ public class SERVICEPlanning {
                 list.add(p);
             }
 
+            System.out.println("✅ " + list.size() + " plannings chargés");
+
         } catch (SQLException e) {
+            System.err.println("❌ Erreur chargement plannings: " + e.getMessage());
             e.printStackTrace();
         }
         return list;
+    }
+
+    // Récupérer un planning par ID
+    public Planning getPlanningById(int id) {
+        String sql = "SELECT * FROM planning WHERE id = ?";
+
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Planning p = new Planning();
+                p.setId(rs.getInt("id"));
+                p.setEmployeId(rs.getInt("employe_id"));
+                p.setDate(rs.getDate("date"));
+                p.setHeureDebut(rs.getTime("heure_debut"));
+                p.setHeureFin(rs.getTime("heure_fin"));
+                p.setTypeShift(rs.getString("type_shift"));
+                return p;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur récupération planning ID " + id + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void updatePlanning(Planning p) {
@@ -77,10 +109,15 @@ public class SERVICEPlanning {
             ps.setString(5, p.getTypeShift());
             ps.setInt(6, p.getId());
 
-            ps.executeUpdate();
-            System.out.println(" Planning modifié");
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("✅ Planning modifié (ID: " + p.getId() + ")");
+            } else {
+                System.out.println("⚠️ Aucun planning trouvé avec ID: " + p.getId());
+            }
 
         } catch (SQLException e) {
+            System.err.println("❌ Erreur modification planning: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -92,16 +129,22 @@ public class SERVICEPlanning {
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ps.executeUpdate();
-            System.out.println(" Planning supprimé");
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("✅ Planning supprimé (ID: " + id + ")");
+            } else {
+                System.out.println("⚠️ Aucun planning trouvé avec ID: " + id);
+            }
 
         } catch (SQLException e) {
+            System.err.println("❌ Erreur suppression planning: " + e.getMessage());
             e.printStackTrace();
         }
     }
-    // Compter le nombre total d'employés
+
+    // Compter le nombre total d'utilisateurs avec rôle employé
     public int compterTotalEmployes() {
-        String sql = "SELECT COUNT(*) FROM employe";
+        String sql = "SELECT COUNT(*) FROM utilisateur WHERE role = 'employe' OR role = 'EMPLOYE' OR role LIKE 'responsable%'";
         try (Connection c = DBConnection.getConnection();
              Statement st = c.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
@@ -109,6 +152,7 @@ public class SERVICEPlanning {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
+            System.err.println("❌ Erreur comptage employés: " + e.getMessage());
             e.printStackTrace();
         }
         return 0;
@@ -124,6 +168,7 @@ public class SERVICEPlanning {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
+            System.err.println("❌ Erreur comptage en poste: " + e.getMessage());
             e.printStackTrace();
         }
         return 0;
@@ -131,8 +176,8 @@ public class SERVICEPlanning {
 
     // Compter les employés absents aujourd'hui
     public int compterAbsents() {
-        String sql = "SELECT COUNT(*) FROM employe WHERE id NOT IN " +
-                "(SELECT DISTINCT employe_id FROM planning WHERE date = CURDATE())";
+        String sql = "SELECT COUNT(*) FROM utilisateur WHERE (role = 'employe' OR role = 'EMPLOYE' OR role LIKE 'responsable%') " +
+                "AND id NOT IN (SELECT DISTINCT employe_id FROM planning WHERE date = CURDATE())";
         try (Connection c = DBConnection.getConnection();
              Statement st = c.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
@@ -140,12 +185,13 @@ public class SERVICEPlanning {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
+            System.err.println("❌ Erreur comptage absents: " + e.getMessage());
             e.printStackTrace();
         }
         return 0;
     }
 
-    // Pour obtenir les statistiques du jour spécifique (si tu veux)
+    // Pour obtenir les statistiques du jour spécifique
     public int compterEnPosteParDate(LocalDate date) {
         String sql = "SELECT COUNT(DISTINCT employe_id) FROM planning WHERE date = ?";
         try (Connection c = DBConnection.getConnection();
@@ -156,14 +202,15 @@ public class SERVICEPlanning {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
+            System.err.println("❌ Erreur comptage en poste par date: " + e.getMessage());
             e.printStackTrace();
         }
         return 0;
     }
 
     public int compterAbsentsParDate(LocalDate date) {
-        String sql = "SELECT COUNT(*) FROM employe WHERE id NOT IN " +
-                "(SELECT DISTINCT employe_id FROM planning WHERE date = ?)";
+        String sql = "SELECT COUNT(*) FROM utilisateur WHERE (role = 'employe' OR role = 'EMPLOYE' OR role LIKE 'responsable%') " +
+                "AND id NOT IN (SELECT DISTINCT employe_id FROM planning WHERE date = ?)";
         try (Connection c = DBConnection.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setDate(1, Date.valueOf(date));
@@ -172,9 +219,26 @@ public class SERVICEPlanning {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
+            System.err.println("❌ Erreur comptage absents par date: " + e.getMessage());
             e.printStackTrace();
         }
         return 0;
     }
 
+    // Compter par type de shift
+    public int compterParShift(String shift) {
+        String sql = "SELECT COUNT(*) FROM planning WHERE type_shift = ?";
+        try (Connection c = DBConnection.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, shift);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur comptage shift " + shift + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

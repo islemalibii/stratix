@@ -2,7 +2,11 @@ package controllers;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import models.Employe;
 import models.Planning;
 import services.EmployeeService;
@@ -10,16 +14,16 @@ import services.SERVICEPlanning;
 
 import java.sql.Date;
 import java.sql.Time;
-import java.time.format.DateTimeFormatter;
+import java.io.IOException;
 import java.util.List;
 
 public class PlanningController {
 
-    @FXML private ComboBox<Employe> cmbEmploye;  // Changé de TextField à ComboBox
+    @FXML private ComboBox<Employe> cmbEmploye;
     @FXML private DatePicker dpDate;
-    @FXML private TextField txtHeureDebut, txtHeureFin;
+    @FXML private TextField txtHeureDebut;
+    @FXML private TextField txtHeureFin;
     @FXML private ComboBox<String> cbTypeShift;
-    @FXML private ListView<String> listViewPlannings;
 
     // Statistiques
     @FXML private Label lblTotalEmployes;
@@ -32,11 +36,13 @@ public class PlanningController {
 
     @FXML
     public void initialize() {
+        System.out.println("=== Initialisation PlanningController ===");
+
         // Charger les employés dans la ComboBox
         List<Employe> employes = employeService.getAllEmployes();
         cmbEmploye.setItems(FXCollections.observableArrayList(employes));
 
-        // Afficher le nom au lieu de l'objet
+        // Afficher le nom dans la ComboBox
         cmbEmploye.setCellFactory(param -> new ListCell<Employe>() {
             @Override
             protected void updateItem(Employe emp, boolean empty) {
@@ -44,7 +50,8 @@ public class PlanningController {
                 if (empty || emp == null) {
                     setText(null);
                 } else {
-                    setText(emp.getUsername() + " - " + emp.getPoste());
+                    String poste = (emp.getPoste() != null && !emp.getPoste().isEmpty()) ? " - " + emp.getPoste() : "";
+                    setText(emp.getUsername() + poste);
                 }
             }
         });
@@ -56,27 +63,19 @@ public class PlanningController {
                 if (empty || emp == null) {
                     setText(null);
                 } else {
-                    setText(emp.getUsername() + " - " + emp.getPoste());
+                    String poste = (emp.getPoste() != null && !emp.getPoste().isEmpty()) ? " - " + emp.getPoste() : "";
+                    setText(emp.getUsername() + poste);
                 }
             }
         });
 
         cbTypeShift.getItems().addAll("JOUR", "SOIR", "NUIT");
 
-        // Charger les données
-        chargerPlannings();
+        // Charger les statistiques
         chargerStatistiques();
 
-        // Sélection dans la liste
-        listViewPlannings.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldVal, newVal) -> {
-                    if (newVal != null) {
-                        String[] parts = newVal.split(" \\| ");
-                        selectedPlanningId = Integer.parseInt(parts[0]);
-                        remplirFormulaire(selectedPlanningId);
-                    }
-                }
-        );
+        System.out.println("✅ PlanningController initialisé");
+        System.out.println("   Total employés: " + employes.size());
     }
 
     @FXML
@@ -93,13 +92,10 @@ public class PlanningController {
             p.setTypeShift(cbTypeShift.getValue());
 
             service.addPlanning(p);
-            showAlert("Succès", "Planning ajouté avec succès !");
-            chargerPlannings();
-            chargerStatistiques();
+            showAlert("Succès", "✅ Planning ajouté avec succès !");
             viderFormulaire();
+            chargerStatistiques();
 
-        } catch (NumberFormatException e) {
-            showAlert("Erreur", "Vérifiez les champs !");
         } catch (IllegalArgumentException e) {
             showAlert("Erreur", "Format d'heure incorrect ! Utilisez HH:MM (ex: 08:30)");
         } catch (Exception e) {
@@ -128,10 +124,9 @@ public class PlanningController {
             p.setTypeShift(cbTypeShift.getValue());
 
             service.updatePlanning(p);
-            showAlert("Succès", "Planning modifié avec succès !");
-            chargerPlannings();
-            chargerStatistiques();
+            showAlert("Succès", "✅ Planning modifié avec succès !");
             viderFormulaire();
+            chargerStatistiques();
 
         } catch (Exception e) {
             showAlert("Erreur", "Erreur lors de la modification : " + e.getMessage());
@@ -152,63 +147,71 @@ public class PlanningController {
 
         if (confirm.showAndWait().get() == ButtonType.OK) {
             service.deletePlanning(selectedPlanningId);
-            showAlert("Succès", "Planning supprimé avec succès !");
-            chargerPlannings();
-            chargerStatistiques();
+            showAlert("Succès", "✅ Planning supprimé avec succès !");
             viderFormulaire();
+            chargerStatistiques();
         }
     }
 
-    private void remplirFormulaire(int id) {
-        // Ici tu dois implémenter une méthode getPlanningById dans SERVICEPlanning
-        // Pour l'instant, on va juste sélectionner l'employé depuis la liste
+    @FXML
+    private void openPlanningList() {
+        try {
+            System.out.println("Ouverture de la liste des plannings...");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/PlanningListeView.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("📋 Liste des Plannings");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible d'ouvrir la liste des plannings");
+        }
     }
 
     private boolean validerChamps() {
         if (cmbEmploye.getValue() == null) {
-            showAlert("Erreur", "Sélectionnez un employé !");
+            showAlert("Erreur", "❌ Sélectionnez un employé !");
             return false;
         }
         if (dpDate.getValue() == null) {
-            showAlert("Erreur", "La date est requise !");
+            showAlert("Erreur", "❌ La date est requise !");
             return false;
         }
-        if (txtHeureDebut.getText().isEmpty()) {
-            showAlert("Erreur", "L'heure de début est requise !");
+        if (txtHeureDebut.getText().trim().isEmpty()) {
+            showAlert("Erreur", "❌ L'heure de début est requise !");
             return false;
         }
-        if (txtHeureFin.getText().isEmpty()) {
-            showAlert("Erreur", "L'heure de fin est requise !");
+        if (txtHeureFin.getText().trim().isEmpty()) {
+            showAlert("Erreur", "❌ L'heure de fin est requise !");
             return false;
         }
         if (cbTypeShift.getValue() == null) {
-            showAlert("Erreur", "Le type de shift est requis !");
+            showAlert("Erreur", "❌ Le type de shift est requis !");
             return false;
         }
+
+        // Validation du format d'heure (HH:MM)
+        if (!txtHeureDebut.getText().matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")) {
+            showAlert("Erreur", "❌ Format d'heure début invalide. Utilisez HH:MM (ex: 08:30)");
+            return false;
+        }
+        if (!txtHeureFin.getText().matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")) {
+            showAlert("Erreur", "❌ Format d'heure fin invalide. Utilisez HH:MM (ex: 17:30)");
+            return false;
+        }
+
         return true;
     }
 
-    private void chargerPlannings() {
-        listViewPlannings.getItems().clear();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        for (Planning p : service.getAllPlannings()) {
-            Employe emp = employeService.getEmployeById(p.getEmployeId());
-            String empName = (emp != null) ? emp.getUsername() : "Employé " + p.getEmployeId();
-
-            listViewPlannings.getItems().add(
-                    p.getId() + " | " + empName +
-                            " | " + p.getDate().toLocalDate().format(formatter) +
-                            " | " + p.getHeureDebut() + "-" + p.getHeureFin() +
-                            " | " + p.getTypeShift()
-            );
-        }
-    }
-
     private void chargerStatistiques() {
-        lblTotalEmployes.setText(String.valueOf(employeService.getAllEmployes().size()));
-        lblEnPoste.setText(String.valueOf(service.compterEnPoste()));
-        lblAbsents.setText(String.valueOf(service.compterAbsents()));
+        try {
+            lblTotalEmployes.setText(String.valueOf(employeService.getAllEmployes().size()));
+            lblEnPoste.setText(String.valueOf(service.compterEnPoste()));
+            lblAbsents.setText(String.valueOf(service.compterAbsents()));
+        } catch (Exception e) {
+            System.err.println("Erreur chargement statistiques: " + e.getMessage());
+        }
     }
 
     private void viderFormulaire() {
@@ -218,7 +221,6 @@ public class PlanningController {
         txtHeureFin.clear();
         cbTypeShift.setValue(null);
         selectedPlanningId = -1;
-        listViewPlannings.getSelectionModel().clearSelection();
     }
 
     private void showAlert(String title, String message) {

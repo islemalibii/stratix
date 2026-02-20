@@ -2,26 +2,35 @@ package controllers;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import models.Employe;
 import models.Tache;
 import services.EmployeeService;
 import services.SERVICETache;
 
 import java.sql.Date;
-import java.time.format.DateTimeFormatter;
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public class TacheController {
 
     @FXML private TextField txtTitre;
     @FXML private TextField txtDescription;
-    @FXML private TextField txtEmployeId;  // ← C'est un TextField, pas ComboBox
+    @FXML private ComboBox<Employe> cmbEmploye;
     @FXML private TextField txtProjetId;
     @FXML private ComboBox<String> cbPriorite;
     @FXML private ComboBox<String> cbStatut;
     @FXML private DatePicker dpDeadline;
-    @FXML private ListView<String> listViewTaches;
+
+    @FXML private Label lblTotalTaches;
+    @FXML private Label lblAFaire;
+    @FXML private Label lblEnCours;
+    @FXML private Label lblTerminees;
 
     private SERVICETache service = new SERVICETache();
     private EmployeeService employeService = new EmployeeService();
@@ -29,27 +38,48 @@ public class TacheController {
 
     @FXML
     public void initialize() {
+        System.out.println("=== Initialisation TacheController ===");
+
+        // Charger les employés dans la ComboBox
+        List<Employe> employes = employeService.getAllEmployes();
+        cmbEmploye.setItems(FXCollections.observableArrayList(employes));
+
+        // Afficher le nom dans la ComboBox
+        cmbEmploye.setCellFactory(param -> new ListCell<Employe>() {
+            @Override
+            protected void updateItem(Employe emp, boolean empty) {
+                super.updateItem(emp, empty);
+                if (empty || emp == null) {
+                    setText(null);
+                } else {
+                    setText(emp.getDisplayName());
+                }
+            }
+        });
+
+        cmbEmploye.setButtonCell(new ListCell<Employe>() {
+            @Override
+            protected void updateItem(Employe emp, boolean empty) {
+                super.updateItem(emp, empty);
+                if (empty || emp == null) {
+                    setText(null);
+                } else {
+                    setText(emp.getDisplayName());
+                }
+            }
+        });
+
         // Initialiser les ComboBox
         cbPriorite.getItems().addAll("HAUTE", "MOYENNE", "BASSE");
         cbStatut.getItems().addAll("A_FAIRE", "EN_COURS", "TERMINEE");
 
-        System.out.println("✅ TacheController initialisé");
-        System.out.println("   txtEmployeId: " + (txtEmployeId != null ? "OK" : "null"));
-        System.out.println("   cbPriorite: " + (cbPriorite != null ? "OK" : "null"));
-        System.out.println("   cbStatut: " + (cbStatut != null ? "OK" : "null"));
+        // Vérification des composants
+        System.out.println("   cmbEmploye: " + (cmbEmploye != null ? "✅" : "❌"));
+        System.out.println("   cbPriorite: " + (cbPriorite != null ? "✅" : "❌"));
+        System.out.println("   cbStatut: " + (cbStatut != null ? "✅" : "❌"));
+        System.out.println("   txtTitre: " + (txtTitre != null ? "✅" : "❌"));
 
-        chargerTaches();
-
-        // Sélection dans la liste
-        listViewTaches.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldVal, newVal) -> {
-                    if (newVal != null) {
-                        String[] parts = newVal.split(" \\| ");
-                        selectedTacheId = Integer.parseInt(parts[0]);
-                        remplirFormulaire(selectedTacheId);
-                    }
-                }
-        );
+        mettreAJourStatistiques();
     }
 
     @FXML
@@ -63,16 +93,18 @@ public class TacheController {
             t.setDeadline(Date.valueOf(dpDeadline.getValue()));
             t.setStatut(cbStatut.getValue());
             t.setPriorite(cbPriorite.getValue());
-            t.setEmployeId(Integer.parseInt(txtEmployeId.getText()));
+
+            Employe selectedEmploye = cmbEmploye.getValue();
+            t.setEmployeId(selectedEmploye.getId());
             t.setProjetId(Integer.parseInt(txtProjetId.getText()));
 
             service.addTache(t);
-            showAlert("Succès", "Tâche ajoutée avec succès !");
-            chargerTaches();
+            showAlert("Succès", "✅ Tâche ajoutée avec succès !");
+            mettreAJourStatistiques();
             viderFormulaire();
 
         } catch (NumberFormatException e) {
-            showAlert("Erreur", "Les IDs doivent être des nombres !");
+            showAlert("Erreur", "L'ID Projet doit être un nombre !");
         } catch (Exception e) {
             showAlert("Erreur", "Erreur : " + e.getMessage());
             e.printStackTrace();
@@ -96,12 +128,14 @@ public class TacheController {
             t.setDeadline(Date.valueOf(dpDeadline.getValue()));
             t.setStatut(cbStatut.getValue());
             t.setPriorite(cbPriorite.getValue());
-            t.setEmployeId(Integer.parseInt(txtEmployeId.getText()));
+
+            Employe selectedEmploye = cmbEmploye.getValue();
+            t.setEmployeId(selectedEmploye.getId());
             t.setProjetId(Integer.parseInt(txtProjetId.getText()));
 
             service.updateTache(t);
-            showAlert("Succès", "Tâche modifiée avec succès !");
-            chargerTaches();
+            showAlert("Succès", "✅ Tâche modifiée avec succès !");
+            mettreAJourStatistiques();
             viderFormulaire();
 
         } catch (Exception e) {
@@ -122,79 +156,82 @@ public class TacheController {
         confirm.setHeaderText(null);
         confirm.setContentText("Voulez-vous vraiment supprimer cette tâche ?");
 
-        if (confirm.showAndWait().get() == ButtonType.OK) {
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             service.deleteTache(selectedTacheId);
-            showAlert("Succès", "Tâche supprimée avec succès !");
-            chargerTaches();
+            showAlert("Succès", "✅ Tâche supprimée avec succès !");
+            mettreAJourStatistiques();
             viderFormulaire();
         }
     }
 
+    @FXML
+    private void openTacheListe() {
+        try {
+            System.out.println("Ouverture de la liste des tâches...");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/TacheListeView.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("📋 Liste des Tâches");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible d'ouvrir la liste des tâches");
+        }
+    }
+
     private boolean validerChamps() {
-        if (txtTitre.getText().isEmpty()) {
-            showAlert("Erreur", "Le titre est requis !");
+        if (txtTitre.getText().trim().isEmpty()) {
+            showAlert("Erreur", "❌ Le titre est requis !");
             return false;
         }
-        if (txtDescription.getText().isEmpty()) {
-            showAlert("Erreur", "La description est requise !");
+        if (txtDescription.getText().trim().isEmpty()) {
+            showAlert("Erreur", "❌ La description est requise !");
             return false;
         }
         if (dpDeadline.getValue() == null) {
-            showAlert("Erreur", "La deadline est requise !");
+            showAlert("Erreur", "❌ La deadline est requise !");
             return false;
         }
         if (cbStatut.getValue() == null) {
-            showAlert("Erreur", "Le statut est requis !");
+            showAlert("Erreur", "❌ Le statut est requis !");
             return false;
         }
         if (cbPriorite.getValue() == null) {
-            showAlert("Erreur", "La priorité est requise !");
+            showAlert("Erreur", "❌ La priorité est requise !");
             return false;
         }
-        if (txtEmployeId.getText().isEmpty()) {
-            showAlert("Erreur", "L'ID Employé est requis !");
+        if (cmbEmploye.getValue() == null) {
+            showAlert("Erreur", "❌ Sélectionnez un employé !");
             return false;
         }
-        if (txtProjetId.getText().isEmpty()) {
-            showAlert("Erreur", "L'ID Projet est requis !");
+        if (txtProjetId.getText().trim().isEmpty()) {
+            showAlert("Erreur", "❌ L'ID Projet est requis !");
             return false;
         }
         return true;
     }
 
-    private void remplirFormulaire(int id) {
-        Tache t = service.getTacheById(id);
-        if (t != null) {
-            txtTitre.setText(t.getTitre());
-            txtDescription.setText(t.getDescription());
-            dpDeadline.setValue(t.getDeadline().toLocalDate());
-            cbStatut.setValue(t.getStatut());
-            cbPriorite.setValue(t.getPriorite());
-            txtEmployeId.setText(String.valueOf(t.getEmployeId()));
-            txtProjetId.setText(String.valueOf(t.getProjetId()));
-        }
-    }
-
-    private void chargerTaches() {
-        listViewTaches.getItems().clear();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
+    private void mettreAJourStatistiques() {
         List<Tache> taches = service.getAllTaches();
-        for (Tache t : taches) {
-            String prioriteEmoji = "";
-            switch(t.getPriorite()) {
-                case "HAUTE": prioriteEmoji = "🔴"; break;
-                case "MOYENNE": prioriteEmoji = "🟡"; break;
-                case "BASSE": prioriteEmoji = "🟢"; break;
-            }
+        int total = taches.size();
+        int aFaire = 0;
+        int enCours = 0;
+        int terminees = 0;
 
-            listViewTaches.getItems().add(
-                    t.getId() + " | " + prioriteEmoji + " " + t.getTitre() +
-                            " | Emp " + t.getEmployeId() +
-                            " | " + t.getDeadline().toLocalDate().format(formatter) +
-                            " | " + t.getStatut()
-            );
+        for (Tache t : taches) {
+            switch(t.getStatut()) {
+                case "A_FAIRE": aFaire++; break;
+                case "EN_COURS": enCours++; break;
+                case "TERMINEE": terminees++; break;
+            }
         }
+
+        if (lblTotalTaches != null) lblTotalTaches.setText(String.valueOf(total));
+        if (lblAFaire != null) lblAFaire.setText(String.valueOf(aFaire));
+        if (lblEnCours != null) lblEnCours.setText(String.valueOf(enCours));
+        if (lblTerminees != null) lblTerminees.setText(String.valueOf(terminees));
     }
 
     private void viderFormulaire() {
@@ -203,10 +240,9 @@ public class TacheController {
         dpDeadline.setValue(null);
         cbStatut.setValue(null);
         cbPriorite.setValue(null);
-        txtEmployeId.clear();
+        cmbEmploye.setValue(null);
         txtProjetId.clear();
         selectedTacheId = -1;
-        listViewTaches.getSelectionModel().clearSelection();
     }
 
     private void showAlert(String title, String message) {

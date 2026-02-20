@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="700" prefWidth="1000" style="-fx-background-color: #f0f4f8;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.PlanningListeController">
+
+    <!-- Header -->
+    <VBox layoutX="0" layoutY="0" prefWidth="1000" style="-fx-background-color: #2c3e50;">
+        <HBox alignment="CENTER_LEFT" prefHeight="70" spacing="20" style="-fx-padding: 0 30;">
+            <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" text="📋 LISTE DES PLANNINGS" />
+        </HBox>
+    </VBox>
+
+    <!-- Statistiques -->
+    <HBox layoutX="30" layoutY="90" prefWidth="940" spacing="20">
+        <VBox spacing="5" style="-fx-background-color: #eff6ff; -fx-padding: 15; -fx-background-radius: 10;" HBox.hgrow="ALWAYS">
+            <Label style="-fx-font-size: 14px; -fx-text-fill: #1e40af;" text="Total plannings" />
+            <Label fx:id="lblTotalPlannings" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1e40af;" text="0" />
+        </VBox>
+
+        <VBox spacing="5" style="-fx-background-color: #fef9c3; -fx-padding: 15; -fx-background-radius: 10;" HBox.hgrow="ALWAYS">
+            <Label style="-fx-font-size: 14px; -fx-text-fill: #854d0e;" text="JOUR" />
+            <Label fx:id="lblTotalJour" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #854d0e;" text="0" />
+        </VBox>
+
+        <VBox spacing="5" style="-fx-background-color: #fed7aa; -fx-padding: 15; -fx-background-radius: 10;" HBox.hgrow="ALWAYS">
+            <Label style="-fx-font-size: 14px; -fx-text-fill: #9a3412;" text="SOIR" />
+            <Label fx:id="lblTotalSoir" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #9a3412;" text="0" />
+        </VBox>
+
+        <VBox spacing="5" style="-fx-background-color: #e0f2fe; -fx-padding: 15; -fx-background-radius: 10;" HBox.hgrow="ALWAYS">
+            <Label style="-fx-font-size: 14px; -fx-text-fill: #0369a1;" text="NUIT" />
+            <Label fx:id="lblTotalNuit" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #0369a1;" text="0" />
+        </VBox>
+    </HBox>
+
+    <!-- Tableau des plannings -->
+    <VBox layoutX="30" layoutY="220" prefHeight="400" prefWidth="940" spacing="10">
+        <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="📅 Plannings enregistrés" />
+
+        <TableView fx:id="tablePlannings" prefHeight="350" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #e2e8f0;">
+            <columns>
+                <TableColumn fx:id="colId" prefWidth="50" text="ID" />
+                <TableColumn fx:id="colEmploye" prefWidth="150" text="Employé" />
+                <TableColumn fx:id="colDate" prefWidth="100" text="Date" />
+                <TableColumn fx:id="colHeureDebut" prefWidth="80" text="Début" />
+                <TableColumn fx:id="colHeureFin" prefWidth="80" text="Fin" />
+                <TableColumn fx:id="colTypeShift" prefWidth="80" text="Shift" />
+            </columns>
+        </TableView>
+    </VBox>
+
+    <!-- Bouton retour -->
+    <Button layoutX="11.0" layoutY="642.0" onAction="#retourFormulaire" style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;" text="← Retour au formulaire" />
+</AnchorPane>
