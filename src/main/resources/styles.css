@@ -75,3 +75,27 @@
 .btn-cancel:hover, .btn-archive-view:hover {
     -fx-background-color: #f1f5f9;
 }
+
+.card-view {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    /* Ombre portée : horizontal, vertical, flou, étalement */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
+    -fx-border-color: #EDF2F7;
+    -fx-border-radius: 15;
+    -fx-border-width: 1;
+    -fx-transition: all 0.3s ease-in-out;
+}
+
+.card-view:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(66, 153, 225, 0.3), 15, 0, 0, 8);
+    -fx-translate-y: -5; /* Petit effet de soulèvement au survol */
+    -fx-cursor: hand;
+}
+
+.progress-bar {
+    -fx-background-radius: 10;
+}
+.progress-bar .bar {
+    -fx-background-radius: 10;
+}

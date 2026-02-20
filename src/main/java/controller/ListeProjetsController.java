@@ -193,4 +193,32 @@ public class ListeProjetsController {
         }
     }
 
+    @FXML
+    private void allerAuFront() {
+        try {
+            // Chargement de la vue Employe (Front-Office)
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EmployeListeProjets.fxml"));
+            Parent root = loader.load();
+
+            // Récupération de la scène actuelle à partir du bouton
+            Stage stage = (Stage) containerProjets.getScene().getWindow();
+
+            // On change la scène (on peut ajuster la taille si nécessaire)
+            Scene scene = new Scene(root, 1000, 700);
+
+            // N'oubliez pas de ré-appliquer le CSS si besoin
+            if (getClass().getResource("/styles.css") != null) {
+                scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+            }
+
+            stage.setScene(scene);
+            stage.setTitle("Espace Employé - Consultation des Projets");
+            stage.show();
+
+        } catch (IOException e) {
+            System.err.println("Erreur lors du passage au Front-Office : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 }

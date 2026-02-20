@@ -51,4 +51,9 @@
         </content>
     </ScrollPane>
 
+    <HBox spacing="15">
+        <Button text="👤 Mode Employé (Front)" onAction="#allerAuFront"
+                style="-fx-background-color: #6366f1; -fx-text-fill: white; -fx-font-weight: bold;"/>
+    </HBox>
+
 </VBox>
