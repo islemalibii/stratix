@@ -1,6 +1,7 @@
 package org.example.controllers;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -37,9 +38,37 @@ public class FormulaireProduitController {
     private service_produit serviceProduit = new service_produit();
     private Runnable onProduitAjoute; // Callback pour rafraîchir la liste
 
+    // Liste des catégories prédéfinies
+    private final String[] categoriesPredifinies = {
+            "Électronique", "Informatique", "Bureau", "Mobilier", "Consommable", "Autre"
+    };
+
     @FXML
     public void initialize() {
-        // Initialisation si nécessaire
+        // Initialisation de la ComboBox
+        categorieCombo.setItems(FXCollections.observableArrayList(categoriesPredifinies));
+
+        // Ajouter un listener pour gérer la sélection "Autre"
+        categorieCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if ("Autre".equals(newVal)) {
+                // Rendre la ComboBox éditable et effacer le texte pour permettre la saisie
+                categorieCombo.setEditable(true);
+                categorieCombo.getEditor().clear();
+                categorieCombo.getEditor().requestFocus();
+            } else {
+                // Si ce n'est pas "Autre", on garde le comportement normal
+                categorieCombo.setEditable(false);
+            }
+        });
+
+        // Listener pour capturer la saisie manuelle quand "Autre" est sélectionné
+        categorieCombo.getEditor().textProperty().addListener((obs, oldVal, newVal) -> {
+            if (categorieCombo.isEditable() && newVal != null && !newVal.isEmpty()) {
+                // La valeur saisie sera utilisée comme catégorie personnalisée
+                System.out.println("Catégorie personnalisée : " + newVal);
+            }
+        });
+
         System.out.println("Formulaire initialisé");
     }
 
@@ -48,9 +77,10 @@ public class FormulaireProduitController {
         btnValider.setText("Ajouter");
         dateCreationPicker.setValue(LocalDate.now());
 
-        categorieCombo.setItems(FXCollections.observableArrayList(
-                "Électronique", "Informatique", "Bureau", "Mobilier", "Consommable", "Autre"
-        ));
+        // Réinitialiser la ComboBox
+        categorieCombo.setItems(FXCollections.observableArrayList(categoriesPredifinies));
+        categorieCombo.getSelectionModel().clearSelection();
+        categorieCombo.setEditable(false);
     }
 
     public void setModeModification(produit p) {
@@ -60,7 +90,32 @@ public class FormulaireProduitController {
         idField.setText(String.valueOf(p.getId()));
         nomField.setText(p.getNom());
         descriptionField.setText(p.getDescription());
-        categorieCombo.setValue(p.getCategorie());
+
+        // Gérer la catégorie existante
+        String categorieExistante = p.getCategorie();
+        if (categorieExistante != null) {
+            // Vérifier si la catégorie existe dans la liste prédéfinie
+            boolean estCategoriePredifinie = false;
+            for (String cat : categoriesPredifinies) {
+                if (cat.equals(categorieExistante)) {
+                    estCategoriePredifinie = true;
+                    break;
+                }
+            }
+
+            if (estCategoriePredifinie) {
+                // C'est une catégorie prédéfinie
+                categorieCombo.setValue(categorieExistante);
+                categorieCombo.setEditable(false);
+            } else {
+                // C'est une catégorie personnalisée
+                categorieCombo.setEditable(true);
+                categorieCombo.getEditor().setText(categorieExistante);
+                // Sélectionner "Autre" pour indiquer que c'est personnalisé
+                categorieCombo.getSelectionModel().select("Autre");
+            }
+        }
+
         prixField.setText(String.valueOf(p.getPrix()));
         stockActuelField.setText(String.valueOf(p.getStock_actuel()));
         stockMinField.setText(String.valueOf(p.getStock_min()));
@@ -68,14 +123,31 @@ public class FormulaireProduitController {
             dateCreationPicker.setValue(LocalDate.parse(p.getDate_creation()));
         }
         ressourcesField.setText(p.getRessources_necessaires());
-
-        categorieCombo.setItems(FXCollections.observableArrayList(
-                "Électronique", "Informatique", "Bureau", "Mobilier", "Consommable", "Autre"
-        ));
     }
 
     public void setOnProduitAjoute(Runnable callback) {
         this.onProduitAjoute = callback;
+    }
+
+    /**
+     * Récupère la valeur de la catégorie (sélectionnée ou saisie)
+     */
+    private String getCategorieValue() {
+        if (categorieCombo.isEditable()) {
+            // Si la ComboBox est éditable, on prend la valeur saisie
+            String saisie = categorieCombo.getEditor().getText();
+            if (saisie != null && !saisie.trim().isEmpty()) {
+                return saisie.trim();
+            }
+        }
+
+        // Sinon, on prend la valeur sélectionnée
+        String selection = categorieCombo.getValue();
+        if (selection != null && !selection.trim().isEmpty()) {
+            return selection.trim();
+        }
+
+        return null;
     }
 
     @FXML
@@ -93,7 +165,13 @@ public class FormulaireProduitController {
 
             p.setNom(nomField.getText().trim());
             p.setDescription(descriptionField.getText().trim());
-            p.setCategorie(categorieCombo.getValue());
+
+            // Récupérer la catégorie (sélectionnée ou saisie)
+            String categorie = getCategorieValue();
+            if (categorie != null) {
+                p.setCategorie(categorie);
+            }
+
             p.setPrix(Double.parseDouble(prixField.getText().trim()));
             p.setStock_actuel(Integer.parseInt(stockActuelField.getText().trim()));
             p.setStock_min(Integer.parseInt(stockMinField.getText().trim()));
@@ -134,10 +212,14 @@ public class FormulaireProduitController {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Le nom est obligatoire");
             return false;
         }
-        if (categorieCombo.getValue() == null) {
+
+        // Validation de la catégorie
+        String categorie = getCategorieValue();
+        if (categorie == null || categorie.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "La catégorie est obligatoire");
             return false;
         }
+
         try {
             Double.parseDouble(prixField.getText().trim());
         } catch (NumberFormatException e) {
@@ -169,5 +251,26 @@ public class FormulaireProduitController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // Ajouter cette méthode pour sauvegarder les catégories personnalisées
+    private void ajouterCategoriePersonnalisee(String nouvelleCategorie) {
+        if (nouvelleCategorie != null && !nouvelleCategorie.isEmpty()) {
+            // Vérifier si la catégorie n'existe pas déjà
+            boolean existe = false;
+            for (String cat : categoriesPredifinies) {
+                if (cat.equalsIgnoreCase(nouvelleCategorie)) {
+                    existe = true;
+                    break;
+                }
+            }
+
+            if (!existe) {
+                // Ajouter à la liste des catégories pour une utilisation future
+                ObservableList<String> items = FXCollections.observableArrayList(categoriesPredifinies);
+                items.add(nouvelleCategorie);
+                categorieCombo.setItems(items);
+            }
+        }
     }
 }
