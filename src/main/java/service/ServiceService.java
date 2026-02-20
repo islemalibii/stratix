@@ -40,6 +40,7 @@ public class ServiceService {
         ste.executeUpdate(req);
         System.out.println("Service ajouté: " + service.getTitre());
     }
+
     public List<Service> afficherAll() throws SQLException {
         List<Service> liste = new ArrayList<>();
         String req = "SELECT s.*, c.nom as categorie_nom, c.description as categorie_description "
@@ -110,6 +111,30 @@ public class ServiceService {
         }
         res.close();
         return null;
+    }
+
+    public List<Service> rechercher(String texteRecherche, String categorieFiltre) throws SQLException {
+        List<Service> tousLesServices = afficherAll();
+
+        if ((texteRecherche == null || texteRecherche.isEmpty()) &&
+                (categorieFiltre == null || categorieFiltre.equals("Tous"))) {
+            return tousLesServices;
+        }
+
+        return tousLesServices.stream()
+                .filter(service -> {
+                    boolean correspondTexte = texteRecherche == null || texteRecherche.isEmpty() ||
+                            service.getTitre().toLowerCase().contains(texteRecherche.toLowerCase()) ||
+                            (service.getDescription() != null &&
+                                    service.getDescription().toLowerCase().contains(texteRecherche.toLowerCase()));
+
+                    boolean correspondCategorie = categorieFiltre == null || categorieFiltre.equals("Tous") ||
+                            (service.getCategorie() != null &&
+                                    service.getCategorie().getNom().equals(categorieFiltre));
+
+                    return correspondTexte && correspondCategorie;
+                })
+                .toList();
     }
 
     public void updateTitre(Service service) throws SQLException {

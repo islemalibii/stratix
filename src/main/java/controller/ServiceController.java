@@ -1,7 +1,5 @@
 package controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -58,48 +56,48 @@ public class ServiceController implements Initializable {
 
         for (Service s : services) {
             HBox row = new HBox(10);
-            row.getStyleClass().add("table-row");
+            row.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0; -fx-alignment: center-left;");
             row.setPrefHeight(50);
 
             Label titre = new Label(s.getTitre());
-            titre.getStyleClass().add("titre-cell");
+            titre.setStyle("-fx-font-weight: bold; -fx-min-width: 150; -fx-text-fill: #2c3e50;");
             titre.setPrefWidth(200);
 
             String catName = (s.getCategorie() != null) ? s.getCategorie().getNom() : "Non catégorisé";
             Label categorie = new Label(catName);
-            categorie.getStyleClass().add("categorie-cell");
+            categorie.setStyle("-fx-text-fill: #7f8c8d; -fx-font-style: italic; -fx-min-width: 100;");
             categorie.setPrefWidth(120);
 
             Label budget = new Label(String.format("%,.0f DT", s.getBudget()));
-            budget.getStyleClass().add("budget-cell");
+            budget.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-min-width: 80;");
             budget.setPrefWidth(120);
 
             Label dateDebut = new Label(s.getDateDebut());
-            dateDebut.getStyleClass().add("dates-cell");
+            dateDebut.setStyle("-fx-text-fill: #7f8c8d; -fx-min-width: 100;");
             dateDebut.setPrefWidth(120);
 
             Label dateFin = new Label(s.getDateFin());
-            dateFin.getStyleClass().add("dates-cell");
+            dateFin.setStyle("-fx-text-fill: #7f8c8d; -fx-min-width: 100;");
             dateFin.setPrefWidth(120);
 
             Label resp = new Label(String.valueOf(s.getResponsableId()));
-            resp.getStyleClass().add("resp-cell");
+            resp.setStyle("-fx-text-fill: #7f8c8d; -fx-min-width: 50; -fx-alignment: center;");
             resp.setPrefWidth(80);
 
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
             HBox actions = new HBox(5);
-            actions.getStyleClass().add("action-buttons");
+            actions.setAlignment(Pos.CENTER_RIGHT);
             actions.setPrefWidth(200);
 
             Button btnModifier = new Button("Modifier");
-            btnModifier.getStyleClass().add("btn-modifier");
+            btnModifier.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;");
             btnModifier.setPrefWidth(80);
             btnModifier.setOnAction(e -> ouvrirModification(s));
 
             Button btnSupprimer = new Button("Supprimer");
-            btnSupprimer.getStyleClass().add("btn-supprimer");
+            btnSupprimer.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;");
             btnSupprimer.setPrefWidth(80);
             btnSupprimer.setOnAction(e -> supprimerService(s));
 
@@ -107,6 +105,19 @@ public class ServiceController implements Initializable {
 
             row.getChildren().addAll(titre, categorie, budget, dateDebut, dateFin, resp, spacer, actions);
             servicesContainer.getChildren().add(row);
+        }
+    }
+
+    @FXML
+    private void handleSearch() {
+        String texteRecherche = searchField.getText();
+        String categorieFiltre = filterType.getValue();
+
+        try {
+            List<Service> resultats = serviceService.rechercher(texteRecherche, categorieFiltre);
+            afficherLignes(resultats);
+        } catch (SQLException e) {
+            showAlert("Erreur", "Erreur lors de la recherche: " + e.getMessage());
         }
     }
 
@@ -168,22 +179,6 @@ public class ServiceController implements Initializable {
         } catch (Exception e) {
             showAlert("Erreur", e.getMessage());
         }
-    }
-
-    @FXML
-    private void handleSearch() {
-        String searchText = searchField.getText().toLowerCase();
-        String selectedType = filterType.getValue();
-
-        List<Service> filtered = allServices.stream()
-                .filter(s -> searchText.isEmpty() ||
-                        s.getTitre().toLowerCase().contains(searchText))
-                .filter(s -> selectedType.equals("Tous") ||
-                        (s.getCategorie() != null &&
-                                s.getCategorie().getNom().equals(selectedType)))
-                .toList();
-
-        afficherLignes(filtered);
     }
 
     private void showAlert(String title, String message) {
