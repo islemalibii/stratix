@@ -171,6 +171,11 @@ public class AjoutController implements Initializable {
             lblError.setText("La date de fin doit être après la date de début");
             return false;
         }
+
+        if (dateDebutPicker.getValue().isBefore(LocalDate.now())) {
+            lblError.setText("La date de début ne peut pas être dans le passé");
+            return false;
+        }
         if (txtBudget.getText().trim().isEmpty()) {
             lblError.setText("Le budget est obligatoire");
             return false;

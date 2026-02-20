@@ -21,7 +21,7 @@
         <TextArea fx:id="txtDescription" prefRowCount="3" styleClass="form-field" promptText="Description du service" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
         <Label text="Date création:" styleClass="form-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <DatePicker fx:id="dateCreationPicker" styleClass="form-field" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <DatePicker fx:id="dateCreationPicker" styleClass="form-field" GridPane.rowIndex="3" GridPane.columnIndex="1" editable="false" disable="true"/>
 
         <Label text="Date début:" styleClass="form-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
         <DatePicker fx:id="dateDebutPicker" styleClass="form-field" promptText="AAAA-MM-JJ" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
