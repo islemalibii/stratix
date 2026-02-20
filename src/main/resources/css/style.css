@@ -188,3 +188,14 @@
     -fx-font-weight: bold;
     -fx-text-fill: -fx-primary;
 }
+.btn-pdf {
+    -fx-background-color: #d32f2f;
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+.btn-pdf:hover {
+    -fx-opacity: 0.9;
+}

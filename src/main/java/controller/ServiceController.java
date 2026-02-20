@@ -1,5 +1,8 @@
 package controller;
-
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -10,9 +13,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Service;
+import service.PDFService;
 import service.ServiceService;
 import java.net.URL;
 import java.sql.SQLException;
@@ -236,5 +241,25 @@ public class ServiceController implements Initializable {
         alert.setTitle(title);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    @FXML
+    private void handleExporterPDF() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Exporter les services");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf"));
+        fileChooser.setInitialFileName("rapport_services_" +
+                LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".pdf");
+
+        File file = fileChooser.showSaveDialog(servicesContainer.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                PDFService.exporterServices(allServices, file.getAbsolutePath());
+                showAlert("Succès", "Rapport PDF exporté avec succès !\n" + file.getName());
+            } catch (IOException e) {
+                showAlert("Erreur", "Impossible d'exporter le PDF: " + e.getMessage());
+            }
+        }
     }
 }
