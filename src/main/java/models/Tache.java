@@ -51,3 +51,4 @@ public class Tache {
     public String getPriorite() { return priorite; }
     public void setPriorite(String priorite) { this.priorite = priorite; }
 }
+//
