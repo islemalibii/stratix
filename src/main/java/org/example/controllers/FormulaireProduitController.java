@@ -301,7 +301,6 @@ public class FormulaireProduitController {
             produit p = new produit();
             boolean isNewProduct = (idField.getText() == null || idField.getText().isEmpty());
 
-            // Ne pas setter l'ID pour un nouveau produit
             if (!isNewProduct) {
                 p.setId(Integer.parseInt(idField.getText()));
             }
@@ -316,20 +315,23 @@ public class FormulaireProduitController {
             p.setRessources_necessaires(ressourcesField.getText().trim());
 
             if (isNewProduct) {
-                // 1. D'abord gérer l'image si sélectionnée
+                // CORRECTION: Gérer l'image AVANT l'insertion
                 if (selectedImageFile != null) {
-                    // Pour un nouveau produit, on aura besoin de l'ID après insertion
-                    // On va d'abord ajouter le produit sans image, puis mettre à jour avec l'image
-                    serviceProduit.add(p); // Le produit est ajouté et l'ID est maintenant défini
+                    // Étape 1: D'abord copier l'image pour obtenir le chemin
+                    // Mais on a besoin de l'ID pour nommer l'image...
+                    // Solution: Faire une insertion temporaire sans image pour obtenir l'ID
 
-                    // 2. Maintenant qu'on a l'ID, on peut copier l'image
+                    // Insérer d'abord sans image
+                    serviceProduit.add(p);  // L'ID est maintenant généré
+
+                    // Maintenant qu'on a l'ID, copier l'image
                     String imagePath = copyImageToAppDirectory(selectedImageFile, p.getId());
                     if (imagePath != null) {
                         p.setImage_path(imagePath);
-                        serviceProduit.update(p); // Mise à jour avec le chemin de l'image
+                        serviceProduit.update(p); // Mise à jour avec l'image
                     }
                 } else {
-                    // Ajout sans image
+                    // Pas d'image, insertion directe
                     serviceProduit.add(p);
                 }
 
@@ -341,7 +343,7 @@ public class FormulaireProduitController {
                     String imagePath = copyImageToAppDirectory(selectedImageFile, p.getId());
                     p.setImage_path(imagePath);
                 } else {
-                    // Conserver l'image existante ou null
+                    // Conserver l'image existante
                     p.setImage_path(currentImagePath);
                 }
 
