@@ -24,6 +24,9 @@ public class DashboardAdminController {
 
     @FXML
     private Label welcomeLabel;
+    
+    @FXML
+    private Label avatarLabel;
 
     @FXML
     private Label titleLabel;
@@ -51,6 +54,11 @@ public class DashboardAdminController {
     public void setCurrentUser(Utilisateur user) {
         this.currentUser = user;
         welcomeLabel.setText("Bienvenue, " + user.getNom() + " " + user.getPrenom());
+        
+        // Mettre à jour l'avatar avec la première lettre du prénom
+        if (user.getPrenom() != null && !user.getPrenom().isEmpty()) {
+            avatarLabel.setText(user.getPrenom().substring(0, 1).toUpperCase());
+        }
     }
 
     @FXML
