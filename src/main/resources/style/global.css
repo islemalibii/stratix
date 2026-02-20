@@ -425,3 +425,7 @@
 .stat-card .label {
     -fx-text-alignment: center;
 }
+
+.check-box {
+    -fx-text-fill: #333333;
+}

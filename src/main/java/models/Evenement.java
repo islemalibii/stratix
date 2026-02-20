@@ -88,7 +88,7 @@ public class Evenement {
         return ressources;
     }
 
-    public void setRessourcesUtilisees(List<Ressource> ressources) {
+    public void setRessources(List<Ressource> ressources) {
         this.ressources = ressources;
     }
 

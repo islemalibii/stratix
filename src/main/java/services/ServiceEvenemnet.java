@@ -2,6 +2,7 @@ package services;
 
 import interfaces.Services;
 import models.Evenement;
+import models.Ressource;
 import models.enums.EventStatus;
 import models.enums.EventType;
 import utils.MyDataBase;
@@ -23,7 +24,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
         String req = "INSERT INTO evenement(type_event, date_event, description, statut, lieu, titre, image_url) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)"; // l values ywalou treated as data mch sql ynajm yexecuta : protection contre l sql injection
 
-        try (PreparedStatement pst = cnx.prepareStatement(req)) {
+        try (PreparedStatement pst = cnx.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);) {
 
             pst.setString(1, evenement.getType_event().name());
             pst.setDate(2, java.sql.Date.valueOf(evenement.getDate_event())); // LocalDate ll SQL Date
@@ -34,12 +35,28 @@ public class ServiceEvenemnet implements Services<Evenement> {
             pst.setString(7, evenement.getImageUrl());
 
             pst.executeUpdate();
+
+
+            ResultSet rs = pst.getGeneratedKeys();
+
+            if (rs.next()) {
+                int eventId = rs.getInt(1);
+                evenement.setId(eventId);
+
+                ServiceEventRessource link = new ServiceEventRessource();
+
+                for (Ressource r : evenement.getRessources()) {
+                    link.addRessourceToEvent(eventId, r.getid(), r.getQuatite());
+                }
+            }
             System.out.println("Evenement added successfully");
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
+
+
     //lladmin
     @Override
     public void update(Evenement evenement) {
@@ -90,8 +107,8 @@ public class ServiceEvenemnet implements Services<Evenement> {
                 e.setDescription(rs.getString("description"));
                 e.setLieu(rs.getString("lieu"));
                 e.setDate_event(rs.getDate("date_event").toLocalDate());
-                e.setType_event(EventType.valueOf(rs.getString("type_event").toLowerCase()));
-                e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
+                e.setType_event(EventType.valueOf(rs.getString("type_event")));
+                e.setStatut(EventStatus.valueOf(rs.getString("statut")));
                 e.setArchived(rs.getInt("isArchived") == 1);
                 e.setImageUrl(rs.getString("image_url"));
 
@@ -249,5 +266,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
         }
         return list;
     }
+
+
 
 }

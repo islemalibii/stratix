@@ -6,14 +6,14 @@ public class Ressource {
     private int id;
     private String nom;
     private String type_ressource;
-    private int quatite;
+    private int quantite;
     private String fournisseur;
     public Ressource(){}
     public Ressource(int id, String nom, String type_ressource, int quatite,String fournisseur) {
         this.id = id;
         this.nom=nom;
         this.type_ressource=type_ressource;
-        this.quatite=quatite;
+        this.quantite=quatite;
         this.fournisseur=fournisseur;
 
     }
@@ -43,11 +43,11 @@ public class Ressource {
     }
 
     public int getQuatite() {
-        return quatite;
+        return quantite;
     }
 
     public void setQuatite(int quatite) {
-        this.quatite = quatite;
+        this.quantite = quatite;
     }
 
     public String getFournisseur() {
@@ -64,7 +64,7 @@ public class Ressource {
                 "id=" + id +
                 ", nom='" + nom + '\'' +
                 ", type_ressource='" + type_ressource + '\'' +
-                ", quatite=" + quatite +
+                ", quatite=" + quantite +
                 ", fournisseur='" + fournisseur + '\'' +
                 '}';
     }

@@ -2,9 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.image.ImageView?>
+
 
 <StackPane prefHeight="700.0" prefWidth="1000.0" styleClass="main-bg"
            stylesheets="@/style/global.css"
@@ -59,6 +57,14 @@
             <VBox spacing="5">
                 <Label text="Statut Initial" styleClass="input-label" />
                 <ComboBox fx:id="statusCombo" maxWidth="Infinity" promptText="Choisir le statut" />
+            </VBox>
+
+            <VBox spacing="10">
+                <Label text="Ressources pour l'événement" styleClass="input-label"/>
+
+                <ScrollPane prefHeight="200" fitToWidth="true">
+                    <VBox fx:id="ressourcesContainer" spacing="8"/>
+                </ScrollPane>
             </VBox>
 
             <Separator style="-fx-padding: 10 0;" />
