@@ -315,23 +315,21 @@ public class FormulaireProduitController {
             p.setRessources_necessaires(ressourcesField.getText().trim());
 
             if (isNewProduct) {
-                // CORRECTION: Gérer l'image AVANT l'insertion
+                // Ajout d'un nouveau produit
                 if (selectedImageFile != null) {
-                    // Étape 1: D'abord copier l'image pour obtenir le chemin
-                    // Mais on a besoin de l'ID pour nommer l'image...
-                    // Solution: Faire une insertion temporaire sans image pour obtenir l'ID
+                    // Étape 1: Ajouter le produit sans image d'abord
+                    p.setImage_path(null); // Important: mettre à null pour l'insertion
+                    serviceProduit.add(p); // L'ID est maintenant généré
 
-                    // Insérer d'abord sans image
-                    serviceProduit.add(p);  // L'ID est maintenant généré
-
-                    // Maintenant qu'on a l'ID, copier l'image
+                    // Étape 2: Copier l'image avec l'ID généré
                     String imagePath = copyImageToAppDirectory(selectedImageFile, p.getId());
                     if (imagePath != null) {
                         p.setImage_path(imagePath);
                         serviceProduit.update(p); // Mise à jour avec l'image
                     }
                 } else {
-                    // Pas d'image, insertion directe
+                    // Ajout sans image
+                    p.setImage_path(null);
                     serviceProduit.add(p);
                 }
 
