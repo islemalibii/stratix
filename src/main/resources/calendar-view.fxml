@@ -1,68 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="800" prefWidth="1200" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.WhiteboardController">
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.CalendarController"
+            style="-fx-background-color: #f8fafc;">
 
     <!-- Header -->
-    <HBox layoutX="0" layoutY="0" prefHeight="70" prefWidth="1200" style="-fx-background-color: #1e293b; -fx-padding: 0 20;" alignment="CENTER_LEFT">
-        <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" text="📋 TABLEAU KANBAN - GESTION DES TÂCHES" />
-    </HBox>
+    <top>
+        <VBox style="-fx-background-color: #2c3e50; -fx-padding: 20 30;">
+            <Label text="📅 CALENDRIER DES PLANNINGS"
+                   style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+            <Label text="Visualisation mensuelle des plannings employés"
+                   style="-fx-text-fill: #94a3b8; -fx-font-size: 14px;"/>
+        </VBox>
+    </top>
 
-    <!-- Instructions -->
-    <HBox layoutX="20" layoutY="90" spacing="10" alignment="CENTER_LEFT">
-        <Label style="-fx-font-size: 14px; -fx-text-fill: #6b7280;" text="💡 Cliquez droit sur une carte pour plus d'options" />
-    </HBox>
+    <center>
+        <VBox spacing="20" style="-fx-padding: 20;">
 
-    <!-- Kanban Board -->
-    <HBox layoutX="20" layoutY="120" spacing="20" prefHeight="650">
-
-        <!-- Colonne À FAIRE -->
-        <VBox spacing="10" prefWidth="280" style="-fx-background-color: #f1f5f9; -fx-padding: 15; -fx-background-radius: 10;">
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #475569;" text="📌 À FAIRE" />
-                <Label fx:id="lblCountAFaire" style="-fx-background-color: #94a3b8; -fx-text-fill: white; -fx-padding: 2 8; -fx-background-radius: 12;" text="0" />
+            <!-- Navigation mois -->
+            <HBox spacing="20" alignment="CENTER">
+                <Button text="◀ Mois précédent" onAction="#previousMonth"
+                        style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                <Label fx:id="lblMonthYear" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Février 2026"/>
+                <Button text="Mois suivant ▶" onAction="#nextMonth"
+                        style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"/>
             </HBox>
 
-            <ScrollPane fitToWidth="true" prefHeight="550" style="-fx-background: transparent; -fx-background-color: transparent;">
-                <VBox fx:id="columnAFaire" spacing="10" prefWidth="250">
-                    <!-- Les cartes seront ajoutées dynamiquement -->
+            <!-- Calendrier -->
+            <HBox spacing="20">
+                <!-- Grille du calendrier -->
+                <VBox spacing="10" HBox.hgrow="ALWAYS">
+                    <Label text="Calendrier" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                    <ScrollPane fitToWidth="true" style="-fx-background: white; -fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                        <GridPane fx:id="calendarGrid" hgap="5" vgap="5" style="-fx-padding: 10;">
+                            <!-- Le contenu sera rempli par le contrôleur -->
+                        </GridPane>
+                    </ScrollPane>
                 </VBox>
-            </ScrollPane>
-        </VBox>
 
-        <!-- Colonne EN COURS -->
-        <VBox spacing="10" prefWidth="280" style="-fx-background-color: #fef9c3; -fx-padding: 15; -fx-background-radius: 10;">
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #854d0e;" text="⚡ EN COURS" />
-                <Label fx:id="lblCountEnCours" style="-fx-background-color: #eab308; -fx-text-fill: white; -fx-padding: 2 8; -fx-background-radius: 12;" text="0" />
+                <!-- Liste des événements du jour -->
+                <VBox spacing="10" prefWidth="300">
+                    <Label text="Événements du jour" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                    <ListView fx:id="eventsListView" prefHeight="400" style="-fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;"/>
+                </VBox>
             </HBox>
 
-            <ScrollPane fitToWidth="true" prefHeight="550" style="-fx-background: transparent; -fx-background-color: transparent;">
-                <VBox fx:id="columnEnCours" spacing="10" prefWidth="250">
-                    <!-- Les cartes seront ajoutées dynamiquement -->
-                </VBox>
-            </ScrollPane>
-        </VBox>
-
-        <!-- Colonne TERMINÉE -->
-        <VBox spacing="10" prefWidth="280" style="-fx-background-color: #dcfce7; -fx-padding: 15; -fx-background-radius: 10;">
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #166534;" text="✅ TERMINÉE" />
-                <Label fx:id="lblCountTerminee" style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-padding: 2 8; -fx-background-radius: 12;" text="0" />
+            <!-- Légende -->
+            <HBox spacing="30" alignment="CENTER" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10; -fx-border-color: #e2e8f0;">
+                <Label text="Légende :" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                <HBox spacing="5">
+                    <Label text="●" style="-fx-text-fill: #3b82f6; -fx-font-size: 16px;"/>
+                    <Label text="Matin"/>
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="●" style="-fx-text-fill: #f59e0b; -fx-font-size: 16px;"/>
+                    <Label text="Après-midi"/>
+                </HBox>
+                <HBox spacing="5">
+                    <Label text="●" style="-fx-text-fill: #8b5cf6; -fx-font-size: 16px;"/>
+                    <Label text="Nuit"/>
+                </HBox>
             </HBox>
-
-            <ScrollPane fitToWidth="true" prefHeight="550" style="-fx-background: transparent; -fx-background-color: transparent;">
-                <VBox fx:id="columnTerminee" spacing="10" prefWidth="250">
-                    <!-- Les cartes seront ajoutées dynamiquement -->
-                </VBox>
-            </ScrollPane>
         </VBox>
-
-    </HBox>
-
-</AnchorPane>
+    </center>
+</BorderPane>
