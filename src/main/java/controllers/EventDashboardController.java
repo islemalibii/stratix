@@ -105,9 +105,9 @@ public class EventDashboardController {
         title.getStyleClass().add("card-title");
         title.setWrapText(true);
 
-        Label desc = new Label(e.getDescription());
-        desc.getStyleClass().add("card-description");
-        desc.setWrapText(true);
+        Label typeLabel = new Label(e.getType_event() != null ? e.getType_event().name() : "TYPE NON DÉFINI");
+        typeLabel.getStyleClass().add("card-description");
+        typeLabel.setWrapText(true);
 
         Label dateLieu = new Label(e.getDate_event() + " | " + e.getLieu());
         dateLieu.getStyleClass().add("card-details");
@@ -142,7 +142,7 @@ public class EventDashboardController {
         });
 
         actions.getChildren().addAll(modifyBtn, archiveBtn);
-        infoBox.getChildren().addAll(title, desc, dateLieu, status, actions);
+        infoBox.getChildren().addAll(title, typeLabel, dateLieu, status, actions);
         card.getChildren().addAll(imageView, infoBox);
 
         return card;
@@ -221,7 +221,7 @@ public class EventDashboardController {
             eventContainer.getScene().setRoot(root);
 
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

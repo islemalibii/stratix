@@ -23,10 +23,12 @@
                        promptText="Rechercher un événement..."
                        HBox.hgrow="ALWAYS" />
 
+            <ComboBox fx:id="typeFilterCombo" onAction="#handleFilter"
+                      promptText="Filtrer par Type" prefWidth="200" />
 
-
-            <Button onAction="#switchToAdminView" text="Vue Employé (Test)" styleClass="btn-ghost" />
+            <Button onAction="#switchToAdminView" text="Vue Admin" styleClass="btn-ghost" />
         </HBox>
+
 
         <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
             <content>

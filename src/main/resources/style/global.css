@@ -428,4 +428,9 @@
 
 .check-box {
     -fx-text-fill: #333333;
-}
+}.card-type {
+     -fx-text-fill: #666666;
+     -fx-font-size: 13px;
+     -fx-font-style: italic;
+     -fx-font-weight: bold;
+ }

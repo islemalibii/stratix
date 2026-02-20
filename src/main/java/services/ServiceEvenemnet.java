@@ -225,7 +225,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
                 e.setDate_event(rs.getDate("date_event").toLocalDate());
                 e.setImageUrl(rs.getString("image_url"));
                 e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
-                e.setType_event(EventType.valueOf(rs.getString("type_event").toLowerCase()));
+                e.setType_event(EventType.valueOf(rs.getString("type_event")));
 
                 list.add(e);
             }
@@ -259,6 +259,34 @@ public class ServiceEvenemnet implements Services<Evenement> {
                 e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
                 e.setType_event(EventType.valueOf(rs.getString("type_event").toLowerCase()));
 
+                list.add(e);
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return list;
+    }
+
+    //llemployee
+    public List<Evenement> filterByType(EventType type) {
+        List<Evenement> list = new ArrayList<>();
+        String req = "SELECT * FROM evenement WHERE type_event = ? AND statut = ? AND isArchived = 0";
+
+        try (PreparedStatement pst = cnx.prepareStatement(req)) {
+            pst.setString(1, type.name());
+            pst.setString(2, EventStatus.planifier.name());
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                Evenement e = new Evenement();
+                e.setId(rs.getInt("id"));
+                e.setTitre(rs.getString("titre"));
+                e.setDescription(rs.getString("description"));
+                e.setLieu(rs.getString("lieu"));
+                e.setDate_event(rs.getDate("date_event").toLocalDate());
+                e.setType_event(EventType.valueOf(rs.getString("type_event").toLowerCase()));
+                e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
+                e.setImageUrl(rs.getString("image_url"));
                 list.add(e);
             }
         } catch (SQLException ex) {

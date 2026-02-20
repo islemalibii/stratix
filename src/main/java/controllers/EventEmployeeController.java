@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -14,6 +15,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.Evenement;
+import models.enums.EventType;
 import services.ServiceEvenemnet;
 
 import java.io.IOException;
@@ -25,6 +27,7 @@ public class EventEmployeeController {
 
     @FXML private FlowPane eventContainer;
     @FXML private TextField searchField;
+    @FXML private ComboBox<String> typeFilterCombo;
 
     private ServiceEvenemnet service = new ServiceEvenemnet();
     private List<Evenement> events = new ArrayList<>();
@@ -32,6 +35,12 @@ public class EventEmployeeController {
     @FXML
     public void initialize() {
 
+
+        typeFilterCombo.getItems().add("Tous");
+        for (EventType t : EventType.values()) {
+            typeFilterCombo.getItems().add(t.name());
+        }
+        typeFilterCombo.setValue("Tous");
 
         events = service.getPlanifierOnly();
         displayEvents(events);
@@ -75,9 +84,9 @@ public class EventEmployeeController {
         title.getStyleClass().add("card-title");
         title.setWrapText(true);
 
-        Label desc = new Label(e.getDescription());
-        desc.getStyleClass().add("card-description");
-        desc.setWrapText(true);
+        Label typeLabel = new Label(e.getType_event() != null ? e.getType_event().name() : "TYPE NON DÉFINI");
+        typeLabel.getStyleClass().add("card-description");
+        typeLabel.setWrapText(true);
 
         Label dateLieu = new Label(e.getDate_event() + " | " + e.getLieu());
         dateLieu.getStyleClass().add("card-details");
@@ -104,17 +113,50 @@ public class EventEmployeeController {
         });
 
         actions.getChildren().addAll(participeBtn, moreBtn);
-        infoBox.getChildren().addAll(title, desc, dateLieu, actions);
+        infoBox.getChildren().addAll(title, typeLabel, dateLieu, actions);
         card.getChildren().addAll(imageView, infoBox);
 
         return card;
     }
 
+    private void applyFilters() {
+        String query = searchField.getText();
+        String selectedType = typeFilterCombo.getValue();
+
+        List<Evenement> results;
+
+        boolean hasSearch = query != null && !query.isEmpty();
+        boolean hasFilter = selectedType != null && !selectedType.equals("Tous");
+
+        if (hasSearch && hasFilter) {
+            EventType type = EventType.valueOf(selectedType);
+            results = service.searchPlanifierByTitle(query).stream()
+                    .filter(e -> e.getType_event() == type)
+                    .toList();
+        }
+        else if (hasSearch) {
+            results = service.searchPlanifierByTitle(query);
+        }
+        else if (hasFilter) {
+            EventType type = EventType.valueOf(selectedType);
+            results = service.filterByType(type);
+        }
+        // Cas 4: Rien du tout (Reset)
+        else {
+            results = service.getPlanifierOnly();
+        }
+
+        displayEvents(results);
+    }
+
     @FXML
     private void search() {
-        String query = searchField.getText();
-        List<Evenement> results = service.searchPlanifierByTitle(query);
-        displayEvents(results);
+        applyFilters();
+    }
+
+    @FXML
+    private void handleFilter() {
+        applyFilters();
     }
 
 
