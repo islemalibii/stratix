@@ -205,4 +205,4 @@ public class CalendarController {
             eventsListView.getItems().add("Aucun planning pour cette date");
         }
     }
-}
+}//
