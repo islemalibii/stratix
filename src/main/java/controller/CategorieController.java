@@ -1,7 +1,5 @@
 package controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -23,9 +21,12 @@ import java.util.ResourceBundle;
 public class CategorieController implements Initializable {
 
     @FXML private VBox categoriesContainer;
+    @FXML private Button btnArchives;
+    @FXML private Button btnRetour;
 
     private CategorieServiceService categorieService;
     private List<CategorieService> allCategories;
+    private boolean modeArchive = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -39,7 +40,11 @@ public class CategorieController implements Initializable {
 
     private void chargerDonnees() {
         try {
-            allCategories = categorieService.afficherAll();
+            if (modeArchive) {
+                allCategories = categorieService.afficherArchives();
+            } else {
+                allCategories = categorieService.afficherAll();
+            }
             afficherLignes(allCategories);
         } catch (SQLException e) {
             showAlert("Erreur", e.getMessage());
@@ -54,38 +59,92 @@ public class CategorieController implements Initializable {
             row.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0; -fx-alignment: center-left;");
             row.setPrefHeight(50);
 
-            // PLUS DE COLONNE ID !!!
-
             Label nom = new Label(c.getNom());
             nom.setStyle("-fx-font-weight: bold; -fx-min-width: 200; -fx-text-fill: #2c3e50;");
-            nom.setPrefWidth(200);
+            nom.setPrefWidth(250);
 
             String desc = c.getDescription();
-            if (desc != null && desc.length() > 50) {
-                desc = desc.substring(0, 47) + "...";
+            if (desc != null && desc.length() > 60) {
+                desc = desc.substring(0, 57) + "...";
             }
             Label description = new Label(desc != null ? desc : "");
-            description.setStyle("-fx-text-fill: #7f8c8d; -fx-min-width: 300;");
-            description.setPrefWidth(300);
+            description.setStyle("-fx-text-fill: #7f8c8d; -fx-min-width: 250;");
+            description.setPrefWidth(250);
 
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
             HBox actions = new HBox(5);
             actions.setAlignment(Pos.CENTER_RIGHT);
+            actions.setPrefWidth(150);
 
-            Button btnModifier = new Button("Modifier");
-            btnModifier.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
-            btnModifier.setOnAction(e -> ouvrirModification(c));
+            if (modeArchive) {
+                Button btnDesarchiver = new Button("Restaurer");
+                btnDesarchiver.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
+                btnDesarchiver.setOnAction(e -> desarchiverCategorie(c));
+                actions.getChildren().add(btnDesarchiver);
+            } else {
+                Button btnArchiver = new Button("Archiver");
+                btnArchiver.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
+                btnArchiver.setOnAction(e -> archiverCategorie(c));
 
-            Button btnSupprimer = new Button("Supprimer");
-            btnSupprimer.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
-            btnSupprimer.setOnAction(e -> supprimerCategorie(c));
+                Button btnModifier = new Button("Modifier");
+                btnModifier.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
+                btnModifier.setOnAction(e -> ouvrirModification(c));
 
-            actions.getChildren().addAll(btnModifier, btnSupprimer);
+                actions.getChildren().addAll(btnArchiver, btnModifier);
+            }
 
             row.getChildren().addAll(nom, description, spacer, actions);
             categoriesContainer.getChildren().add(row);
+        }
+    }
+
+    @FXML
+    private void handleVoirArchives() {
+        modeArchive = true;
+        chargerDonnees();
+        btnArchives.setVisible(false);
+        btnRetour.setVisible(true);
+    }
+
+    @FXML
+    private void handleRetour() {
+        modeArchive = false;
+        chargerDonnees();
+        btnArchives.setVisible(true);
+        btnRetour.setVisible(false);
+    }
+
+    private void archiverCategorie(CategorieService categorie) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmation");
+        confirm.setContentText("Archiver cette catégorie ?");
+
+        if (confirm.showAndWait().get() == ButtonType.OK) {
+            try {
+                categorieService.archiver(categorie.getId());
+                chargerDonnees();
+                showAlert("Succès", "Catégorie archivée!");
+            } catch (SQLException e) {
+                showAlert("Erreur", e.getMessage());
+            }
+        }
+    }
+
+    private void desarchiverCategorie(CategorieService categorie) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmation");
+        confirm.setContentText("Restaurer cette catégorie ?");
+
+        if (confirm.showAndWait().get() == ButtonType.OK) {
+            try {
+                categorieService.desarchiver(categorie.getId());
+                chargerDonnees();
+                showAlert("Succès", "Catégorie restaurée!");
+            } catch (SQLException e) {
+                showAlert("Erreur", e.getMessage());
+            }
         }
     }
 
@@ -108,22 +167,6 @@ public class CategorieController implements Initializable {
 
         } catch (Exception e) {
             showAlert("Erreur", e.getMessage());
-        }
-    }
-
-    private void supprimerCategorie(CategorieService categorie) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirmation");
-        confirm.setContentText("Supprimer cette catégorie ?");
-
-        if (confirm.showAndWait().get() == ButtonType.OK) {
-            try {
-                categorieService.delete(categorie.getId());
-                chargerDonnees();
-                showAlert("Succès", "Catégorie supprimée!");
-            } catch (SQLException e) {
-                showAlert("Erreur", e.getMessage());
-            }
         }
     }
 

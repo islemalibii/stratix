@@ -18,6 +18,8 @@
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Label text="Liste des Services" styleClass="section-title"/>
         <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnArchives" text="Archives" onAction="#handleVoirArchives" styleClass="btn-archive"/>
+        <Button fx:id="btnRetour" text="⬅ Retour" onAction="#handleRetour" styleClass="btn-retour" visible="false"/>
         <Button text="+ Ajouter" onAction="#handleAjouter" styleClass="btn-add"/>
     </HBox>
 

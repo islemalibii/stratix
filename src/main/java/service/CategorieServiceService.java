@@ -2,7 +2,6 @@ package service;
 
 import model.CategorieService;
 import util.db;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +24,10 @@ public class CategorieServiceService {
         String nom = escape(categorie.getNom());
         String description = escape(categorie.getDescription());
 
-        String req = "INSERT INTO categorie_service (nom, description, date_creation) VALUES ("
+        String req = "INSERT INTO categorie_service (nom, description, date_creation, archive) VALUES ("
                 + "'" + nom + "', "
                 + "'" + description + "', "
-                + "CURRENT_DATE)";
+                + "CURRENT_DATE, 0)";
 
         ste = conn.createStatement();
         ste.executeUpdate(req);
@@ -36,8 +35,16 @@ public class CategorieServiceService {
     }
 
     public List<CategorieService> afficherAll() throws SQLException {
+        return afficherParStatut(false);
+    }
+
+    public List<CategorieService> afficherArchives() throws SQLException {
+        return afficherParStatut(true);
+    }
+
+    private List<CategorieService> afficherParStatut(boolean archive) throws SQLException {
         List<CategorieService> liste = new ArrayList<>();
-        String req = "SELECT * FROM categorie_service ORDER BY nom";
+        String req = "SELECT * FROM categorie_service WHERE archive = " + (archive ? "1" : "0") + " ORDER BY nom";
 
         ste = conn.createStatement();
         ResultSet res = ste.executeQuery(req);
@@ -48,6 +55,7 @@ public class CategorieServiceService {
             c.setNom(res.getString("nom"));
             c.setDescription(res.getString("description"));
             c.setDateCreation(res.getString("date_creation"));
+            c.setArchive(res.getBoolean("archive"));
             liste.add(c);
         }
         res.close();
@@ -66,6 +74,7 @@ public class CategorieServiceService {
             c.setNom(res.getString("nom"));
             c.setDescription(res.getString("description"));
             c.setDateCreation(res.getString("date_creation"));
+            c.setArchive(res.getBoolean("archive"));
             res.close();
             return c;
         }
@@ -88,21 +97,31 @@ public class CategorieServiceService {
             System.out.println("Catégorie modifiée ID=" + categorie.getId());
         }
     }
-    public void delete(int id) throws SQLException {
-        String checkReq = "SELECT COUNT(*) FROM service WHERE categorie_id = " + id;
+
+    public void archiver(int id) throws SQLException {
+        String checkReq = "SELECT COUNT(*) FROM service WHERE categorie_id = " + id + " AND archive = 0";
         ResultSet rs = ste.executeQuery(checkReq);
         rs.next();
         int count = rs.getInt(1);
 
         if (count > 0) {
-            throw new SQLException("Impossible de supprimer : " + count + " service(s) utilisent cette catégorie");
+            throw new SQLException("Impossible d'archiver : " + count + " service(s) actifs utilisent cette catégorie");
         }
 
-        String req = "DELETE FROM categorie_service WHERE id = " + id;
+        String req = "UPDATE categorie_service SET archive = 1 WHERE id = " + id;
         ste = conn.createStatement();
         int rowsAffected = ste.executeUpdate(req);
         if (rowsAffected > 0) {
-            System.out.println("Catégorie supprimée ID=" + id);
+            System.out.println("Catégorie archivée ID=" + id);
+        }
+    }
+
+    public void desarchiver(int id) throws SQLException {
+        String req = "UPDATE categorie_service SET archive = 0 WHERE id = " + id;
+        ste = conn.createStatement();
+        int rowsAffected = ste.executeUpdate(req);
+        if (rowsAffected > 0) {
+            System.out.println("Catégorie désarchivée ID=" + id);
         }
     }
 

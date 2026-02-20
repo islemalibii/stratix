@@ -20,15 +20,15 @@ public class Main {
 
             Service s1 = new Service(0, "Developpement Web",
                     "Creation site web", "2026-02-08", "2026-03-01", "2026-06-30",
-                    101, 5000.00, 1);
+                    101, 5000.00, 1, false);
 
             Service s2 = new Service(0, "Formation Java",
                     "Cours programmation Java", "2026-02-08", "2026-02-15", "2026-04-15",
-                    102, 3000.00, 2);
+                    102, 3000.00, 2, false);
 
             Service s3 = new Service(0, "Maintenance",
                     "Maintenance serveurs", "2026-02-08", "2026-02-10", "2026-12-31",
-                    103, 2000.00, 3);
+                    103, 2000.00, 3, false);
 
             service.ajouter(s1);
             service.ajouter(s2);
@@ -47,7 +47,8 @@ public class Main {
                     System.out.println("   - ID: " + s.getId() +
                             " | Titre: " + s.getTitre() +
                             " | Catégorie: " + catName +
-                            " | Budget: " + s.getBudget() + " DT");
+                            " | Budget: " + s.getBudget() + " DT" +
+                            " | Archivé: " + (s.isArchive() ? "Oui" : "Non"));
                 }
             }
 
@@ -66,16 +67,23 @@ public class Main {
                 System.out.println("   - " + s.getTitre() + " (ID: " + s.getId() + ") - " + s.getBudget() + " DT");
             }
 
-            System.out.println(" Suppression du dernier service:");
+            System.out.println(" Archivage du dernier service:");
             if (!services.isEmpty()) {
                 int dernierId = services.get(services.size() - 1).getId();
-                service.delete(dernierId);
-                System.out.println("  Service ID " + dernierId + " supprimé");
+                service.archiver(dernierId);
+                System.out.println("  Service ID " + dernierId + " archivé");
             }
 
-            System.out.println("État final:");
+            System.out.println("État final (services actifs):");
             services = service.afficherAll();
-            System.out.println("   Services restants: " + services.size());
+            System.out.println("   Services actifs restants: " + services.size());
+
+            System.out.println(" Affichage des archives:");
+            List<Service> archives = service.afficherArchives();
+            System.out.println("   Services archivés: " + archives.size());
+            for (Service s : archives) {
+                System.out.println("   - " + s.getTitre() + " (ID: " + s.getId() + ")");
+            }
 
             System.out.println(" Recherche par ID:");
             if (!services.isEmpty()) {
@@ -98,7 +106,5 @@ public class Main {
                 }
             }
         }
-
-
     }
 }

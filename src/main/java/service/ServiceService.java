@@ -3,7 +3,6 @@ package service;
 import model.Service;
 import model.CategorieService;
 import util.db;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,7 @@ public class ServiceService {
         String description = escape(service.getDescription());
 
         String req = "INSERT INTO service (titre, description, date_creation, date_debut, "
-                + "date_fin, responsable_id, budget, categorie_id) VALUES ("
+                + "date_fin, responsable_id, budget, categorie_id, archive) VALUES ("
                 + "'" + titre + "', "
                 + "'" + description + "', "
                 + "'" + service.getDateCreation() + "', "
@@ -34,7 +33,7 @@ public class ServiceService {
                 + "'" + service.getDateFin() + "', "
                 + service.getResponsableId() + ", "
                 + service.getBudget() + ", "
-                + service.getCategorieId() + ")";
+                + service.getCategorieId() + ", 0)";
 
         ste = conn.createStatement();
         ste.executeUpdate(req);
@@ -42,10 +41,19 @@ public class ServiceService {
     }
 
     public List<Service> afficherAll() throws SQLException {
+        return afficherParStatut(false);
+    }
+
+    public List<Service> afficherArchives() throws SQLException {
+        return afficherParStatut(true);
+    }
+
+    private List<Service> afficherParStatut(boolean archive) throws SQLException {
         List<Service> liste = new ArrayList<>();
         String req = "SELECT s.*, c.nom as categorie_nom, c.description as categorie_description "
                 + "FROM service s "
                 + "LEFT JOIN categorie_service c ON s.categorie_id = c.id "
+                + "WHERE s.archive = " + (archive ? "1" : "0") + " "
                 + "ORDER BY s.id";
 
         ste = conn.createStatement();
@@ -62,6 +70,7 @@ public class ServiceService {
             s.setResponsableId(res.getInt("responsable_id"));
             s.setBudget(res.getDouble("budget"));
             s.setCategorieId(res.getInt("categorie_id"));
+            s.setArchive(res.getBoolean("archive"));
 
             if (s.getCategorieId() > 0 && res.getString("categorie_nom") != null) {
                 CategorieService cat = new CategorieService();
@@ -97,6 +106,7 @@ public class ServiceService {
             s.setResponsableId(res.getInt("responsable_id"));
             s.setBudget(res.getDouble("budget"));
             s.setCategorieId(res.getInt("categorie_id"));
+            s.setArchive(res.getBoolean("archive"));
 
             if (s.getCategorieId() > 0 && res.getString("categorie_nom") != null) {
                 CategorieService cat = new CategorieService();
@@ -137,6 +147,33 @@ public class ServiceService {
                 .toList();
     }
 
+    public void archiver(int id) throws SQLException {
+        String req = "UPDATE service SET archive = 1 WHERE id = " + id;
+        ste = conn.createStatement();
+        int rowsAffected = ste.executeUpdate(req);
+        if (rowsAffected > 0) {
+            System.out.println("Service archivé ID=" + id);
+        }
+    }
+
+    public void desarchiver(int id) throws SQLException {
+        String req = "UPDATE service SET archive = 0 WHERE id = " + id;
+        ste = conn.createStatement();
+        int rowsAffected = ste.executeUpdate(req);
+        if (rowsAffected > 0) {
+            System.out.println("Service désarchivé ID=" + id);
+        }
+    }
+
+    public void supprimerDefinitivement(int id) throws SQLException {
+        String req = "DELETE FROM service WHERE id = " + id;
+        ste = conn.createStatement();
+        int rowsAffected = ste.executeUpdate(req);
+        if (rowsAffected > 0) {
+            System.out.println("Service supprimé définitivement ID=" + id);
+        }
+    }
+
     public void updateTitre(Service service) throws SQLException {
         String titre = escape(service.getTitre());
         String description = escape(service.getDescription());
@@ -154,16 +191,6 @@ public class ServiceService {
         ste = conn.createStatement();
         ste.executeUpdate(req);
         System.out.println("Service modifié ID=" + service.getId());
-    }
-
-    public void delete(int id) throws SQLException {
-        String req = "DELETE FROM service WHERE id = " + id;
-
-        ste = conn.createStatement();
-        int rowsAffected = ste.executeUpdate(req);
-        if (rowsAffected > 0) {
-            System.out.println("Service supprimé ID=" + id);
-        }
     }
 
     public void close() throws SQLException {

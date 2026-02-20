@@ -23,9 +23,12 @@ public class ServiceController implements Initializable {
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filterType;
     @FXML private VBox servicesContainer;
+    @FXML private Button btnArchives;
+    @FXML private Button btnRetour;
 
     private ServiceService serviceService;
     private List<Service> allServices;
+    private boolean modeArchive = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -44,7 +47,11 @@ public class ServiceController implements Initializable {
 
     private void chargerDonnees() {
         try {
-            allServices = serviceService.afficherAll();
+            if (modeArchive) {
+                allServices = serviceService.afficherArchives();
+            } else {
+                allServices = serviceService.afficherAll();
+            }
             afficherLignes(allServices);
         } catch (SQLException e) {
             showAlert("Erreur", e.getMessage());
@@ -91,21 +98,77 @@ public class ServiceController implements Initializable {
             actions.setAlignment(Pos.CENTER_RIGHT);
             actions.setPrefWidth(200);
 
-            Button btnModifier = new Button("Modifier");
-            btnModifier.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;");
-            btnModifier.setPrefWidth(80);
-            btnModifier.setOnAction(e -> ouvrirModification(s));
+            if (modeArchive) {
+                Button btnDesarchiver = new Button("Restaurer");
+                btnDesarchiver.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;");
+                btnDesarchiver.setPrefWidth(90);
+                btnDesarchiver.setOnAction(e -> desarchiverService(s));
+                actions.getChildren().add(btnDesarchiver);
+            } else {
+                Button btnArchiver = new Button("Archiver");
+                btnArchiver.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;");
+                btnArchiver.setPrefWidth(80);
+                btnArchiver.setOnAction(e -> archiverService(s));
 
-            Button btnSupprimer = new Button("Supprimer");
-            btnSupprimer.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;");
-            btnSupprimer.setPrefWidth(80);
-            btnSupprimer.setOnAction(e -> supprimerService(s));
+                Button btnModifier = new Button("Modifier");
+                btnModifier.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;");
+                btnModifier.setPrefWidth(80);
+                btnModifier.setOnAction(e -> ouvrirModification(s));
 
-            actions.getChildren().addAll(btnModifier, btnSupprimer);
+                actions.getChildren().addAll(btnArchiver, btnModifier);
+            }
 
             row.getChildren().addAll(titre, categorie, budget, dateDebut, dateFin, resp, spacer, actions);
             servicesContainer.getChildren().add(row);
         }
+    }
+
+    private void archiverService(Service service) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmation");
+        confirm.setContentText("Archiver ce service ?");
+
+        if (confirm.showAndWait().get() == ButtonType.OK) {
+            try {
+                serviceService.archiver(service.getId());
+                chargerDonnees();
+                showAlert("Succès", "Service archivé!");
+            } catch (SQLException e) {
+                showAlert("Erreur", e.getMessage());
+            }
+        }
+    }
+
+    private void desarchiverService(Service service) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmation");
+        confirm.setContentText("Restaurer ce service ?");
+
+        if (confirm.showAndWait().get() == ButtonType.OK) {
+            try {
+                serviceService.desarchiver(service.getId());
+                chargerDonnees();
+                showAlert("Succès", "Service restauré!");
+            } catch (SQLException e) {
+                showAlert("Erreur", e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void handleVoirArchives() {
+        modeArchive = true;
+        chargerDonnees();
+        btnArchives.setVisible(false);
+        btnRetour.setVisible(true);
+    }
+
+    @FXML
+    private void handleRetour() {
+        modeArchive = false;
+        chargerDonnees();
+        btnArchives.setVisible(true);
+        btnRetour.setVisible(false);
     }
 
     @FXML
@@ -114,7 +177,15 @@ public class ServiceController implements Initializable {
         String categorieFiltre = filterType.getValue();
 
         try {
-            List<Service> resultats = serviceService.rechercher(texteRecherche, categorieFiltre);
+            List<Service> resultats;
+            if (modeArchive) {
+                resultats = serviceService.afficherArchives().stream()
+                        .filter(s -> texteRecherche.isEmpty() ||
+                                s.getTitre().toLowerCase().contains(texteRecherche.toLowerCase()))
+                        .toList();
+            } else {
+                resultats = serviceService.rechercher(texteRecherche, categorieFiltre);
+            }
             afficherLignes(resultats);
         } catch (SQLException e) {
             showAlert("Erreur", "Erreur lors de la recherche: " + e.getMessage());
@@ -140,22 +211,6 @@ public class ServiceController implements Initializable {
 
         } catch (Exception e) {
             showAlert("Erreur", e.getMessage());
-        }
-    }
-
-    private void supprimerService(Service service) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirmation");
-        confirm.setContentText("Supprimer ce service ?");
-
-        if (confirm.showAndWait().get() == ButtonType.OK) {
-            try {
-                serviceService.delete(service.getId());
-                chargerDonnees();
-                showAlert("Succès", "Service supprimé!");
-            } catch (SQLException e) {
-                showAlert("Erreur", e.getMessage());
-            }
         }
     }
 

@@ -61,6 +61,32 @@
     -fx-opacity: 0.9;
 }
 
+.btn-archive {
+    -fx-background-color: #7f8c8d;
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-archive:hover {
+    -fx-opacity: 0.9;
+}
+
+.btn-retour {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-padding: 10 20;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-retour:hover {
+    -fx-opacity: 0.9;
+}
+
 .table-header {
     -fx-background-color: -fx-primary;
     -fx-padding: 10;
@@ -94,55 +120,6 @@
 
 .table-row:hover {
     -fx-background-color: #f8f9fa;
-}
-
-.titre-cell {
-    -fx-font-weight: bold;
-    -fx-text-fill: -fx-primary;
-}
-
-.categorie-cell {
-    -fx-text-fill: -fx-text-light;
-    -fx-font-style: italic;
-}
-
-.budget-cell {
-    -fx-text-fill: -fx-success;
-    -fx-font-weight: bold;
-}
-
-.dates-cell {
-    -fx-text-fill: -fx-text-light;
-}
-
-.resp-cell {
-    -fx-text-fill: -fx-text-light;
-}
-
-.btn-modifier {
-    -fx-background-color: -fx-warning;
-    -fx-text-fill: white;
-    -fx-padding: 5 10;
-    -fx-background-radius: 5;
-    -fx-cursor: hand;
-    -fx-font-weight: bold;
-}
-
-.btn-modifier:hover {
-    -fx-opacity: 0.9;
-}
-
-.btn-supprimer {
-    -fx-background-color: -fx-danger;
-    -fx-text-fill: white;
-    -fx-padding: 5 10;
-    -fx-background-radius: 5;
-    -fx-cursor: hand;
-    -fx-font-weight: bold;
-}
-
-.btn-supprimer:hover {
-    -fx-opacity: 0.9;
 }
 
 .popup-container {

@@ -11,12 +11,13 @@ public class Service {
     private double budget;
     private int categorieId;
     private CategorieService categorie;
+    private boolean archive;
 
     public Service() {}
 
     public Service(int id, String titre, String description, String dateCreation,
                    String dateDebut, String dateFin, int responsableId,
-                   double budget, int categorieId) {
+                   double budget, int categorieId, boolean archive) {
         this.id = id;
         this.titre = titre;
         this.description = description;
@@ -26,6 +27,7 @@ public class Service {
         this.responsableId = responsableId;
         this.budget = budget;
         this.categorieId = categorieId;
+        this.archive = archive;
     }
 
     public int getId() { return id; }
@@ -58,8 +60,6 @@ public class Service {
     public CategorieService getCategorie() { return categorie; }
     public void setCategorie(CategorieService categorie) { this.categorie = categorie; }
 
-    @Override
-    public String toString() {
-        return "Service [id=" + id + ", titre=" + titre + "]";
-    }
+    public boolean isArchive() { return archive; }
+    public void setArchive(boolean archive) { this.archive = archive; }
 }
