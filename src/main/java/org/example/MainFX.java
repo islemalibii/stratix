@@ -14,9 +14,7 @@ public class MainFX extends Application {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/service-view.fxml"));
             TabPane root = loader.load();
             Scene scene = new Scene(root, 1200, 700);
-
             scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
-
             primaryStage.setTitle("Gestion des Services");
             primaryStage.setScene(scene);
             primaryStage.show();

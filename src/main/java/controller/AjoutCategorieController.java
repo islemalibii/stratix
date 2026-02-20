@@ -6,7 +6,6 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import model.CategorieService;
 import service.CategorieServiceService;
-
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -33,10 +32,8 @@ public class AjoutCategorieController implements Initializable {
     public void setCategorieAModifier(CategorieService categorie) {
         this.categorieAModifier = categorie;
         this.modeModification = true;
-
         lblTitrePopup.setText("MODIFIER CATÉGORIE");
         btnAction.setText("Modifier");
-
         txtNom.setText(categorie.getNom());
         txtDescription.setText(categorie.getDescription());
     }
@@ -44,9 +41,7 @@ public class AjoutCategorieController implements Initializable {
     @FXML
     private void handleAjouter() {
         lblError.setText("");
-
         if (!validerChamps()) return;
-
         try {
             if (modeModification) {
                 categorieAModifier.setNom(txtNom.getText());
@@ -61,7 +56,6 @@ public class AjoutCategorieController implements Initializable {
                 showAlert("Succès", "Catégorie ajoutée!");
             }
             fermer();
-
         } catch (SQLException e) {
             lblError.setText("Erreur SQL: " + e.getMessage());
         }

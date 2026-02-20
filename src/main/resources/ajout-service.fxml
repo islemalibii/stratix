@@ -7,6 +7,7 @@
 <VBox spacing="15" styleClass="popup-container" prefWidth="500" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.AjoutController">
 
     <Label fx:id="lblTitrePopup" text="AJOUTER UN SERVICE" styleClass="popup-title"/>
+
     <Label fx:id="lblError" style="-fx-text-fill: red; -fx-wrap-text: true;" managed="true"/>
 
     <GridPane hgap="15" vgap="12" styleClass="form-grid">
@@ -28,8 +29,8 @@
         <Label text="Date fin:" styleClass="form-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
         <DatePicker fx:id="dateFinPicker" styleClass="form-field" promptText="AAAA-MM-JJ" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-        <Label text="Responsable ID:" styleClass="form-label" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-        <TextField fx:id="txtResponsableId" styleClass="form-field" promptText="101" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+        <Label text="Responsable:" styleClass="form-label" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="comboResponsable" styleClass="form-field" promptText="Sélectionner un responsable" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
         <Label text="Budget (DT):" styleClass="form-label" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
         <TextField fx:id="txtBudget" styleClass="form-field" promptText="5000" GridPane.rowIndex="7" GridPane.columnIndex="1"/>

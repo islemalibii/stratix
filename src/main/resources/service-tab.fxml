@@ -6,23 +6,19 @@
 
 <VBox spacing="20" styleClass="main-container" xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ServiceController">
-
     <Label text="GESTION DES SERVICES" styleClass="page-title"/>
-
     <HBox spacing="10" styleClass="search-container">
         <TextField fx:id="searchField" promptText="Rechercher un service..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
         <ComboBox fx:id="filterType" promptText="Tous les types" prefWidth="150" styleClass="filter-combo"/>
         <Button text="Rechercher" onAction="#handleSearch" styleClass="search-button"/>
     </HBox>
-
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Label text="Liste des Services" styleClass="section-title"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button fx:id="btnArchives" text="Archives" onAction="#handleVoirArchives" styleClass="btn-archive"/>
+        <Button fx:id="btnArchives" text=" Archives" onAction="#handleVoirArchives" styleClass="btn-archive"/>
         <Button fx:id="btnRetour" text="⬅ Retour" onAction="#handleRetour" styleClass="btn-retour" visible="false"/>
         <Button text="+ Ajouter" onAction="#handleAjouter" styleClass="btn-add"/>
     </HBox>
-
     <GridPane styleClass="table-header" hgap="10" vgap="5">
         <columnConstraints>
             <ColumnConstraints percentWidth="20"/>
@@ -41,9 +37,7 @@
         <Label text="Resp" styleClass="table-header-label" GridPane.columnIndex="5" GridPane.rowIndex="0"/>
         <Label text="Actions" styleClass="table-header-label" GridPane.columnIndex="6" GridPane.rowIndex="0"/>
     </GridPane>
-
     <ScrollPane fitToWidth="true" styleClass="table-scroll" VBox.vgrow="ALWAYS">
         <VBox fx:id="servicesContainer" spacing="1" styleClass="table-body"/>
     </ScrollPane>
-
 </VBox>

@@ -1,5 +1,7 @@
 package controller;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -12,7 +14,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.Service;
 import service.ServiceService;
-
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
@@ -34,12 +35,9 @@ public class ServiceController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         try {
             serviceService = new ServiceService();
-
             filterType.getItems().addAll("Tous", "Développement", "Formation", "Maintenance", "Conseil", "Support");
             filterType.setValue("Tous");
-
             chargerDonnees();
-
         } catch (SQLException e) {
             showAlert("Erreur", e.getMessage());
         }
@@ -60,7 +58,6 @@ public class ServiceController implements Initializable {
 
     private void afficherLignes(List<Service> services) {
         servicesContainer.getChildren().clear();
-
         for (Service s : services) {
             HBox row = new HBox(10);
             row.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0; -fx-alignment: center-left;");
@@ -87,9 +84,18 @@ public class ServiceController implements Initializable {
             dateFin.setStyle("-fx-text-fill: #7f8c8d; -fx-min-width: 100;");
             dateFin.setPrefWidth(120);
 
-            Label resp = new Label(String.valueOf(s.getResponsableId()));
-            resp.setStyle("-fx-text-fill: #7f8c8d; -fx-min-width: 50; -fx-alignment: center;");
-            resp.setPrefWidth(80);
+            String responsableNom = "Non assigné";
+            if (s.getUtilisateurId() > 0) {
+                try {
+                    responsableNom = serviceService.getResponsableNom(s.getUtilisateurId());
+                } catch (SQLException e) {
+                    responsableNom = "Erreur";
+                }
+            }
+
+            Label resp = new Label(responsableNom);
+            resp.setStyle("-fx-text-fill: #7f8c8d; -fx-min-width: 100; -fx-alignment: center;");
+            resp.setPrefWidth(100);
 
             Region spacer = new Region();
             HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -127,7 +133,6 @@ public class ServiceController implements Initializable {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation");
         confirm.setContentText("Archiver ce service ?");
-
         if (confirm.showAndWait().get() == ButtonType.OK) {
             try {
                 serviceService.archiver(service.getId());
@@ -143,7 +148,6 @@ public class ServiceController implements Initializable {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation");
         confirm.setContentText("Restaurer ce service ?");
-
         if (confirm.showAndWait().get() == ButtonType.OK) {
             try {
                 serviceService.desarchiver(service.getId());
@@ -175,7 +179,6 @@ public class ServiceController implements Initializable {
     private void handleSearch() {
         String texteRecherche = searchField.getText();
         String categorieFiltre = filterType.getValue();
-
         try {
             List<Service> resultats;
             if (modeArchive) {
@@ -196,19 +199,15 @@ public class ServiceController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ajout-service.fxml"));
             Parent root = loader.load();
-
             AjoutController controller = loader.getController();
             controller.setServiceService(serviceService);
             controller.setServiceAModifier(service);
-
             Stage stage = new Stage();
             stage.setTitle("Modifier Service");
             stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
-
             chargerDonnees();
-
         } catch (Exception e) {
             showAlert("Erreur", e.getMessage());
         }
@@ -219,18 +218,14 @@ public class ServiceController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ajout-service.fxml"));
             Parent root = loader.load();
-
             AjoutController controller = loader.getController();
             controller.setServiceService(serviceService);
-
             Stage stage = new Stage();
             stage.setTitle("Ajouter Service");
             stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
-
             chargerDonnees();
-
         } catch (Exception e) {
             showAlert("Erreur", e.getMessage());
         }

@@ -7,7 +7,7 @@ public class Service {
     private String dateCreation;
     private String dateDebut;
     private String dateFin;
-    private int responsableId;
+    private int utilisateurId;
     private double budget;
     private int categorieId;
     private CategorieService categorie;
@@ -16,7 +16,7 @@ public class Service {
     public Service() {}
 
     public Service(int id, String titre, String description, String dateCreation,
-                   String dateDebut, String dateFin, int responsableId,
+                   String dateDebut, String dateFin, int utilisateurId,
                    double budget, int categorieId, boolean archive) {
         this.id = id;
         this.titre = titre;
@@ -24,7 +24,7 @@ public class Service {
         this.dateCreation = dateCreation;
         this.dateDebut = dateDebut;
         this.dateFin = dateFin;
-        this.responsableId = responsableId;
+        this.utilisateurId = utilisateurId;
         this.budget = budget;
         this.categorieId = categorieId;
         this.archive = archive;
@@ -48,8 +48,8 @@ public class Service {
     public String getDateFin() { return dateFin; }
     public void setDateFin(String dateFin) { this.dateFin = dateFin; }
 
-    public int getResponsableId() { return responsableId; }
-    public void setResponsableId(int responsableId) { this.responsableId = responsableId; }
+    public int getUtilisateurId() { return utilisateurId; }
+    public void setUtilisateurId(int utilisateurId) { this.utilisateurId = utilisateurId; }
 
     public double getBudget() { return budget; }
     public void setBudget(double budget) { this.budget = budget; }

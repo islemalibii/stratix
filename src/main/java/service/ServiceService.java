@@ -2,6 +2,7 @@ package service;
 
 import model.Service;
 import model.CategorieService;
+import model.ResponsableInfo;
 import util.db;
 import java.sql.*;
 import java.util.ArrayList;
@@ -23,21 +24,18 @@ public class ServiceService {
     public void ajouter(Service service) throws SQLException {
         String titre = escape(service.getTitre());
         String description = escape(service.getDescription());
-
         String req = "INSERT INTO service (titre, description, date_creation, date_debut, "
-                + "date_fin, responsable_id, budget, categorie_id, archive) VALUES ("
+                + "date_fin, utilisateur_id, budget, categorie_id, archive) VALUES ("
                 + "'" + titre + "', "
                 + "'" + description + "', "
                 + "'" + service.getDateCreation() + "', "
                 + "'" + service.getDateDebut() + "', "
                 + "'" + service.getDateFin() + "', "
-                + service.getResponsableId() + ", "
+                + service.getUtilisateurId() + ", "
                 + service.getBudget() + ", "
                 + service.getCategorieId() + ", 0)";
-
         ste = conn.createStatement();
         ste.executeUpdate(req);
-        System.out.println("Service ajouté: " + service.getTitre());
     }
 
     public List<Service> afficherAll() throws SQLException {
@@ -55,10 +53,8 @@ public class ServiceService {
                 + "LEFT JOIN categorie_service c ON s.categorie_id = c.id "
                 + "WHERE s.archive = " + (archive ? "1" : "0") + " "
                 + "ORDER BY s.id";
-
         ste = conn.createStatement();
         ResultSet res = ste.executeQuery(req);
-
         while (res.next()) {
             Service s = new Service();
             s.setId(res.getInt("id"));
@@ -67,11 +63,10 @@ public class ServiceService {
             s.setDateCreation(res.getString("date_creation"));
             s.setDateDebut(res.getString("date_debut"));
             s.setDateFin(res.getString("date_fin"));
-            s.setResponsableId(res.getInt("responsable_id"));
+            s.setUtilisateurId(res.getInt("utilisateur_id"));
             s.setBudget(res.getDouble("budget"));
             s.setCategorieId(res.getInt("categorie_id"));
             s.setArchive(res.getBoolean("archive"));
-
             if (s.getCategorieId() > 0 && res.getString("categorie_nom") != null) {
                 CategorieService cat = new CategorieService();
                 cat.setId(s.getCategorieId());
@@ -79,7 +74,6 @@ public class ServiceService {
                 cat.setDescription(res.getString("categorie_description"));
                 s.setCategorie(cat);
             }
-
             liste.add(s);
         }
         res.close();
@@ -91,10 +85,8 @@ public class ServiceService {
                 + "FROM service s "
                 + "LEFT JOIN categorie_service c ON s.categorie_id = c.id "
                 + "WHERE s.id = " + id;
-
         ste = conn.createStatement();
         ResultSet res = ste.executeQuery(req);
-
         if (res.next()) {
             Service s = new Service();
             s.setId(res.getInt("id"));
@@ -103,11 +95,10 @@ public class ServiceService {
             s.setDateCreation(res.getString("date_creation"));
             s.setDateDebut(res.getString("date_debut"));
             s.setDateFin(res.getString("date_fin"));
-            s.setResponsableId(res.getInt("responsable_id"));
+            s.setUtilisateurId(res.getInt("utilisateur_id"));
             s.setBudget(res.getDouble("budget"));
             s.setCategorieId(res.getInt("categorie_id"));
             s.setArchive(res.getBoolean("archive"));
-
             if (s.getCategorieId() > 0 && res.getString("categorie_nom") != null) {
                 CategorieService cat = new CategorieService();
                 cat.setId(s.getCategorieId());
@@ -115,7 +106,6 @@ public class ServiceService {
                 cat.setDescription(res.getString("categorie_description"));
                 s.setCategorie(cat);
             }
-
             res.close();
             return s;
         }
@@ -123,25 +113,55 @@ public class ServiceService {
         return null;
     }
 
+    public List<ResponsableInfo> getResponsables() throws SQLException {
+        List<ResponsableInfo> liste = new ArrayList<>();
+        String req = "SELECT id, CONCAT(nom, ' ', prenom) as nomComplet, email, poste "
+                + "FROM utilisateur "
+                + "WHERE role IN ('responsable', 'responsable_projet', 'responsable_production', 'responsable_rh') "
+                + "ORDER BY nom, prenom";
+        ste = conn.createStatement();
+        ResultSet res = ste.executeQuery(req);
+        while (res.next()) {
+            ResponsableInfo r = new ResponsableInfo(
+                    res.getInt("id"),
+                    res.getString("nomComplet"),
+                    res.getString("email"),
+                    res.getString("poste")
+            );
+            liste.add(r);
+        }
+        res.close();
+        return liste;
+    }
+
+    public String getResponsableNom(int id) throws SQLException {
+        String req = "SELECT CONCAT(nom, ' ', prenom) as nomComplet FROM utilisateur WHERE id = " + id;
+        ste = conn.createStatement();
+        ResultSet res = ste.executeQuery(req);
+        if (res.next()) {
+            String nom = res.getString("nomComplet");
+            res.close();
+            return nom;
+        }
+        res.close();
+        return "Non assigné";
+    }
+
     public List<Service> rechercher(String texteRecherche, String categorieFiltre) throws SQLException {
         List<Service> tousLesServices = afficherAll();
-
         if ((texteRecherche == null || texteRecherche.isEmpty()) &&
                 (categorieFiltre == null || categorieFiltre.equals("Tous"))) {
             return tousLesServices;
         }
-
         return tousLesServices.stream()
                 .filter(service -> {
                     boolean correspondTexte = texteRecherche == null || texteRecherche.isEmpty() ||
                             service.getTitre().toLowerCase().contains(texteRecherche.toLowerCase()) ||
                             (service.getDescription() != null &&
                                     service.getDescription().toLowerCase().contains(texteRecherche.toLowerCase()));
-
                     boolean correspondCategorie = categorieFiltre == null || categorieFiltre.equals("Tous") ||
                             (service.getCategorie() != null &&
                                     service.getCategorie().getNom().equals(categorieFiltre));
-
                     return correspondTexte && correspondCategorie;
                 })
                 .toList();
@@ -150,47 +170,29 @@ public class ServiceService {
     public void archiver(int id) throws SQLException {
         String req = "UPDATE service SET archive = 1 WHERE id = " + id;
         ste = conn.createStatement();
-        int rowsAffected = ste.executeUpdate(req);
-        if (rowsAffected > 0) {
-            System.out.println("Service archivé ID=" + id);
-        }
+        ste.executeUpdate(req);
     }
 
     public void desarchiver(int id) throws SQLException {
         String req = "UPDATE service SET archive = 0 WHERE id = " + id;
         ste = conn.createStatement();
-        int rowsAffected = ste.executeUpdate(req);
-        if (rowsAffected > 0) {
-            System.out.println("Service désarchivé ID=" + id);
-        }
-    }
-
-    public void supprimerDefinitivement(int id) throws SQLException {
-        String req = "DELETE FROM service WHERE id = " + id;
-        ste = conn.createStatement();
-        int rowsAffected = ste.executeUpdate(req);
-        if (rowsAffected > 0) {
-            System.out.println("Service supprimé définitivement ID=" + id);
-        }
+        ste.executeUpdate(req);
     }
 
     public void updateTitre(Service service) throws SQLException {
         String titre = escape(service.getTitre());
         String description = escape(service.getDescription());
-
         String req = "UPDATE service SET "
                 + "titre = '" + titre + "', "
                 + "description = '" + description + "', "
                 + "date_debut = '" + service.getDateDebut() + "', "
                 + "date_fin = '" + service.getDateFin() + "', "
-                + "responsable_id = " + service.getResponsableId() + ", "
+                + "utilisateur_id = " + service.getUtilisateurId() + ", "
                 + "budget = " + service.getBudget() + ", "
                 + "categorie_id = " + service.getCategorieId() + " "
                 + "WHERE id = " + service.getId();
-
         ste = conn.createStatement();
         ste.executeUpdate(req);
-        System.out.println("Service modifié ID=" + service.getId());
     }
 
     public void close() throws SQLException {

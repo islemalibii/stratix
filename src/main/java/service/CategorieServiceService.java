@@ -12,7 +12,6 @@ public class CategorieServiceService {
 
     public CategorieServiceService() throws SQLException {
         conn = db.getConnection();
-        System.out.println("Connexion catégorie établie");
     }
 
     private String escape(String str) {
@@ -23,15 +22,12 @@ public class CategorieServiceService {
     public void ajouter(CategorieService categorie) throws SQLException {
         String nom = escape(categorie.getNom());
         String description = escape(categorie.getDescription());
-
         String req = "INSERT INTO categorie_service (nom, description, date_creation, archive) VALUES ("
                 + "'" + nom + "', "
                 + "'" + description + "', "
                 + "CURRENT_DATE, 0)";
-
         ste = conn.createStatement();
         ste.executeUpdate(req);
-        System.out.println("Catégorie ajoutée: " + categorie.getNom());
     }
 
     public List<CategorieService> afficherAll() throws SQLException {
@@ -45,10 +41,8 @@ public class CategorieServiceService {
     private List<CategorieService> afficherParStatut(boolean archive) throws SQLException {
         List<CategorieService> liste = new ArrayList<>();
         String req = "SELECT * FROM categorie_service WHERE archive = " + (archive ? "1" : "0") + " ORDER BY nom";
-
         ste = conn.createStatement();
         ResultSet res = ste.executeQuery(req);
-
         while (res.next()) {
             CategorieService c = new CategorieService();
             c.setId(res.getInt("id"));
@@ -64,10 +58,8 @@ public class CategorieServiceService {
 
     public CategorieService getById(int id) throws SQLException {
         String req = "SELECT * FROM categorie_service WHERE id = " + id;
-
         ste = conn.createStatement();
         ResultSet res = ste.executeQuery(req);
-
         if (res.next()) {
             CategorieService c = new CategorieService();
             c.setId(res.getInt("id"));
@@ -85,17 +77,12 @@ public class CategorieServiceService {
     public void modifier(CategorieService categorie) throws SQLException {
         String nom = escape(categorie.getNom());
         String description = escape(categorie.getDescription());
-
         String req = "UPDATE categorie_service SET "
                 + "nom = '" + nom + "', "
                 + "description = '" + description + "' "
                 + "WHERE id = " + categorie.getId();
-
         ste = conn.createStatement();
-        int rowsAffected = ste.executeUpdate(req);
-        if (rowsAffected > 0) {
-            System.out.println("Catégorie modifiée ID=" + categorie.getId());
-        }
+        ste.executeUpdate(req);
     }
 
     public void archiver(int id) throws SQLException {
@@ -103,26 +90,18 @@ public class CategorieServiceService {
         ResultSet rs = ste.executeQuery(checkReq);
         rs.next();
         int count = rs.getInt(1);
-
         if (count > 0) {
             throw new SQLException("Impossible d'archiver : " + count + " service(s) actifs utilisent cette catégorie");
         }
-
         String req = "UPDATE categorie_service SET archive = 1 WHERE id = " + id;
         ste = conn.createStatement();
-        int rowsAffected = ste.executeUpdate(req);
-        if (rowsAffected > 0) {
-            System.out.println("Catégorie archivée ID=" + id);
-        }
+        ste.executeUpdate(req);
     }
 
     public void desarchiver(int id) throws SQLException {
         String req = "UPDATE categorie_service SET archive = 0 WHERE id = " + id;
         ste = conn.createStatement();
-        int rowsAffected = ste.executeUpdate(req);
-        if (rowsAffected > 0) {
-            System.out.println("Catégorie désarchivée ID=" + id);
-        }
+        ste.executeUpdate(req);
     }
 
     public void close() throws SQLException {
