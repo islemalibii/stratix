@@ -4,10 +4,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.scene.input.KeyCode;
 import models.produit;
-import models.ressource;
 import service.service_produit;
 
 import java.time.LocalDate;
@@ -22,6 +21,10 @@ public class FormulaireProduitController {
     private TextArea descriptionField;
     @FXML
     private ComboBox<String> categorieCombo;
+    @FXML
+    private VBox autreCategorieContainer; // NOUVEAU: Conteneur pour la catégorie personnalisée
+    @FXML
+    private TextField autreCategorieField; // NOUVEAU: Champ pour saisir la catégorie personnalisée
     @FXML
     private TextField prixField;
     @FXML
@@ -38,7 +41,7 @@ public class FormulaireProduitController {
     private Button btnValider;
 
     private service_produit serviceProduit = new service_produit();
-    private Runnable onProduitAjoute; // Callback pour rafraîchir la liste
+    private Runnable onProduitAjoute;
 
     // Liste des catégories prédéfinies
     private final String[] categoriesPredifinies = {
@@ -50,43 +53,24 @@ public class FormulaireProduitController {
         // Initialisation de la ComboBox
         categorieCombo.setItems(FXCollections.observableArrayList(categoriesPredifinies));
 
+        // Cacher le champ de catégorie personnalisée au démarrage
+        autreCategorieContainer.setVisible(false);
+        autreCategorieContainer.setManaged(false);
+
         // Ajouter un listener pour gérer la sélection "Autre"
         categorieCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if ("Autre".equals(newVal)) {
-                // Rendre la ComboBox éditable
-                categorieCombo.setEditable(true);
+                // Afficher le champ de catégorie personnalisée
+                autreCategorieContainer.setVisible(true);
+                autreCategorieContainer.setManaged(true);
 
-                // Effacer le texte et mettre le focus sur l'éditeur
-                categorieCombo.getEditor().clear();
-
-                // Utiliser Platform.runLater pour s'assurer que le focus est bien pris
-                javafx.application.Platform.runLater(() -> {
-                    categorieCombo.getEditor().requestFocus();
-                });
-
-                // Sélectionner tout le texte pour faciliter la saisie
-                categorieCombo.getEditor().selectAll();
+                // Mettre le focus sur le champ personnalisé
+                autreCategorieField.requestFocus();
+                autreCategorieField.clear();
             } else {
-                // Si ce n'est pas "Autre", on garde le comportement normal
-                categorieCombo.setEditable(false);
-            }
-        });
-
-        // Permettre la validation avec Entrée quand on saisit une catégorie personnalisée
-        categorieCombo.getEditor().setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                // Validation implicite
-                categorieCombo.setValue(categorieCombo.getEditor().getText());
-            }
-        });
-
-        // Pour que la perte de focus valide aussi la saisie
-        categorieCombo.getEditor().focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) { // Perte de focus
-                String texteSaisi = categorieCombo.getEditor().getText();
-                if (texteSaisi != null && !texteSaisi.trim().isEmpty()) {
-                    categorieCombo.setValue(texteSaisi);
-                }
+                // Cacher le champ de catégorie personnalisée
+                autreCategorieContainer.setVisible(false);
+                autreCategorieContainer.setManaged(false);
             }
         });
 
@@ -98,11 +82,11 @@ public class FormulaireProduitController {
         btnValider.setText("Ajouter");
         dateCreationPicker.setValue(LocalDate.now());
 
-        // Réinitialiser la ComboBox
-        categorieCombo.setItems(FXCollections.observableArrayList(categoriesPredifinies));
+        // Réinitialiser
         categorieCombo.getSelectionModel().clearSelection();
-        categorieCombo.setEditable(false);
-        categorieCombo.getEditor().clear();
+        autreCategorieContainer.setVisible(false);
+        autreCategorieContainer.setManaged(false);
+        autreCategorieField.clear();
     }
 
     public void setModeModification(produit p) {
@@ -116,31 +100,26 @@ public class FormulaireProduitController {
         // Gérer la catégorie existante
         String categorieExistante = p.getCategorie();
         if (categorieExistante != null && !categorieExistante.isEmpty()) {
-            // Vérifier si la catégorie existe dans la liste prédéfinie
-            boolean estCategoriePredifinie = false;
+            // Vérifier si c'est une catégorie prédéfinie
+            boolean estPredifinie = false;
             for (String cat : categoriesPredifinies) {
                 if (cat.equals(categorieExistante)) {
-                    estCategoriePredifinie = true;
+                    estPredifinie = true;
                     break;
                 }
             }
 
-            if (estCategoriePredifinie) {
-                // C'est une catégorie prédéfinie
+            if (estPredifinie) {
+                // Catégorie prédéfinie
                 categorieCombo.setValue(categorieExistante);
-                categorieCombo.setEditable(false);
+                autreCategorieContainer.setVisible(false);
+                autreCategorieContainer.setManaged(false);
             } else {
-                // C'est une catégorie personnalisée
-                categorieCombo.setEditable(true);
-                categorieCombo.getEditor().setText(categorieExistante);
-                // Sélectionner "Autre" pour indiquer que c'est personnalisé
-                categorieCombo.getSelectionModel().select("Autre");
-
-                // Mettre le focus sur l'éditeur
-                javafx.application.Platform.runLater(() -> {
-                    categorieCombo.getEditor().requestFocus();
-                    categorieCombo.getEditor().selectAll();
-                });
+                // Catégorie personnalisée
+                categorieCombo.setValue("Autre");
+                autreCategorieContainer.setVisible(true);
+                autreCategorieContainer.setManaged(true);
+                autreCategorieField.setText(categorieExistante);
             }
         }
 
@@ -158,24 +137,23 @@ public class FormulaireProduitController {
     }
 
     /**
-     * Récupère la valeur de la catégorie (sélectionnée ou saisie)
+     * Récupère la valeur de la catégorie
      */
     private String getCategorieValue() {
-        // Si la ComboBox est éditable, on prend la valeur de l'éditeur
-        if (categorieCombo.isEditable()) {
-            String saisie = categorieCombo.getEditor().getText();
-            if (saisie != null && !saisie.trim().isEmpty()) {
-                return saisie.trim();
-            }
-        }
-
-        // Sinon, on prend la valeur sélectionnée
         String selection = categorieCombo.getValue();
-        if (selection != null && !selection.trim().isEmpty()) {
-            return selection.trim();
-        }
 
-        return null;
+        if ("Autre".equals(selection)) {
+            // Retourner la valeur du champ personnalisé
+            String autreCategorie = autreCategorieField.getText();
+            if (autreCategorie != null && !autreCategorie.trim().isEmpty()) {
+                return autreCategorie.trim();
+            } else {
+                return null; // Pas de catégorie saisie
+            }
+        } else {
+            // Retourner la catégorie sélectionnée
+            return selection;
+        }
     }
 
     @FXML
@@ -193,13 +171,7 @@ public class FormulaireProduitController {
 
             p.setNom(nomField.getText().trim());
             p.setDescription(descriptionField.getText().trim());
-
-            // Récupérer la catégorie (sélectionnée ou saisie)
-            String categorie = getCategorieValue();
-            if (categorie != null) {
-                p.setCategorie(categorie);
-            }
-
+            p.setCategorie(getCategorieValue());
             p.setPrix(Double.parseDouble(prixField.getText().trim()));
             p.setStock_actuel(Integer.parseInt(stockActuelField.getText().trim()));
             p.setStock_min(Integer.parseInt(stockMinField.getText().trim()));
@@ -214,13 +186,8 @@ public class FormulaireProduitController {
                 showAlert(Alert.AlertType.INFORMATION, "Succès", "Produit modifié avec succès !");
             }
 
-            // Ajouter la catégorie personnalisée à la liste pour une prochaine utilisation
-            if (categorie != null && !estDansCategoriesPredifinies(categorie)) {
-                ajouterCategoriePersonnalisee(categorie);
-            }
-
             if (onProduitAjoute != null) {
-                onProduitAjoute.run(); // Rafraîchir la liste
+                onProduitAjoute.run();
             }
 
             fermerFormulaire();
@@ -248,7 +215,7 @@ public class FormulaireProduitController {
 
         // Validation de la catégorie
         String categorie = getCategorieValue();
-        if (categorie == null || categorie.isEmpty()) {
+        if (categorie == null || categorie.trim().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "La catégorie est obligatoire");
             return false;
         }
@@ -284,36 +251,5 @@ public class FormulaireProduitController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    // Vérifier si une catégorie est dans la liste prédéfinie
-    private boolean estDansCategoriesPredifinies(String categorie) {
-        for (String cat : categoriesPredifinies) {
-            if (cat.equalsIgnoreCase(categorie)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Ajouter cette méthode pour sauvegarder les catégories personnalisées
-    private void ajouterCategoriePersonnalisee(String nouvelleCategorie) {
-        if (nouvelleCategorie != null && !nouvelleCategorie.isEmpty()) {
-            // Vérifier si la catégorie n'existe pas déjà
-            boolean existe = false;
-            ObservableList<String> itemsActuels = categorieCombo.getItems();
-
-            for (String cat : itemsActuels) {
-                if (cat.equalsIgnoreCase(nouvelleCategorie)) {
-                    existe = true;
-                    break;
-                }
-            }
-
-            if (!existe) {
-                // Ajouter à la liste des catégories pour une utilisation future
-                itemsActuels.add(nouvelleCategorie);
-            }
-        }
     }
 }
