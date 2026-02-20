@@ -162,6 +162,23 @@ public class SignupController {
             return;
         }
 
+        // Vérifier l'unicité de l'email et du CIN
+        try {
+            if (utilisateurService.emailExists(email)) {
+                showError("Cet email est déjà utilisé");
+                return;
+            }
+            
+            if (utilisateurService.cinExists(cin)) {
+                showError("Ce CIN est déjà enregistré");
+                return;
+            }
+        } catch (Exception e) {
+            showError("Erreur lors de la vérification des données");
+            e.printStackTrace();
+            return;
+        }
+
         // Créer l'utilisateur avec mot de passe hashé
         try {
             String hashedPassword = PasswordValidator.hashPassword(password);

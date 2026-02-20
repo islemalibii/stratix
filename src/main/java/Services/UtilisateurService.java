@@ -181,6 +181,76 @@ public class UtilisateurService {
         ps.setString(2, email);
         ps.executeUpdate();
     }
+    
+    // Vérifier si un email existe déjà
+    public boolean emailExists(String email) throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Connexion à la base de données non disponible");
+        }
+        
+        String query = "SELECT COUNT(*) FROM utilisateur WHERE email = ?";
+        PreparedStatement ps = connection.prepareStatement(query);
+        ps.setString(1, email);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+        return false;
+    }
+    
+    // Vérifier si un email existe déjà (en excluant un utilisateur spécifique pour la modification)
+    public boolean emailExistsExcludingUser(String email, int userId) throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Connexion à la base de données non disponible");
+        }
+        
+        String query = "SELECT COUNT(*) FROM utilisateur WHERE email = ? AND id != ?";
+        PreparedStatement ps = connection.prepareStatement(query);
+        ps.setString(1, email);
+        ps.setInt(2, userId);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+        return false;
+    }
+    
+    // Vérifier si un CIN existe déjà
+    public boolean cinExists(int cin) throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Connexion à la base de données non disponible");
+        }
+        
+        String query = "SELECT COUNT(*) FROM utilisateur WHERE cin = ?";
+        PreparedStatement ps = connection.prepareStatement(query);
+        ps.setInt(1, cin);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+        return false;
+    }
+    
+    // Vérifier si un CIN existe déjà (en excluant un utilisateur spécifique pour la modification)
+    public boolean cinExistsExcludingUser(int cin, int userId) throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Connexion à la base de données non disponible");
+        }
+        
+        String query = "SELECT COUNT(*) FROM utilisateur WHERE cin = ? AND id != ?";
+        PreparedStatement ps = connection.prepareStatement(query);
+        ps.setInt(1, cin);
+        ps.setInt(2, userId);
+        ResultSet rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+        return false;
+    }
 
     // Mapper ResultSet vers Utilisateur
     private Utilisateur mapResultSetToUtilisateur(ResultSet rs) throws SQLException {

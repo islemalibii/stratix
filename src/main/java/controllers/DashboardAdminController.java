@@ -464,6 +464,18 @@ public class DashboardAdminController {
         if (result.isPresent() && result.get() == saveButtonType) {
             try {
                 Utilisateur newUser = createUserFromForm(grid);
+                
+                // Vérifier l'unicité de l'email et du CIN
+                if (utilisateurService.emailExists(newUser.getEmail())) {
+                    showAlert("Erreur", "Cet email est déjà utilisé");
+                    return;
+                }
+                
+                if (utilisateurService.cinExists(newUser.getCin())) {
+                    showAlert("Erreur", "Ce CIN est déjà enregistré");
+                    return;
+                }
+                
                 utilisateurService.ajouter(newUser);
                 refreshCurrentView();
                 showAlert("Succès", "Utilisateur ajouté avec succès");
