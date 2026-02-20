@@ -64,4 +64,18 @@ public class produit {
     // Nouveaux getter/setter pour l'image
     public String getImage_path() { return image_path; }
     public void setImage_path(String image_path) { this.image_path = image_path; }
+    public String toString() {
+        return "produit{" +
+                "id=" + id +
+                ", nom='" + nom + '\'' +
+                ", description='" + description + '\'' +
+                ", categorie='" + categorie + '\'' +
+                ", prix=" + prix +
+                ", stock_actuel=" + stock_actuel +
+                ", stock_min=" + stock_min +
+                ", date_creation='" + date_creation + '\'' +
+                ", ressources_necessaires='" + ressources_necessaires + '\'' +
+                ", image_path='" + image_path + '\'' +
+                '}';
+    }
 }
