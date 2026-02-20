@@ -6,14 +6,18 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.stage.Stage;
+import javafx.stage.FileChooser;
 
 import models.Tache;
 import models.Employe;
 import services.SERVICETache;
 import services.EmployeeService;
+import services.PDFExportService;    // ← IMPORT AJOUTÉ
+import services.ExcelExportService;  // ← IMPORT AJOUTÉ
 
+import java.io.File;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -46,17 +50,13 @@ public class TacheListeController implements Initializable {
         employeService = new EmployeeService();
         tacheList = FXCollections.observableArrayList();
 
-        // Configuration des colonnes
         configurerColonnes();
-
-        // Charger les données
         chargerTaches();
     }
 
     private void configurerColonnes() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
 
-        // Priorité avec emoji
         colPriorite.setCellValueFactory(cellData -> {
             Tache t = cellData.getValue();
             String priorite = "";
@@ -71,7 +71,6 @@ public class TacheListeController implements Initializable {
 
         colTitre.setCellValueFactory(new PropertyValueFactory<>("titre"));
 
-        // Colonne Employé avec nom d'utilisateur
         colEmploye.setCellValueFactory(cellData -> {
             Tache t = cellData.getValue();
             Employe emp = employeService.getEmployeById(t.getEmployeId());
@@ -79,7 +78,6 @@ public class TacheListeController implements Initializable {
             return new javafx.beans.property.SimpleStringProperty(nom);
         });
 
-        // Formatage de la deadline
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         colDeadline.setCellValueFactory(cellData -> {
             Tache t = cellData.getValue();
@@ -91,7 +89,6 @@ public class TacheListeController implements Initializable {
             return new javafx.beans.property.SimpleStringProperty("");
         });
 
-        // Statut avec emoji
         colStatut.setCellValueFactory(cellData -> {
             Tache t = cellData.getValue();
             String statut = "";
@@ -105,39 +102,6 @@ public class TacheListeController implements Initializable {
         });
 
         colProjet.setCellValueFactory(new PropertyValueFactory<>("projetId"));
-
-        // Colorer les lignes selon la priorité
-        tableTaches.setRowFactory(tv -> new TableRow<Tache>() {
-            @Override
-            protected void updateItem(Tache tache, boolean empty) {
-                super.updateItem(tache, empty);
-                if (tache == null || empty) {
-                    setStyle("");
-                } else {
-                    String priorite = tache.getPriorite();
-                    switch(priorite) {
-                        case "HAUTE":
-                            setStyle("-fx-background-color: #fee2e2;"); // Rouge clair
-                            break;
-                        case "MOYENNE":
-                            setStyle("-fx-background-color: #fef9c3;"); // Jaune clair
-                            break;
-                        case "BASSE":
-                            setStyle("-fx-background-color: #dcfce7;"); // Vert clair
-                            break;
-                        default:
-                            setStyle("");
-                    }
-                }
-            }
-        });
-
-        // Double-clic pour modifier
-        tableTaches.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                handleRowDoubleClick();
-            }
-        });
     }
 
     private void chargerTaches() {
@@ -146,7 +110,6 @@ public class TacheListeController implements Initializable {
         tacheList.addAll(taches);
         tableTaches.setItems(tacheList);
 
-        // Mettre à jour les statistiques
         int total = taches.size();
         int aFaire = 0, enCours = 0, terminees = 0;
 
@@ -167,31 +130,71 @@ public class TacheListeController implements Initializable {
     }
 
     @FXML
-    private void retourFormulaire() {
-        System.out.println("🔄 Retour au formulaire des tâches");
+    private void exportToPDF() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Exporter les tâches en PDF");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf")
+            );
+            fileChooser.setInitialFileName("taches_" + LocalDate.now() + ".pdf");
 
-        // Fermer la fenêtre actuelle
-        Stage stage = (Stage) tableTaches.getScene().getWindow();
-        stage.close();
+            File file = fileChooser.showSaveDialog(tableTaches.getScene().getWindow());
 
-        // Revenir à la vue tâches
-        MainController.showTaches();
+            if (file != null) {
+                List<Tache> toutesTaches = tacheService.getAllTaches();
+                PDFExportService.exportTachesToPDF(toutesTaches, file.getAbsolutePath());
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Succès");
+                alert.setHeaderText(null);
+                alert.setContentText("✅ PDF exporté avec succès !\n" + file.getName());
+                alert.showAndWait();
+            }
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText(null);
+            alert.setContentText("❌ Erreur : " + e.getMessage());
+            alert.showAndWait();
+            e.printStackTrace();
+        }
     }
 
-    private void handleRowDoubleClick() {
-        Tache selected = tableTaches.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            System.out.println("Tâche sélectionnée: ID " + selected.getId());
+    @FXML
+    private void exportToExcel() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Exporter les tâches en Excel");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Fichiers Excel", "*.xlsx")
+            );
+            fileChooser.setInitialFileName("taches_" + LocalDate.now() + ".xlsx");
 
-            // Fermer la liste
-            Stage stage = (Stage) tableTaches.getScene().getWindow();
-            stage.close();
+            File file = fileChooser.showSaveDialog(tableTaches.getScene().getWindow());
 
-            // Retourner au formulaire
-            MainController.showTaches();
+            if (file != null) {
+                List<Tache> toutesTaches = tacheService.getAllTaches();
+                ExcelExportService.exportTachesToExcel(toutesTaches, file.getAbsolutePath());
 
-            // Ici tu pourrais passer l'ID au TacheController
-            // TacheController.setSelectedTacheId(selected.getId());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Succès");
+                alert.setHeaderText(null);
+                alert.setContentText("✅ Excel exporté avec succès !\n" + file.getName());
+                alert.showAndWait();
+            }
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText(null);
+            alert.setContentText("❌ Erreur : " + e.getMessage());
+            alert.showAndWait();
+            e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void retourFormulaire() {
+        MainController.showTaches();
     }
 }

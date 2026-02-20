@@ -8,12 +8,20 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="700" prefWidth="1000" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TacheListeController">
+<AnchorPane prefHeight="700" prefWidth="1000" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TacheListeController">
 
     <!-- Header -->
     <VBox layoutX="0" layoutY="0" prefWidth="1000" style="-fx-background-color: #2c3e50;">
         <HBox alignment="CENTER_LEFT" prefHeight="70" spacing="20" style="-fx-padding: 0 30;">
             <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" text="📋 LISTE DES TÂCHES" />
+
+            <!-- Boutons d'export à droite -->
+            <HBox spacing="10" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                <Button text="📄 PDF" onAction="#exportToPDF"
+                        style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 20; -fx-cursor: hand;"/>
+                <Button text="📊 Excel" onAction="#exportToExcel"
+                        style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 20; -fx-cursor: hand;"/>
+            </HBox>
         </HBox>
     </VBox>
 
@@ -58,6 +66,7 @@
     </VBox>
 
     <!-- Bouton retour -->
-    <!-- Bouton retour -->
-    <Button layoutX="14.0" layoutY="634.0" onAction="#retourFormulaire" style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;" text="← Retour au formulaire" />
+    <Button layoutX="30" layoutY="640" onAction="#retourFormulaire"
+            style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 8; -fx-cursor: hand;"
+            text="← Retour au formulaire" />
 </AnchorPane>
