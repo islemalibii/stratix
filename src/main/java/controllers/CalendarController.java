@@ -72,7 +72,7 @@ public class CalendarController {
             calendarGrid.add(dayLabel, i, 0);
         }
 
-        // Obtenir le premier jour du moiss
+        // Obtenir le premierr jour du moiss
         LocalDate firstOfMonth = currentYearMonth.atDay(1);
         int dayOfWeek = firstOfMonth.getDayOfWeek().getValue() % 7; // 1=Lundi, 7=Dimanche
 
