@@ -142,7 +142,7 @@ public class SERVICEPlanning {
         }
     }
 
-    // Compter le nombre total d'utilisateurs avec rôle employé
+    // Compter le nombre total d'utilisateurs avec rôle employeeeé
     public int compterTotalEmployes() {
         String sql = "SELECT COUNT(*) FROM utilisateur WHERE role = 'employe' OR role = 'EMPLOYE' OR role LIKE 'responsable%'";
         try (Connection c = DBConnection.getConnection();
