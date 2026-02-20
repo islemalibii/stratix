@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane styleClass="root-container" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.EmployeListeController">
+
+    <stylesheets>
+        <URL value="@styles.css" />
+    </stylesheets>
+
+    <left>
+        <VBox prefWidth="260" spacing="10" styleClass="sidebar">
+            <padding><Insets bottom="20" left="20" right="20" top="30" /></padding>
+
+            <VBox alignment="CENTER" spacing="10">
+                <ImageView fitWidth="80" preserveRatio="true">
+                    <image>
+                        <Image url="@stratix.png" />
+                    </image>
+                </ImageView>
+                <Label styleClass="logo-text" text="STRATIX" />
+            </VBox>
+
+            <Separator style="-fx-opacity: 0.1; -fx-padding: 15 0;" />
+
+            <Button styleClass="sidebar-btn-disabled" text="📊  Tableau de bord" />
+            <Button styleClass="sidebar-btn-disabled" text="👥  Employés" />
+            <Button onAction="#initialize" styleClass="sidebar-btn-active" text="📂  Projets" />
+            <Button styleClass="sidebar-btn-disabled" text="✅  Tâches" />
+            <Button styleClass="sidebar-btn-disabled" text="📦  Ressources" />
+            <Button styleClass="sidebar-btn-disabled" text="📈  Analyse" />
+
+            <Region VBox.vgrow="ALWAYS" />
+
+            <Button onAction="#versBackOffice" prefWidth="220" styleClass="btn-switch-mode" text="⚙️  Mode Administrateur" />
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="25">
+            <padding><Insets bottom="30" left="30" right="30" top="30" /></padding>
+
+            <VBox spacing="5">
+                <Label style=" bold-fx-text-fill: #64748b; -fx-font-size: 16px;" text="Bonjour," textAlignment="CENTER">
+               <font>
+                  <Font name="System Bold" size="27.0" />
+               </font></Label>
+            </VBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <TextField fx:id="searchField" onKeyReleased="#rechercherProjet" promptText="🔍 Rechercher un projet actif..." styleClass="modern-input" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <ScrollPane fitToWidth="true" styleClass="modern-scroll" VBox.vgrow="ALWAYS">
+                <FlowPane fx:id="flowPaneProjets" hgap="30" vgap="30">
+                    <padding><Insets bottom="10" left="10" right="10" top="10" /></padding>
+                </FlowPane>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
