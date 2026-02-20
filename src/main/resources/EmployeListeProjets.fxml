@@ -27,7 +27,7 @@
             <padding><Insets bottom="20" left="20" right="20" top="30" /></padding>
 
             <VBox alignment="CENTER" spacing="10">
-                <ImageView fitWidth="80" preserveRatio="true">
+                <ImageView fitWidth="50" preserveRatio="true">
                     <image>
                         <Image url="@stratix.png" />
                     </image>
