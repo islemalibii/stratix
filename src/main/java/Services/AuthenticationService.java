@@ -28,12 +28,12 @@ public class AuthenticationService {
     /**
      * Vérifier si le compte est verrouillé
      */
-    public boolean isAccountLocked(String email) throws SQLException {
+    public LockStatus isAccountLocked(String email) throws SQLException {
         if (connection == null) {
             throw new SQLException("Connexion à la base de données non disponible");
         }
 
-        String query = "SELECT account_locked, locked_until FROM utilisateur WHERE email = ?";
+        String query = "SELECT account_locked, locked_until, failed_login_attempts FROM utilisateur WHERE email = ?";
         PreparedStatement ps = connection.prepareStatement(query);
         ps.setString(1, email);
         ResultSet rs = ps.executeQuery();
@@ -41,17 +41,24 @@ public class AuthenticationService {
         if (rs.next()) {
             boolean locked = rs.getBoolean("account_locked");
             Timestamp lockedUntil = rs.getTimestamp("locked_until");
+            int attempts = rs.getInt("failed_login_attempts");
 
             if (locked && lockedUntil != null) {
+                LocalDateTime unlockTime = lockedUntil.toLocalDateTime();
+                LocalDateTime now = LocalDateTime.now();
+                
                 // Vérifier si la période de verrouillage est expirée
-                if (LocalDateTime.now().isAfter(lockedUntil.toLocalDateTime())) {
+                if (now.isAfter(unlockTime)) {
                     unlockAccount(email);
-                    return false;
+                    return new LockStatus(false, 0, null);
                 }
-                return true;
+                
+                // Calculer le temps restant
+                long minutesRemaining = java.time.Duration.between(now, unlockTime).toMinutes();
+                return new LockStatus(true, minutesRemaining, unlockTime);
             }
         }
-        return false;
+        return new LockStatus(false, 0, null);
     }
 
     /**
@@ -255,5 +262,42 @@ public class AuthenticationService {
         ps.executeUpdate();
 
         return code;
+    }
+    
+    /**
+     * Classe pour le statut de verrouillage
+     */
+    public static class LockStatus {
+        private final boolean locked;
+        private final long minutesRemaining;
+        private final LocalDateTime unlockTime;
+        
+        public LockStatus(boolean locked, long minutesRemaining, LocalDateTime unlockTime) {
+            this.locked = locked;
+            this.minutesRemaining = minutesRemaining;
+            this.unlockTime = unlockTime;
+        }
+        
+        public boolean isLocked() {
+            return locked;
+        }
+        
+        public long getMinutesRemaining() {
+            return minutesRemaining;
+        }
+        
+        public LocalDateTime getUnlockTime() {
+            return unlockTime;
+        }
+        
+        public String getFormattedTimeRemaining() {
+            if (minutesRemaining < 60) {
+                return minutesRemaining + " minute(s)";
+            } else {
+                long hours = minutesRemaining / 60;
+                long mins = minutesRemaining % 60;
+                return hours + " heure(s) et " + mins + " minute(s)";
+            }
+        }
     }
 }

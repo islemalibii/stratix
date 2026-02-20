@@ -3,15 +3,21 @@ package controllers;
 import Services.AuthenticationService;
 import Services.EmailService;
 import Services.UtilisateurService;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import models.Utilisateur;
 import models.Role;
 import utils.PasswordValidator;
@@ -19,6 +25,7 @@ import utils.SessionManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,8 +92,9 @@ public class LoginController {
 
         try {
             // Vérifier si le compte est verrouillé
-            if (authService.isAccountLocked(email)) {
-                showError("Compte verrouillé. Réessayez dans 15 minutes.");
+            AuthenticationService.LockStatus lockStatus = authService.isAccountLocked(email);
+            if (lockStatus.isLocked()) {
+                showLockoutCountdown(lockStatus);
                 return;
             }
 
@@ -376,5 +384,63 @@ public class LoginController {
     private void showError(String message) {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
+    }
+    
+    /**
+     * Afficher un compteur à rebours pour le verrouillage
+     */
+    private void showLockoutCountdown(AuthenticationService.LockStatus lockStatus) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Compte Verrouillé");
+        alert.setHeaderText("Trop de tentatives échouées");
+        
+        // Label pour le compteur
+        Label countdownLabel = new Label();
+        countdownLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #EF4444;");
+        
+        Label messageLabel = new Label("Votre compte a été temporairement verrouillé.\nVeuillez patienter:");
+        messageLabel.setStyle("-fx-font-size: 14px;");
+        
+        VBox content = new VBox(10);
+        content.setAlignment(Pos.CENTER);
+        content.getChildren().addAll(messageLabel, countdownLabel);
+        
+        alert.getDialogPane().setContent(content);
+        
+        // Calculer le temps restant en secondes
+        long totalSeconds = lockStatus.getMinutesRemaining() * 60;
+        
+        // Timeline pour mettre à jour le compteur chaque seconde
+        Timeline timeline = new Timeline(
+            new KeyFrame(Duration.seconds(1), e -> {
+                long currentSeconds = java.time.Duration.between(
+                    LocalDateTime.now(), 
+                    lockStatus.getUnlockTime()
+                ).getSeconds();
+                
+                if (currentSeconds <= 0) {
+                    alert.close();
+                    showError("Vous pouvez maintenant réessayer de vous connecter");
+                } else {
+                    long minutes = currentSeconds / 60;
+                    long seconds = currentSeconds % 60;
+                    countdownLabel.setText(String.format("%d:%02d", minutes, seconds));
+                }
+            })
+        );
+        
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+        
+        // Arrêter le timeline quand le dialog se ferme
+        alert.setOnCloseRequest(e -> timeline.stop());
+        
+        // Affichage initial
+        long minutes = totalSeconds / 60;
+        long seconds = totalSeconds % 60;
+        countdownLabel.setText(String.format("%d:%02d", minutes, seconds));
+        
+        alert.showAndWait();
+        timeline.stop();
     }
 }
