@@ -1,14 +1,24 @@
 package org.example.controllers;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.produit;
 import service.service_produit;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 
 public class FormulaireProduitController {
@@ -22,9 +32,9 @@ public class FormulaireProduitController {
     @FXML
     private ComboBox<String> categorieCombo;
     @FXML
-    private VBox autreCategorieContainer; // NOUVEAU: Conteneur pour la catégorie personnalisée
+    private VBox autreCategorieContainer;
     @FXML
-    private TextField autreCategorieField; // NOUVEAU: Champ pour saisir la catégorie personnalisée
+    private TextField autreCategorieField;
     @FXML
     private TextField prixField;
     @FXML
@@ -40,8 +50,23 @@ public class FormulaireProduitController {
     @FXML
     private Button btnValider;
 
+    // Nouveaux composants pour l'image
+    @FXML
+    private ImageView imageView;
+    @FXML
+    private Button btnChoisirImage;
+    @FXML
+    private Button btnSupprimerImage;
+    @FXML
+    private Label cheminImageLabel;
+
     private service_produit serviceProduit = new service_produit();
     private Runnable onProduitAjoute;
+
+    // Chemin pour stocker les images
+    private static final String IMAGES_DIRECTORY = "src/main/resources/images/produits/";
+    private File selectedImageFile;
+    private String currentImagePath;
 
     // Liste des catégories prédéfinies
     private final String[] categoriesPredifinies = {
@@ -60,21 +85,110 @@ public class FormulaireProduitController {
         // Ajouter un listener pour gérer la sélection "Autre"
         categorieCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if ("Autre".equals(newVal)) {
-                // Afficher le champ de catégorie personnalisée
                 autreCategorieContainer.setVisible(true);
                 autreCategorieContainer.setManaged(true);
-
-                // Mettre le focus sur le champ personnalisé
                 autreCategorieField.requestFocus();
                 autreCategorieField.clear();
             } else {
-                // Cacher le champ de catégorie personnalisée
                 autreCategorieContainer.setVisible(false);
                 autreCategorieContainer.setManaged(false);
             }
         });
 
+        // Créer le répertoire d'images s'il n'existe pas
+        createImagesDirectory();
+
         System.out.println("Formulaire initialisé");
+    }
+
+    /**
+     * Crée le répertoire pour les images s'il n'existe pas
+     */
+    private void createImagesDirectory() {
+        File directory = new File(IMAGES_DIRECTORY);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+    }
+
+    /**
+     * Gère le choix d'une image
+     */
+    @FXML
+    private void choisirImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choisir une image");
+
+        // Filtrer pour n'afficher que les images
+        FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter(
+                "Images", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp");
+        fileChooser.getExtensionFilters().add(imageFilter);
+
+        // Afficher la boîte de dialogue
+        File file = fileChooser.showOpenDialog(btnChoisirImage.getScene().getWindow());
+
+        if (file != null) {
+            selectedImageFile = file;
+
+            // Afficher un aperçu de l'image
+            try {
+                Image image = new Image(file.toURI().toString());
+                imageView.setImage(image);
+                imageView.setFitHeight(150);
+                imageView.setFitWidth(150);
+                imageView.setPreserveRatio(true);
+
+                // Afficher le nom du fichier
+                cheminImageLabel.setText(file.getName());
+            } catch (Exception e) {
+                showAlert(Alert.AlertType.ERROR, "Erreur",
+                        "Impossible de charger l'image : " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Supprime l'image sélectionnée
+     */
+    @FXML
+    private void supprimerImage() {
+        imageView.setImage(null);
+        selectedImageFile = null;
+        currentImagePath = null;
+        cheminImageLabel.setText("Aucune image sélectionnée");
+    }
+
+    /**
+     * Copie l'image dans le répertoire de l'application
+     */
+    private String copyImageToAppDirectory(File sourceFile, int produitId) {
+        if (sourceFile == null) {
+            return null;
+        }
+
+        try {
+            // Créer un nom de fichier unique basé sur l'ID et le nom original
+            String extension = "";
+            String fileName = sourceFile.getName();
+            int dotIndex = fileName.lastIndexOf('.');
+            if (dotIndex > 0) {
+                extension = fileName.substring(dotIndex);
+            }
+
+            String newFileName = "produit_" + produitId + "_" + System.currentTimeMillis() + extension;
+            Path destinationPath = Paths.get(IMAGES_DIRECTORY, newFileName);
+
+            // Copier le fichier
+            Files.copy(sourceFile.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
+
+            return destinationPath.toString();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Impossible de copier l'image : " + e.getMessage());
+            return null;
+        }
     }
 
     public void setModeAjout() {
@@ -82,11 +196,21 @@ public class FormulaireProduitController {
         btnValider.setText("Ajouter");
         dateCreationPicker.setValue(LocalDate.now());
 
-        // Réinitialiser
+        // Réinitialiser les champs
+        idField.clear();
+        nomField.clear();
+        descriptionField.clear();
         categorieCombo.getSelectionModel().clearSelection();
         autreCategorieContainer.setVisible(false);
         autreCategorieContainer.setManaged(false);
         autreCategorieField.clear();
+        prixField.clear();
+        stockActuelField.clear();
+        stockMinField.clear();
+        ressourcesField.clear();
+
+        // Réinitialiser l'image
+        supprimerImage();
     }
 
     public void setModeModification(produit p) {
@@ -100,7 +224,6 @@ public class FormulaireProduitController {
         // Gérer la catégorie existante
         String categorieExistante = p.getCategorie();
         if (categorieExistante != null && !categorieExistante.isEmpty()) {
-            // Vérifier si c'est une catégorie prédéfinie
             boolean estPredifinie = false;
             for (String cat : categoriesPredifinies) {
                 if (cat.equals(categorieExistante)) {
@@ -110,12 +233,10 @@ public class FormulaireProduitController {
             }
 
             if (estPredifinie) {
-                // Catégorie prédéfinie
                 categorieCombo.setValue(categorieExistante);
                 autreCategorieContainer.setVisible(false);
                 autreCategorieContainer.setManaged(false);
             } else {
-                // Catégorie personnalisée
                 categorieCombo.setValue("Autre");
                 autreCategorieContainer.setVisible(true);
                 autreCategorieContainer.setManaged(true);
@@ -130,28 +251,42 @@ public class FormulaireProduitController {
             dateCreationPicker.setValue(LocalDate.parse(p.getDate_creation()));
         }
         ressourcesField.setText(p.getRessources_necessaires());
+
+        // Charger l'image si elle existe
+        currentImagePath = p.getImage_path();
+        if (currentImagePath != null && !currentImagePath.isEmpty()) {
+            try {
+                File imageFile = new File(currentImagePath);
+                if (imageFile.exists()) {
+                    Image image = new Image(imageFile.toURI().toString());
+                    imageView.setImage(image);
+                    imageView.setFitHeight(150);
+                    imageView.setFitWidth(150);
+                    imageView.setPreserveRatio(true);
+                    cheminImageLabel.setText(imageFile.getName());
+                } else {
+                    cheminImageLabel.setText("Image introuvable");
+                }
+            } catch (Exception e) {
+                cheminImageLabel.setText("Erreur de chargement");
+            }
+        }
     }
 
     public void setOnProduitAjoute(Runnable callback) {
         this.onProduitAjoute = callback;
     }
 
-    /**
-     * Récupère la valeur de la catégorie
-     */
     private String getCategorieValue() {
         String selection = categorieCombo.getValue();
-
         if ("Autre".equals(selection)) {
-            // Retourner la valeur du champ personnalisé
             String autreCategorie = autreCategorieField.getText();
             if (autreCategorie != null && !autreCategorie.trim().isEmpty()) {
                 return autreCategorie.trim();
             } else {
-                return null; // Pas de catégorie saisie
+                return null;
             }
         } else {
-            // Retourner la catégorie sélectionnée
             return selection;
         }
     }
@@ -164,8 +299,9 @@ public class FormulaireProduitController {
 
         try {
             produit p = new produit();
+            boolean isNewProduct = (idField.getText() == null || idField.getText().isEmpty());
 
-            if (idField.getText() != null && !idField.getText().isEmpty()) {
+            if (!isNewProduct) {
                 p.setId(Integer.parseInt(idField.getText()));
             }
 
@@ -178,10 +314,32 @@ public class FormulaireProduitController {
             p.setDate_creation(dateCreationPicker.getValue().toString());
             p.setRessources_necessaires(ressourcesField.getText().trim());
 
-            if (idField.getText() == null || idField.getText().isEmpty()) {
+            if (isNewProduct) {
+                // Ajout du produit
                 serviceProduit.add(p);
+
+                // Après l'ajout, récupérer l'ID généré pour l'image
+                int newId = p.getId(); // Supposons que l'ID est mis à jour après l'ajout
+
+                // Gérer l'image si sélectionnée
+                if (selectedImageFile != null) {
+                    String imagePath = copyImageToAppDirectory(selectedImageFile, newId);
+                    p.setImage_path(imagePath);
+                    serviceProduit.update(p); // Mise à jour avec le chemin de l'image
+                }
+
                 showAlert(Alert.AlertType.INFORMATION, "Succès", "Produit ajouté avec succès !");
             } else {
+                // Modification du produit
+                if (selectedImageFile != null) {
+                    // Nouvelle image sélectionnée
+                    String imagePath = copyImageToAppDirectory(selectedImageFile, p.getId());
+                    p.setImage_path(imagePath);
+                } else if (currentImagePath != null && !currentImagePath.isEmpty()) {
+                    // Conserver l'image existante
+                    p.setImage_path(currentImagePath);
+                }
+
                 serviceProduit.update(p);
                 showAlert(Alert.AlertType.INFORMATION, "Succès", "Produit modifié avec succès !");
             }
@@ -213,7 +371,6 @@ public class FormulaireProduitController {
             return false;
         }
 
-        // Validation de la catégorie
         String categorie = getCategorieValue();
         if (categorie == null || categorie.trim().isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "La catégorie est obligatoire");
