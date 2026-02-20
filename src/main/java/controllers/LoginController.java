@@ -143,12 +143,24 @@ public class LoginController {
             // Générer un nouveau code 2FA
             String code = authService.generate2FACode(user.getId());
             
-            // Afficher le code (dans une vraie app, envoyer par SMS/Email)
-            Alert codeAlert = new Alert(Alert.AlertType.INFORMATION);
-            codeAlert.setTitle("Code 2FA");
-            codeAlert.setHeaderText("Votre code de vérification");
-            codeAlert.setContentText("Code: " + code + "\n\n(Dans une application réelle, ce code serait envoyé par SMS/Email)");
-            codeAlert.showAndWait();
+            // Envoyer le code par email
+            boolean emailSent = emailService.send2FACode(user.getEmail(), code);
+            
+            if (emailSent) {
+                // Email envoyé avec succès
+                Alert infoAlert = new Alert(Alert.AlertType.INFORMATION);
+                infoAlert.setTitle("Code 2FA envoyé");
+                infoAlert.setHeaderText("Code de vérification envoyé");
+                infoAlert.setContentText("Un code de vérification a été envoyé à votre adresse email.\n\nVérifiez votre boîte de réception.");
+                infoAlert.showAndWait();
+            } else {
+                // Si l'envoi échoue, afficher le code à l'écran (fallback)
+                Alert codeAlert = new Alert(Alert.AlertType.INFORMATION);
+                codeAlert.setTitle("Code 2FA");
+                codeAlert.setHeaderText("Impossible d'envoyer l'email");
+                codeAlert.setContentText("Votre code de vérification: " + code + "\n\n(Configurez votre serveur SMTP dans EmailService.java pour activer l'envoi d'emails)");
+                codeAlert.showAndWait();
+            }
             
             // Dialog pour entrer le code
             TextInputDialog dialog = new TextInputDialog();

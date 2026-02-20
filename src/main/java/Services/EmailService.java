@@ -33,10 +33,10 @@ public class EmailService {
     }
     
     /**
-     * Envoyer un code 2FA
+     * Envoyer un code 2FA par email
      */
     public boolean send2FACode(String toEmail, String code) {
-        String subject = "Code de vérification - Stratix";
+        String subject = "Code de vérification 2FA - Stratix";
         String body = build2FAEmailBody(code);
         
         return sendEmail(toEmail, subject, body);

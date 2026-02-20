@@ -214,6 +214,15 @@ public class UtilisateurService {
             utilisateur.setDateEmbauche(dateEmbauche.toLocalDate());
         }
         
+        // Champs pour l'authentification avancée
+        try {
+            utilisateur.setTwoFactorEnabled(rs.getBoolean("two_factor_enabled"));
+            utilisateur.setTwoFactorSecret(rs.getString("two_factor_secret"));
+        } catch (SQLException e) {
+            // Si les colonnes n'existent pas encore, ignorer
+            utilisateur.setTwoFactorEnabled(false);
+        }
+        
         return utilisateur;
     }
 }
