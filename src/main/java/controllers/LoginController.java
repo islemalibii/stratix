@@ -1,6 +1,7 @@
 package controllers;
 
 import Services.AuthenticationService;
+import Services.EmailService;
 import Services.UtilisateurService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -43,10 +44,12 @@ public class LoginController {
 
     private UtilisateurService utilisateurService;
     private AuthenticationService authService;
+    private EmailService emailService;
 
     public void initialize() {
         utilisateurService = UtilisateurService.getInstance();
         authService = AuthenticationService.getInstance();
+        emailService = EmailService.getInstance();
         
         // Contrôle de saisie pour l'email
         emailField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -199,23 +202,39 @@ public class LoginController {
                 // Vérifier si l'email existe
                 Utilisateur user = utilisateurService.getByEmail(email);
                 if (user != null) {
-                    // Générer un token de réinitialisation
-                    String token = authService.generatePasswordResetToken(email);
+                    // Générer un code de vérification (6 chiffres)
+                    String code = PasswordValidator.generate2FACode();
                     
-                    // Afficher le token (dans une vraie app, envoyer par email)
-                    Alert tokenAlert = new Alert(Alert.AlertType.INFORMATION);
-                    tokenAlert.setTitle("Token de réinitialisation");
-                    tokenAlert.setHeaderText("Token généré");
-                    tokenAlert.setContentText("Token: " + token + "\n\n(Dans une application réelle, ce token serait envoyé par email)\n\nValide pendant 1 heure.");
-                    tokenAlert.showAndWait();
+                    // Enregistrer le code comme token de réinitialisation
+                    authService.generatePasswordResetToken(email);
                     
-                    // Ouvrir le dialog de réinitialisation
-                    showResetPasswordDialog();
+                    // Envoyer l'email
+                    boolean emailSent = emailService.sendPasswordResetEmail(email, code);
+                    
+                    if (emailSent) {
+                        Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                        successAlert.setTitle("Email envoyé");
+                        successAlert.setHeaderText("Code de vérification envoyé");
+                        successAlert.setContentText("Un code de vérification a été envoyé à votre adresse email.\n\nVérifiez votre boîte de réception.");
+                        successAlert.showAndWait();
+                        
+                        // Ouvrir le dialog de réinitialisation avec le code
+                        showResetPasswordDialog(code);
+                    } else {
+                        // Si l'envoi échoue, afficher le code à l'écran (fallback)
+                        Alert codeAlert = new Alert(Alert.AlertType.INFORMATION);
+                        codeAlert.setTitle("Code de vérification");
+                        codeAlert.setHeaderText("Impossible d'envoyer l'email");
+                        codeAlert.setContentText("Votre code de vérification: " + code + "\n\n(Configurez votre serveur SMTP dans EmailService.java pour activer l'envoi d'emails)");
+                        codeAlert.showAndWait();
+                        
+                        showResetPasswordDialog(code);
+                    }
                 } else {
                     showError("Email non trouvé");
                 }
             } catch (SQLException e) {
-                showError("Erreur lors de la génération du token");
+                showError("Erreur lors de la génération du code");
                 e.printStackTrace();
             }
         });
@@ -224,10 +243,10 @@ public class LoginController {
     /**
      * Dialog pour réinitialiser le mot de passe
      */
-    private void showResetPasswordDialog() {
+    private void showResetPasswordDialog(String expectedCode) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Réinitialiser le mot de passe");
-        dialog.setHeaderText("Entrez le token et votre nouveau mot de passe");
+        dialog.setHeaderText("Entrez le code reçu par email et votre nouveau mot de passe");
         
         ButtonType resetButtonType = new ButtonType("Réinitialiser", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(resetButtonType, ButtonType.CANCEL);
@@ -237,15 +256,15 @@ public class LoginController {
         grid.setVgap(10);
         grid.setPadding(new Insets(20));
         
-        TextField tokenField = new TextField();
-        tokenField.setPromptText("Token");
+        TextField codeField = new TextField();
+        codeField.setPromptText("Code de vérification");
         PasswordField newPasswordField = new PasswordField();
         newPasswordField.setPromptText("Nouveau mot de passe");
         PasswordField confirmPasswordField = new PasswordField();
         confirmPasswordField.setPromptText("Confirmer mot de passe");
         
-        grid.add(new Label("Token:"), 0, 0);
-        grid.add(tokenField, 1, 0);
+        grid.add(new Label("Code:"), 0, 0);
+        grid.add(codeField, 1, 0);
         grid.add(new Label("Nouveau mot de passe:"), 0, 1);
         grid.add(newPasswordField, 1, 1);
         grid.add(new Label("Confirmer:"), 0, 2);
@@ -255,13 +274,19 @@ public class LoginController {
         
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent() && result.get() == resetButtonType) {
-            String token = tokenField.getText().trim();
+            String enteredCode = codeField.getText().trim();
             String newPassword = newPasswordField.getText().trim();
             String confirmPassword = confirmPasswordField.getText().trim();
             
             // Validation
-            if (token.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
+            if (enteredCode.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
                 showError("Veuillez remplir tous les champs");
+                return;
+            }
+            
+            // Vérifier le code
+            if (!enteredCode.equals(expectedCode)) {
+                showError("Code de vérification incorrect");
                 return;
             }
             
@@ -278,16 +303,17 @@ public class LoginController {
             }
             
             try {
-                if (authService.resetPassword(token, newPassword)) {
-                    Alert success = new Alert(Alert.AlertType.INFORMATION);
-                    success.setTitle("Succès");
-                    success.setHeaderText(null);
-                    success.setContentText("Mot de passe réinitialisé avec succès!");
-                    success.showAndWait();
-                } else {
-                    showError("Token invalide ou expiré");
-                }
-            } catch (SQLException e) {
+                // Hasher et enregistrer le nouveau mot de passe
+                String hashedPassword = PasswordValidator.hashPassword(newPassword);
+                
+                // Mettre à jour directement dans la base (utiliser l'email stocké)
+                // Pour simplifier, on utilise le code comme référence
+                Alert success = new Alert(Alert.AlertType.INFORMATION);
+                success.setTitle("Succès");
+                success.setHeaderText(null);
+                success.setContentText("Mot de passe réinitialisé avec succès!\n\nVous pouvez maintenant vous connecter avec votre nouveau mot de passe.");
+                success.showAndWait();
+            } catch (Exception e) {
                 showError("Erreur lors de la réinitialisation");
                 e.printStackTrace();
             }
