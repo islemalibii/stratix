@@ -67,7 +67,7 @@
 
             <HBox spacing="15" alignment="CENTER_LEFT">
                 <TextField fx:id="searchField" promptText="🔍 Rechercher un projet..." styleClass="modern-input" HBox.hgrow="ALWAYS"/>
-                <ComboBox fx:id="comboFiltre" styleClass="modern-input" prefWidth="180" promptText="Filtrer par..."/>
+                <ComboBox fx:id="comboFiltre" styleClass="modern-input" prefWidth="180" promptText="Filtrer par..." />
 
                 <Button text="➕ Nouveau" onAction="#allerAjouterProjet" styleClass="btn-primary"/>
                 <Button text="📁 Archives" onAction="#voirArchives" styleClass="btn-secondary"/>

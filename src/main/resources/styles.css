@@ -2,7 +2,7 @@
     -fx-background-color: #f8fafc;
 }
 
-/* --- Cartes de Statistiques (Haut) --- */
+
 .summary-card {
     -fx-background-color: white;
     -fx-background-radius: 15;
@@ -10,10 +10,9 @@
 }
 
 .summary-card .label {
-    -fx-text-fill: #1e293b; /* Force les chiffres et textes en sombre */
+    -fx-text-fill: #1e293b;
 }
 
-/* --- Grande CardView Projet --- */
 .project-card {
     -fx-background-color: white;
     -fx-background-radius: 18;
@@ -24,21 +23,18 @@
     -fx-border-radius: 18;
 }
 
-/* CORRECTION : On force les textes de la carte en bleu nuit */
 .project-card .label {
     -fx-text-fill: #334155;
 }
 
-/* Style spécifique pour le titre (Nom du projet) */
 .project-title {
-    -fx-text-fill: #1e293b !important; /* Bleu nuit très foncé */
+    -fx-text-fill: #1e293b !important;
     -fx-font-size: 20px;
     -fx-font-weight: bold;
 }
 
-/* Style spécifique pour la description */
 .project-desc {
-    -fx-text-fill: #64748b !important; /* Gris ardoise pour la description */
+    -fx-text-fill: #64748b !important;
     -fx-font-size: 14px;
 }
 
@@ -48,12 +44,12 @@
     -fx-cursor: hand;
 }
 
-/* --- Badges de Statut --- */
+
 .statut-badge {
     -fx-padding: 5 15;
     -fx-background-radius: 20;
     -fx-font-size: 11px;
-    -fx-text-fill: white !important; /* Ici on force le blanc car le fond est coloré */
+    -fx-text-fill: white !important;
     -fx-font-weight: bold;
 }
 
@@ -62,18 +58,16 @@
 .badge-annule { -fx-background-color: #ef4444; }
 .badge-planifie { -fx-background-color: #6366f1; }
 
-/* --- Barre de progression --- */
 .progress-bar {
     -fx-min-height: 12px;
 }
 .progress-bar .bar {
     -fx-background-radius: 10;
-    -fx-background-color: #3b82f6;
+    -fx-background-color: rgba(0, 98, 255, 0.8);
 }
 
-/* --- Boutons --- */
 .btn-primary {
-    -fx-background-color: #1e293b;
+    -fx-background-color: rgba(35, 59, 30, 0.47);
     -fx-text-fill: white !important;
     -fx-background-radius: 8;
     -fx-padding: 10 20;
@@ -81,15 +75,13 @@
 }
 
 .btn-secondary {
-    -fx-background-color: #f1f5f9;
-    -fx-text-fill: #1e293b !important;
-    -fx-border-color: #cbd5e1;
+    -fx-background-color: #1e293b;
+    -fx-text-fill: white !important;
     -fx-background-radius: 8;
     -fx-padding: 10 20;
     -fx-cursor: hand;
 }
 
-/* --- ScrollPane --- */
 .scroll-pane {
     -fx-background-color: transparent;
     -fx-background: transparent;
@@ -99,7 +91,6 @@
     -fx-background-color: transparent;
 }
 
-/* Sidebar design */
 .sidebar {
     -fx-background-color: #0f172a; /* Bleu très foncé */
 }
@@ -111,7 +102,6 @@
     -fx-padding: 0 0 20 0;
 }
 
-/* Bouton actif (Projets) */
 .sidebar-btn-active {
     -fx-background-color: #3b82f6;
     -fx-text-fill: white;
@@ -123,7 +113,6 @@
     -fx-cursor: hand;
 }
 
-/* Boutons désactivés (Pas ta tâche) */
 .sidebar-btn-disabled {
     -fx-background-color: transparent;
     -fx-text-fill: #64748b;
@@ -141,19 +130,16 @@
     -fx-pref-width: 210;
 }
 
-/* Correction des textes dans les cartes blanches */
 .summary-value { -fx-text-fill: #1e293b; -fx-font-size: 24px; -fx-font-weight: bold; }
 .summary-label { -fx-text-fill: #64748b; }
 
 
-/* Sidebar spécifique Employé (Teinte un peu plus violette/indigo) */
 .sidebar-employe {
-    -fx-background-color: #1e1b4b; /* Indigo très sombre */
+    -fx-background-color: #1e1b4b;
 }
 
-/* On réutilise les styles de boutons précédents pour la cohérence */
 .sidebar-btn-active {
-    -fx-background-color: #6366f1; /* Indigo vif */
+    -fx-background-color: #6366f1;
     -fx-text-fill: white;
     -fx-alignment: CENTER_LEFT;
     -fx-pref-width: 220;
@@ -186,4 +172,32 @@
 .btn-delete:hover {
     -fx-background-color: #fee2e2;
     -fx-text-fill: #ef4444;
+}
+
+.modern-input {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 8 12;
+    -fx-font-size: 13px;
+    -fx-text-fill: #1e293b;
+    -fx-cursor: hand;
+}
+
+.modern-input:hover {
+    -fx-border-color: #cbd5e1;
+}
+
+.modern-input:focused {
+    -fx-border-color: #3b82f6;
+    -fx-border-width: 1.5;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #64748b;
 }

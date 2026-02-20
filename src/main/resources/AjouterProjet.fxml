@@ -27,7 +27,7 @@
         </VBox>
     </HBox>
 
-    <TextField fx:id="tfBudget" promptText="Budget (€)"/>
+    <TextField fx:id="tfBudget" promptText="Budget (dt)"/>
 
     <HBox spacing="10" alignment="CENTER_LEFT">
         <Label text="Statut : " style="-fx-font-weight: bold;"/>
