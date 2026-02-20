@@ -290,35 +290,56 @@ public class ProduitController {
         }
     }
 
+    /**
+     * Méthode pour supprimer un produit sélectionné
+     * CORRIGÉE: Utilise delete(produit) au lieu de delete(int)
+     */
     @FXML
     private void supprimerProduit() {
+        // Récupérer le produit sélectionné dans la ListView
         produit selected = listViewProduits.getSelectionModel().getSelectedItem();
+
+        // Vérifier si un produit est sélectionné
         if (selected == null) {
             showAlert(Alert.AlertType.WARNING, "Attention", "Veuillez sélectionner un produit à supprimer");
             return;
         }
 
+        // Boîte de dialogue de confirmation
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirmation");
+        confirm.setTitle("Confirmation de suppression");
         confirm.setHeaderText("Supprimer le produit");
         confirm.setContentText("Voulez-vous vraiment supprimer le produit \"" + selected.getNom() + "\" ?");
 
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                // Supprimer aussi l'image associée si elle existe
+                // 1. Supprimer l'image associée si elle existe
                 if (selected.getImage_path() != null && !selected.getImage_path().isEmpty()) {
                     File imageFile = new File(selected.getImage_path());
                     if (imageFile.exists()) {
-                        imageFile.delete();
+                        boolean deleted = imageFile.delete();
+                        if (deleted) {
+                            System.out.println("Image supprimée: " + selected.getImage_path());
+                        }
                     }
                 }
 
-                serviceProduit.delete(selected.getId());
+                // 2. Supprimer le produit de la base de données
+                // CORRECTION: Passer l'objet produit entier, pas seulement l'ID
+                serviceProduit.delete(selected);
+
+                // 3. Rafraîchir la liste affichée
                 rafraichirListe();
-                showAlert(Alert.AlertType.INFORMATION, "Succès", "Produit supprimé avec succès");
+
+                // 4. Afficher un message de succès
+                showAlert(Alert.AlertType.INFORMATION, "Succès",
+                        "Le produit \"" + selected.getNom() + "\" a été supprimé avec succès");
+
             } catch (Exception e) {
-                showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible de supprimer le produit: " + e.getMessage());
+                showAlert(Alert.AlertType.ERROR, "Erreur",
+                        "Impossible de supprimer le produit: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -332,26 +353,26 @@ public class ProduitController {
     // Méthodes de navigation
     @FXML
     private void naviguerEmployes() {
-        // Implémentez la navigation
         System.out.println("Navigation vers Employés");
+        // Implémentez la navigation vers la vue des employés
     }
 
     @FXML
     private void naviguerProjets() {
-        // Implémentez la navigation
         System.out.println("Navigation vers Projets");
+        // Implémentez la navigation vers la vue des projets
     }
 
     @FXML
     private void naviguerTaches() {
-        // Implémentez la navigation
         System.out.println("Navigation vers Tâches");
+        // Implémentez la navigation vers la vue des tâches
     }
 
     @FXML
     private void naviguerProduits() {
-        // Déjà sur cette page
         System.out.println("Déjà sur Produits");
+        // Déjà sur cette page
     }
 
     @FXML
@@ -371,16 +392,19 @@ public class ProduitController {
 
     @FXML
     private void naviguerPrevoyance() {
-        // Implémentez la navigation
         System.out.println("Navigation vers Prévoyance");
+        // Implémentez la navigation vers la vue prévoyance
     }
 
     @FXML
     private void naviguerAnalyse() {
-        // Implémentez la navigation
         System.out.println("Navigation vers Analyse");
+        // Implémentez la navigation vers la vue analyse
     }
 
+    /**
+     * Affiche une boîte de dialogue d'alerte
+     */
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
