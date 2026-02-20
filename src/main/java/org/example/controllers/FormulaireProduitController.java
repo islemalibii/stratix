@@ -301,6 +301,7 @@ public class FormulaireProduitController {
             produit p = new produit();
             boolean isNewProduct = (idField.getText() == null || idField.getText().isEmpty());
 
+            // Ne pas setter l'ID pour un nouveau produit
             if (!isNewProduct) {
                 p.setId(Integer.parseInt(idField.getText()));
             }
@@ -315,17 +316,21 @@ public class FormulaireProduitController {
             p.setRessources_necessaires(ressourcesField.getText().trim());
 
             if (isNewProduct) {
-                // Ajout du produit
-                serviceProduit.add(p);
-
-                // Après l'ajout, récupérer l'ID généré pour l'image
-                int newId = p.getId(); // Supposons que l'ID est mis à jour après l'ajout
-
-                // Gérer l'image si sélectionnée
+                // 1. D'abord gérer l'image si sélectionnée
                 if (selectedImageFile != null) {
-                    String imagePath = copyImageToAppDirectory(selectedImageFile, newId);
-                    p.setImage_path(imagePath);
-                    serviceProduit.update(p); // Mise à jour avec le chemin de l'image
+                    // Pour un nouveau produit, on aura besoin de l'ID après insertion
+                    // On va d'abord ajouter le produit sans image, puis mettre à jour avec l'image
+                    serviceProduit.add(p); // Le produit est ajouté et l'ID est maintenant défini
+
+                    // 2. Maintenant qu'on a l'ID, on peut copier l'image
+                    String imagePath = copyImageToAppDirectory(selectedImageFile, p.getId());
+                    if (imagePath != null) {
+                        p.setImage_path(imagePath);
+                        serviceProduit.update(p); // Mise à jour avec le chemin de l'image
+                    }
+                } else {
+                    // Ajout sans image
+                    serviceProduit.add(p);
                 }
 
                 showAlert(Alert.AlertType.INFORMATION, "Succès", "Produit ajouté avec succès !");
@@ -335,8 +340,8 @@ public class FormulaireProduitController {
                     // Nouvelle image sélectionnée
                     String imagePath = copyImageToAppDirectory(selectedImageFile, p.getId());
                     p.setImage_path(imagePath);
-                } else if (currentImagePath != null && !currentImagePath.isEmpty()) {
-                    // Conserver l'image existante
+                } else {
+                    // Conserver l'image existante ou null
                     p.setImage_path(currentImagePath);
                 }
 
@@ -352,9 +357,9 @@ public class FormulaireProduitController {
 
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Erreur : " + e.getMessage());
+            e.printStackTrace();
         }
     }
-
     @FXML
     private void annulerFormulaire() {
         fermerFormulaire();
