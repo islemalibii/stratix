@@ -12,12 +12,11 @@ public class service_produit implements service<produit> {
 
     @Override
     public void add(produit p) {
-        // CORRECTION: Enlever l'ID de la liste des colonnes (auto-incrémenté)
+        // Requête avec gestion de l'image_path
         String req = "INSERT INTO produit(nom, description, categorie, prix, stock_actuel, stock_min, date_creation, ressources_necessaires, image_path) VALUES (?,?,?,?,?,?,?,?,?)";
 
         try {
             Connection cnx = database.getInstance().getCnx();
-            // Utiliser RETURN_GENERATED_KEYS pour récupérer l'ID généré
             PreparedStatement ps = cnx.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
 
             ps.setString(1, p.getNom());
@@ -28,19 +27,23 @@ public class service_produit implements service<produit> {
             ps.setInt(6, p.getStock_min());
             ps.setDate(7, Date.valueOf(p.getDate_creation()));
             ps.setString(8, p.getRessources_necessaires());
-            ps.setString(9, p.getImage_path()); // Ajout de l'image
+
+            // Gestion de l'image_path : utiliser setNull si null
+            if (p.getImage_path() != null && !p.getImage_path().isEmpty()) {
+                ps.setString(9, p.getImage_path());
+            } else {
+                ps.setNull(9, java.sql.Types.VARCHAR);
+            }
 
             int affectedRows = ps.executeUpdate();
 
             if (affectedRows > 0) {
-                // Récupérer l'ID généré automatiquement
+                // Récupérer l'ID généré
                 ResultSet rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     p.setId(rs.getInt(1));
                 }
                 System.out.println("Produit ajouté avec succès ! ID: " + p.getId());
-            } else {
-                System.out.println("Échec de l'ajout du produit");
             }
 
         } catch (SQLException e) {
@@ -77,11 +80,11 @@ public class service_produit implements service<produit> {
 
                 p.setRessources_necessaires(rs.getString("ressources_necessaires"));
 
-                // AJOUT: Récupérer l'image_path
+                // Récupérer l'image_path (peut être null)
                 try {
                     p.setImage_path(rs.getString("image_path"));
                 } catch (SQLException e) {
-                    p.setImage_path(null); // La colonne n'existe pas encore
+                    p.setImage_path(null);
                 }
 
                 list.add(p);
@@ -97,7 +100,6 @@ public class service_produit implements service<produit> {
 
     @Override
     public void update(produit p) {
-        // CORRECTION: Ajouter image_path dans la mise à jour
         String req = "UPDATE produit SET nom=?, description=?, categorie=?, prix=?, stock_actuel=?, stock_min=?, date_creation=?, ressources_necessaires=?, image_path=? WHERE id=?";
 
         try {
@@ -112,7 +114,14 @@ public class service_produit implements service<produit> {
             ps.setInt(6, p.getStock_min());
             ps.setDate(7, Date.valueOf(p.getDate_creation()));
             ps.setString(8, p.getRessources_necessaires());
-            ps.setString(9, p.getImage_path()); // Ajout de l'image
+
+            // Gestion de l'image_path pour la mise à jour
+            if (p.getImage_path() != null && !p.getImage_path().isEmpty()) {
+                ps.setString(9, p.getImage_path());
+            } else {
+                ps.setNull(9, java.sql.Types.VARCHAR);
+            }
+
             ps.setInt(10, p.getId());
 
             int rows = ps.executeUpdate();
