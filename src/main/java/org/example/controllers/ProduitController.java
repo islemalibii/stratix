@@ -13,7 +13,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import models.produit;
 import service.service_produit;
 
@@ -124,6 +123,9 @@ public class ProduitController {
                     // Charger l'image
                     chargerImageProduit(produit, imageView);
 
+                    // Ajouter le tooltip pour voir l'image en grand
+                    ajouterTooltipImage(imageView, produit);
+
                     setGraphic(cellBox);
                 }
             }
@@ -168,6 +170,41 @@ public class ProduitController {
             imageView.setImage(null);
             imageView.setStyle("-fx-background-color: #f0f0f0;");
         }
+    }
+
+    /**
+     * Ajoute un tooltip pour voir l'image en grand au survol
+     */
+    private void ajouterTooltipImage(ImageView imageView, produit produit) {
+        Tooltip tooltip = new Tooltip();
+        tooltip.setGraphic(new ImageView());
+        tooltip.setStyle("-fx-background-color: white; -fx-border-color: #ccc; -fx-padding: 5;");
+
+        imageView.setOnMouseEntered(event -> {
+            if (produit.getImage_path() != null && !produit.getImage_path().isEmpty()) {
+                try {
+                    File imageFile = new File(produit.getImage_path());
+                    if (imageFile.exists()) {
+                        Image fullImage = new Image(imageFile.toURI().toString(), 200, 200, true, true);
+                        ImageView fullImageView = new ImageView(fullImage);
+                        fullImageView.setPreserveRatio(true);
+                        tooltip.setGraphic(fullImageView);
+                        tooltip.show(imageView, event.getScreenX() + 10, event.getScreenY() + 10);
+                    }
+                } catch (Exception e) {
+                    // Ignorer
+                }
+            }
+        });
+
+        imageView.setOnMouseExited(event -> tooltip.hide());
+
+        // Cacher le tooltip quand on bouge la souris
+        imageView.setOnMouseMoved(event -> {
+            if (tooltip.isShowing()) {
+                tooltip.hide();
+            }
+        });
     }
 
     /**
@@ -292,25 +329,29 @@ public class ProduitController {
         mettreAJourStatistiques();
     }
 
-    // Méthodes de navigation (à adapter selon votre application)
+    // Méthodes de navigation
     @FXML
     private void naviguerEmployes() {
         // Implémentez la navigation
+        System.out.println("Navigation vers Employés");
     }
 
     @FXML
     private void naviguerProjets() {
         // Implémentez la navigation
+        System.out.println("Navigation vers Projets");
     }
 
     @FXML
     private void naviguerTaches() {
         // Implémentez la navigation
+        System.out.println("Navigation vers Tâches");
     }
 
     @FXML
     private void naviguerProduits() {
         // Déjà sur cette page
+        System.out.println("Déjà sur Produits");
     }
 
     @FXML
@@ -331,11 +372,13 @@ public class ProduitController {
     @FXML
     private void naviguerPrevoyance() {
         // Implémentez la navigation
+        System.out.println("Navigation vers Prévoyance");
     }
 
     @FXML
     private void naviguerAnalyse() {
         // Implémentez la navigation
+        System.out.println("Navigation vers Analyse");
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
@@ -344,29 +387,5 @@ public class ProduitController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-        private void ajouterTooltipImage(ImageView imageView, produit produit) {
-            Tooltip tooltip = new Tooltip();
-            tooltip.setGraphic(new ImageView());
-            tooltip.setStyle("-fx-background-color: white; -fx-border-color: #ccc;");
-
-            imageView.setOnMouseEntered(event -> {
-                if (produit.getImage_path() != null && !produit.getImage_path().isEmpty()) {
-                    try {
-                        File imageFile = new File(produit.getImage_path());
-                        if (imageFile.exists()) {
-                            Image fullImage = new Image(imageFile.toURI().toString(), 200, 200, true, true);
-                            ImageView fullImageView = new ImageView(fullImage);
-                            fullImageView.setPreserveRatio(true);
-                            tooltip.setGraphic(fullImageView);
-                            tooltip.show(imageView, event.getScreenX(), event.getScreenY());
-                        }
-                    } catch (Exception e) {
-                        // Ignorer
-                    }
-                }
-            });
-
-            imageView.setOnMouseExited(event -> tooltip.hide());
-        }
     }
 }
