@@ -18,6 +18,7 @@ import service.service_produit;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
@@ -144,7 +145,6 @@ public class ProduitController {
                     Image image = new Image(imageFile.toURI().toString(), true);
                     imageView.setImage(image);
                 } else {
-                    // Image par défaut si le fichier n'existe pas
                     setDefaultImage(imageView);
                 }
             } catch (Exception e) {
@@ -152,7 +152,6 @@ public class ProduitController {
                 setDefaultImage(imageView);
             }
         } else {
-            // Pas d'image associée
             setDefaultImage(imageView);
         }
     }
@@ -162,11 +161,9 @@ public class ProduitController {
      */
     private void setDefaultImage(ImageView imageView) {
         try {
-            // Essayer de charger une image par défaut depuis les ressources
             Image defaultImage = new Image(getClass().getResourceAsStream("/images/default-product.png"));
             imageView.setImage(defaultImage);
         } catch (Exception e) {
-            // Si pas d'image par défaut, laisser vide ou mettre un placeholder
             imageView.setImage(null);
             imageView.setStyle("-fx-background-color: #f0f0f0;");
         }
@@ -198,8 +195,6 @@ public class ProduitController {
         });
 
         imageView.setOnMouseExited(event -> tooltip.hide());
-
-        // Cacher le tooltip quand on bouge la souris
         imageView.setOnMouseMoved(event -> {
             if (tooltip.isShowing()) {
                 tooltip.hide();
@@ -242,19 +237,28 @@ public class ProduitController {
         statsValeurStock.setText(String.format("Valeur stock: %.2f DT", valeurStock));
     }
 
-
+    /**
+     * Ouvre le formulaire d'ajout de produit
+     * CORRECTION: Utilise ajouterProduit.fxml au lieu de FormulaireProduit.fxml
+     */
     @FXML
     private void ouvrirAjoutProduit() {
         try {
-            // CORRECTION: Vérifiez le chemin exact de votre fichier FXML
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/FormulaireProduit.fxml"));
+            // Charger le bon fichier FXML - ajouterProduit.fxml
+            URL fxmlUrl = getClass().getResource("/fxml/ajouterProduit.fxml");
+            if (fxmlUrl == null) {
+                // Essayer sans le dossier fxml
+                fxmlUrl = getClass().getResource("/ajouterProduit.fxml");
+            }
 
-            // Alternative: si le fichier est dans le même package
-            // FXMLLoader loader = new FXMLLoader(getClass().getResource("FormulaireProduit.fxml"));
+            if (fxmlUrl == null) {
+                showAlert(Alert.AlertType.ERROR, "Erreur",
+                        "Fichier ajouterProduit.fxml introuvable!\n" +
+                                "Vérifiez qu'il est dans src/main/resources/fxml/");
+                return;
+            }
 
-            // Alternative: chemin absolu depuis la racine des ressources
-            // FXMLLoader loader = new FXMLLoader(getClass().getResource("/FormulaireProduit.fxml"));
-
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
 
             FormulaireProduitController controller = loader.getController();
@@ -269,13 +273,14 @@ public class ProduitController {
 
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible d'ouvrir le formulaire: " + e.getMessage());
-            e.printStackTrace(); // Pour voir le détail de l'erreur
-        } catch (NullPointerException e) {
-            showAlert(Alert.AlertType.ERROR, "Erreur", "Fichier FXML introuvable. Vérifiez le chemin: /fxml/FormulaireProduit.fxml");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Ouvre le formulaire de modification de produit
+     * CORRECTION: Utilise ajouterProduit.fxml au lieu de FormulaireProduit.fxml
+     */
     @FXML
     private void ouvrirModifierProduit() {
         produit selected = listViewProduits.getSelectionModel().getSelectedItem();
@@ -285,7 +290,19 @@ public class ProduitController {
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/FormulaireProduit.fxml"));
+            // Charger le bon fichier FXML - ajouterProduit.fxml
+            URL fxmlUrl = getClass().getResource("/fxml/ajouterProduit.fxml");
+            if (fxmlUrl == null) {
+                fxmlUrl = getClass().getResource("/ajouterProduit.fxml");
+            }
+
+            if (fxmlUrl == null) {
+                showAlert(Alert.AlertType.ERROR, "Erreur",
+                        "Fichier ajouterProduit.fxml introuvable!");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
 
             FormulaireProduitController controller = loader.getController();
@@ -300,25 +317,22 @@ public class ProduitController {
 
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible d'ouvrir le formulaire: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     /**
-     * Méthode pour supprimer un produit sélectionné
-     * CORRIGÉE: Utilise delete(produit) au lieu de delete(int)
+     * Supprime un produit sélectionné
      */
     @FXML
     private void supprimerProduit() {
-        // Récupérer le produit sélectionné dans la ListView
         produit selected = listViewProduits.getSelectionModel().getSelectedItem();
 
-        // Vérifier si un produit est sélectionné
         if (selected == null) {
             showAlert(Alert.AlertType.WARNING, "Attention", "Veuillez sélectionner un produit à supprimer");
             return;
         }
 
-        // Boîte de dialogue de confirmation
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation de suppression");
         confirm.setHeaderText("Supprimer le produit");
@@ -327,27 +341,20 @@ public class ProduitController {
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                // 1. Supprimer l'image associée si elle existe
+                // Supprimer l'image associée si elle existe
                 if (selected.getImage_path() != null && !selected.getImage_path().isEmpty()) {
                     File imageFile = new File(selected.getImage_path());
                     if (imageFile.exists()) {
-                        boolean deleted = imageFile.delete();
-                        if (deleted) {
-                            System.out.println("Image supprimée: " + selected.getImage_path());
-                        }
+                        imageFile.delete();
                     }
                 }
 
-                // 2. Supprimer le produit de la base de données
-                // CORRECTION: Passer l'objet produit entier, pas seulement l'ID
+                // Supprimer le produit
                 serviceProduit.delete(selected);
 
-                // 3. Rafraîchir la liste affichée
                 rafraichirListe();
-
-                // 4. Afficher un message de succès
                 showAlert(Alert.AlertType.INFORMATION, "Succès",
-                        "Le produit \"" + selected.getNom() + "\" a été supprimé avec succès");
+                        "Produit supprimé avec succès");
 
             } catch (Exception e) {
                 showAlert(Alert.AlertType.ERROR, "Erreur",
@@ -367,25 +374,21 @@ public class ProduitController {
     @FXML
     private void naviguerEmployes() {
         System.out.println("Navigation vers Employés");
-        // Implémentez la navigation vers la vue des employés
     }
 
     @FXML
     private void naviguerProjets() {
         System.out.println("Navigation vers Projets");
-        // Implémentez la navigation vers la vue des projets
     }
 
     @FXML
     private void naviguerTaches() {
         System.out.println("Navigation vers Tâches");
-        // Implémentez la navigation vers la vue des tâches
     }
 
     @FXML
     private void naviguerProduits() {
         System.out.println("Déjà sur Produits");
-        // Déjà sur cette page
     }
 
     @FXML
@@ -406,18 +409,13 @@ public class ProduitController {
     @FXML
     private void naviguerPrevoyance() {
         System.out.println("Navigation vers Prévoyance");
-        // Implémentez la navigation vers la vue prévoyance
     }
 
     @FXML
     private void naviguerAnalyse() {
         System.out.println("Navigation vers Analyse");
-        // Implémentez la navigation vers la vue analyse
     }
 
-    /**
-     * Affiche une boîte de dialogue d'alerte
-     */
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
