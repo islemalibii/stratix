@@ -284,12 +284,57 @@ public class LoginController {
         PasswordField confirmPasswordField = new PasswordField();
         confirmPasswordField.setPromptText("Confirmer mot de passe");
         
+        // Label pour afficher les exigences du mot de passe
+        Label requirementsLabel = new Label(
+            "Le mot de passe doit contenir:\n" +
+            "• Au moins 8 caractères\n" +
+            "• Une lettre majuscule\n" +
+            "• Une lettre minuscule\n" +
+            "• Un chiffre\n" +
+            "• Un caractère spécial (@#$%^&+=!)"
+        );
+        requirementsLabel.setStyle("-fx-text-fill: #6B7280; -fx-font-size: 11px;");
+        
+        // Label pour l'indicateur de force
+        Label strengthLabel = new Label();
+        strengthLabel.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+        
+        // Validation en temps réel
+        newPasswordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            PasswordValidator.ValidationResult validation = PasswordValidator.validatePassword(newValue);
+            if (newValue.isEmpty()) {
+                strengthLabel.setText("");
+                newPasswordField.setStyle("");
+            } else if (validation.isValid()) {
+                strengthLabel.setText("✓ Mot de passe fort");
+                strengthLabel.setStyle("-fx-text-fill: #10B981; -fx-font-size: 12px; -fx-font-weight: bold;");
+                newPasswordField.setStyle("-fx-border-color: #10B981; -fx-border-width: 2;");
+            } else {
+                strengthLabel.setText("✗ Mot de passe faible");
+                strengthLabel.setStyle("-fx-text-fill: #EF4444; -fx-font-size: 12px; -fx-font-weight: bold;");
+                newPasswordField.setStyle("-fx-border-color: #EF4444; -fx-border-width: 2;");
+            }
+        });
+        
+        // Validation de confirmation
+        confirmPasswordField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.isEmpty()) {
+                confirmPasswordField.setStyle("");
+            } else if (newValue.equals(newPasswordField.getText())) {
+                confirmPasswordField.setStyle("-fx-border-color: #10B981; -fx-border-width: 2;");
+            } else {
+                confirmPasswordField.setStyle("-fx-border-color: #EF4444; -fx-border-width: 2;");
+            }
+        });
+        
         grid.add(new Label("Code:"), 0, 0);
         grid.add(codeField, 1, 0);
         grid.add(new Label("Nouveau mot de passe:"), 0, 1);
         grid.add(newPasswordField, 1, 1);
-        grid.add(new Label("Confirmer:"), 0, 2);
-        grid.add(confirmPasswordField, 1, 2);
+        grid.add(strengthLabel, 1, 2);
+        grid.add(requirementsLabel, 0, 3, 2, 1);
+        grid.add(new Label("Confirmer:"), 0, 4);
+        grid.add(confirmPasswordField, 1, 4);
         
         dialog.getDialogPane().setContent(grid);
         
