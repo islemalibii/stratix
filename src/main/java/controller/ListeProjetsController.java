@@ -3,6 +3,8 @@ package controller;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -14,15 +16,13 @@ import service.ProjetService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ListeProjetsController {
 
-    @FXML private VBox containerProjets;
+    @FXML private FlowPane containerProjets; // Changé de VBox en FlowPane
     @FXML private Label lblTotal, lblEnCours, lblTermine, lblAnnule, lblPlanifie;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> comboFiltre;
-    @FXML private VBox projetsContainer;
 
     private ProjetService projetService;
     private List<Projet> listeCompleteProjets;
@@ -53,15 +53,24 @@ public class ListeProjetsController {
     }
 
     private void updateStatistics(List<Projet> projets) {
-        if (lblTotal == null) return;
+        // On vérifie si l'objet injecté par FXML n'est pas null
+        if (lblTotal != null) {
+            lblTotal.setText(String.valueOf(projets.size()));
+        }
 
-        lblTotal.setText(String.valueOf(projets.size()));
-        lblEnCours.setText(String.valueOf(projets.stream().filter(p -> "En cours".equals(p.getStatut())).count()));
-        lblTermine.setText(String.valueOf(projets.stream().filter(p -> "Terminé".equals(p.getStatut())).count()));
-        lblAnnule.setText(String.valueOf(projets.stream().filter(p -> "Annulé".equals(p.getStatut())).count()));
+        if (lblEnCours != null) {
+            long count = projets.stream().filter(p -> "En cours".equals(p.getStatut())).count();
+            lblEnCours.setText(String.valueOf(count));
+        }
 
-        if (lblPlanifie != null) {
-            lblPlanifie.setText(String.valueOf(projets.stream().filter(p -> "Planifié".equals(p.getStatut())).count()));
+        if (lblTermine != null) {
+            long count = projets.stream().filter(p -> "Terminé".equals(p.getStatut())).count();
+            lblTermine.setText(String.valueOf(count));
+        }
+
+        if (lblAnnule != null) {
+            long count = projets.stream().filter(p -> "Annulé".equals(p.getStatut())).count();
+            lblAnnule.setText(String.valueOf(count));
         }
     }
 
@@ -79,78 +88,86 @@ public class ListeProjetsController {
         }
     }
 
-    private HBox creerCardProjet(Projet p) {
-        HBox card = new HBox(15);
-        card.getStyleClass().add("project-card");
+    private VBox creerCardProjet(Projet p) {
+        // Création de la carte verticale
+        VBox card = new VBox(15);
+        card.setPrefWidth(300);
+        card.setPadding(new Insets(20));
+        card.getStyleClass().add("project-card"); // Utilise le style avec ombre portée
 
-        switch (p.getStatut()) {
-            case "Terminé" -> card.getStyleClass().add("card-termine");
-            case "En cours" -> card.getStyleClass().add("card-en-cours");
-            case "Annulé" -> card.getStyleClass().add("card-annule");
-            default -> card.getStyleClass().add("card-planifie");
-        }
+        // Badge de Statut
+        Label statutBadge = new Label(p.getStatut());
+        statutBadge.getStyleClass().addAll("statut-badge", getStatutClass(p.getStatut()));
 
-        VBox info = new VBox(5);
+        // Titre
         Label nom = new Label(p.getNom());
-        nom.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+        nom.setStyle("-fx-font-weight: bold; -fx-font-size: 18px;");
+        nom.setWrapText(true);
 
+        // Description (limitée en hauteur)
         Label desc = new Label(p.getDescription());
         desc.setStyle("-fx-text-fill: #718096; -fx-font-size: 13px;");
         desc.setWrapText(true);
+        desc.setMinHeight(40);
 
-        Label footer = new Label("Budget: " + p.getBudget() + " DT | Progression: " + p.getProgression() + "%");
-        footer.setStyle("-fx-font-size: 11px; -fx-text-fill: #a0aec0;");
+        // Progression
+        VBox progBox = new VBox(5);
+        Label lblProg = new Label("Progression: " + p.getProgression() + "%");
+        lblProg.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
+        ProgressBar pb = new ProgressBar(p.getProgression() / 100.0);
+        pb.setPrefWidth(Double.MAX_VALUE);
+        progBox.getChildren().addAll(lblProg, pb);
 
-        info.getChildren().addAll(nom, desc, footer);
-        HBox.setHgrow(info, Priority.ALWAYS);
+        // Boutons d'actions
+        HBox actions = new HBox(10);
+        actions.setAlignment(Pos.CENTER);
 
         Button btnMod = new Button("Modifier");
         btnMod.getStyleClass().add("btn-secondary");
+        btnMod.setPrefWidth(100);
         btnMod.setOnAction(e -> ouvrirFenetreModification(p));
 
         Button btnArch = new Button("Archiver");
         btnArch.getStyleClass().add("btn-primary");
-        btnArch.setStyle("-fx-background-color: #f59e0b;"); // Orange pour l'archive
+        btnArch.setStyle("-fx-background-color: #f59e0b;");
+        btnArch.setPrefWidth(100);
         btnArch.setOnAction(e -> {
             projetService.archiverUnProjet(p.getId());
             rafraichirDonnees();
         });
 
-        VBox actions = new VBox(8);
         actions.getChildren().addAll(btnMod, btnArch);
 
-        card.getChildren().addAll(info, actions);
+        card.getChildren().addAll(statutBadge, nom, desc, progBox, new Separator(), actions);
         return card;
     }
 
-    @FXML
-    private void allerAjouterProjet() {
-        chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet");
+    private String getStatutClass(String statut) {
+        return switch (statut) {
+            case "Terminé" -> "badge-termine";
+            case "En cours" -> "badge-en-cours";
+            case "Annulé" -> "badge-annule";
+            default -> "badge-planifie";
+        };
     }
 
-    @FXML
-    private void voirArchives() {
-        chargerFenetre("/ListeArchives.fxml", "Projets Archivés");
-    }
+    @FXML private void allerAjouterProjet() { chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet"); }
+    @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Projets Archivés"); }
 
     private void ouvrirFenetreModification(Projet p) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ModifierProjet.fxml"));
             Parent root = loader.load();
-
             ModifierProjetController controller = loader.getController();
             controller.chargerDonnees(p.getId());
-
             Stage stage = new Stage();
             stage.setTitle("Modifier Projet");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
             stage.showAndWait();
-
             rafraichirDonnees();
         } catch (IOException e) {
-            afficherErreur("Fichier introuvable", "Impossible de charger ModifierProjet.fxml");
-            e.printStackTrace();
+            afficherErreur("Fichier introuvable", "Erreur de chargement de ModifierProjet.fxml");
         }
     }
 
@@ -165,8 +182,7 @@ public class ListeProjetsController {
             stage.showAndWait();
             rafraichirDonnees();
         } catch (IOException e) {
-            afficherErreur("Erreur de chargement", "Impossible de charger la vue : " + fxmlPath);
-            e.printStackTrace();
+            afficherErreur("Erreur de chargement", "Impossible de charger : " + fxmlPath);
         }
     }
 
@@ -178,47 +194,21 @@ public class ListeProjetsController {
     }
 
     @FXML
-    private void allerFrontOffice() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FrontOffice.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) containerProjets.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Front Office");
-
-        } catch (IOException e) {
-            afficherErreur("Erreur", "Impossible d'ouvrir le Front Office");
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
     private void allerAuFront() {
         try {
-            // Chargement de la vue Employe (Front-Office)
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/EmployeListeProjets.fxml"));
             Parent root = loader.load();
 
-            // Récupération de la scène actuelle à partir du bouton
             Stage stage = (Stage) containerProjets.getScene().getWindow();
+            Scene scene = new Scene(root, 1100, 800);
 
-            // On change la scène (on peut ajuster la taille si nécessaire)
-            Scene scene = new Scene(root, 1000, 700);
-
-            // N'oubliez pas de ré-appliquer le CSS si besoin
-            if (getClass().getResource("/styles.css") != null) {
-                scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
-            }
+            // FORCER le CSS sur la nouvelle scène
+            String css = getClass().getResource("/styles.css").toExternalForm();
+            scene.getStylesheets().add(css);
 
             stage.setScene(scene);
-            stage.setTitle("Espace Employé - Consultation des Projets");
-            stage.show();
-
         } catch (IOException e) {
-            System.err.println("Erreur lors du passage au Front-Office : " + e.getMessage());
             e.printStackTrace();
         }
     }
-
 }

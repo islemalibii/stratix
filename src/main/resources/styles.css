@@ -1,101 +1,173 @@
 .root-container {
-    -fx-background-color: #f5f7fa;
-}
-
-.summary-card {
-    -fx-background-color: white;
-    -fx-background-radius: 12;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 8, 0, 0, 4);
-}
-
-.summary-label {
-    -fx-text-fill: #718096;
-    -fx-font-size: 13px;
-}
-
-.project-card {
-    -fx-background-color: white;
-    -fx-background-radius: 8;
-    -fx-padding: 15;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);
-}
-
-.card-termine { -fx-border-color: #10b981; -fx-border-width: 0 0 0 6; }
-.card-en-cours { -fx-border-color: #f59e0b; -fx-border-width: 0 0 0 6; }
-.card-annule { -fx-border-color: #ef4444; -fx-border-width: 0 0 0 6; }
-.card-planifie { -fx-border-color: #6b7280; -fx-border-width: 0 0 0 6; }
-
-.form-container {
     -fx-background-color: #f8fafc;
 }
 
-.input-label {
-    -fx-text-fill: #4a5568;
-    -fx-font-weight: bold;
-    -fx-font-size: 13px;
+/* --- Cartes de Statistiques (Haut) --- */
+.summary-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 5);
 }
 
-.modern-input, .modern-datepicker, .modern-choicebox, .combo-tri {
+.summary-card .label {
+    -fx-text-fill: #1e293b; /* Force les chiffres et textes en sombre */
+}
+
+/* --- Grande CardView Projet --- */
+.project-card {
     -fx-background-color: white;
-    -fx-border-color: #e2e8f0;
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
-    -fx-padding: 8;
+    -fx-background-radius: 18;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 15, 0, 0, 8);
+    -fx-border-color: #edf2f7;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 18;
+}
+
+/* CORRECTION : On force les textes de la carte en bleu nuit */
+.project-card .label {
+    -fx-text-fill: #334155;
+}
+
+/* Style spécifique pour le titre (Nom du projet) */
+.project-title {
+    -fx-text-fill: #1e293b !important; /* Bleu nuit très foncé */
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+/* Style spécifique pour la description */
+.project-desc {
+    -fx-text-fill: #64748b !important; /* Gris ardoise pour la description */
     -fx-font-size: 14px;
 }
 
-.modern-input:focused, .modern-datepicker:focused, .combo-tri:focused {
-    -fx-border-color: #3b82f6;
-    -fx-border-width: 2;
+.project-card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(99, 102, 241, 0.2), 20, 0, 0, 10);
+    -fx-translate-y: -8;
+    -fx-cursor: hand;
 }
 
-
-.btn-ajout, .btn-save, .btn-primary {
-    -fx-background-color: #3b82f6;
-    -fx-text-fill: white;
+/* --- Badges de Statut --- */
+.statut-badge {
+    -fx-padding: 5 15;
+    -fx-background-radius: 20;
+    -fx-font-size: 11px;
+    -fx-text-fill: white !important; /* Ici on force le blanc car le fond est coloré */
     -fx-font-weight: bold;
-    -fx-padding: 10 20;
-    -fx-background-radius: 8;
-    -fx-cursor: hand;
-}
-.btn-save:hover, .btn-ajout:hover {
-    -fx-background-color: #2563eb;
 }
 
-.btn-archive-view, .btn-cancel, .btn-secondary {
-    -fx-background-color: white;
-    -fx-text-fill: #64748b;
-    -fx-border-color: #cbd5e1;
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
-    -fx-font-weight: bold;
-    -fx-padding: 10 20;
-    -fx-cursor: hand;
-}
-.btn-cancel:hover, .btn-archive-view:hover {
-    -fx-background-color: #f1f5f9;
-}
+.badge-termine { -fx-background-color: #10b981; }
+.badge-en-cours { -fx-background-color: #f59e0b; }
+.badge-annule { -fx-background-color: #ef4444; }
+.badge-planifie { -fx-background-color: #6366f1; }
 
-.card-view {
-    -fx-background-color: white;
-    -fx-background-radius: 15;
-    /* Ombre portée : horizontal, vertical, flou, étalement */
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
-    -fx-border-color: #EDF2F7;
-    -fx-border-radius: 15;
-    -fx-border-width: 1;
-    -fx-transition: all 0.3s ease-in-out;
-}
-
-.card-view:hover {
-    -fx-effect: dropshadow(three-pass-box, rgba(66, 153, 225, 0.3), 15, 0, 0, 8);
-    -fx-translate-y: -5; /* Petit effet de soulèvement au survol */
-    -fx-cursor: hand;
-}
-
+/* --- Barre de progression --- */
 .progress-bar {
-    -fx-background-radius: 10;
+    -fx-min-height: 12px;
 }
 .progress-bar .bar {
     -fx-background-radius: 10;
+    -fx-background-color: #3b82f6;
+}
+
+/* --- Boutons --- */
+.btn-primary {
+    -fx-background-color: #1e293b;
+    -fx-text-fill: white !important;
+    -fx-background-radius: 8;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.btn-secondary {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #1e293b !important;
+    -fx-border-color: #cbd5e1;
+    -fx-background-radius: 8;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+/* --- ScrollPane --- */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Sidebar design */
+.sidebar {
+    -fx-background-color: #0f172a; /* Bleu très foncé */
+}
+
+.sidebar-logo {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 20 0;
+}
+
+/* Bouton actif (Projets) */
+.sidebar-btn-active {
+    -fx-background-color: #3b82f6;
+    -fx-text-fill: white;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-width: 220;
+    -fx-padding: 12 15;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+/* Boutons désactivés (Pas ta tâche) */
+.sidebar-btn-disabled {
+    -fx-background-color: transparent;
+    -fx-text-fill: #64748b;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-width: 220;
+    -fx-padding: 12 15;
+    -fx-opacity: 0.7;
+}
+
+.btn-switch-mode {
+    -fx-background-color: #334155;
+    -fx-text-fill: #cbd5e1;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+    -fx-pref-width: 210;
+}
+
+/* Correction des textes dans les cartes blanches */
+.summary-value { -fx-text-fill: #1e293b; -fx-font-size: 24px; -fx-font-weight: bold; }
+.summary-label { -fx-text-fill: #64748b; }
+
+
+/* Sidebar spécifique Employé (Teinte un peu plus violette/indigo) */
+.sidebar-employe {
+    -fx-background-color: #1e1b4b; /* Indigo très sombre */
+}
+
+/* On réutilise les styles de boutons précédents pour la cohérence */
+.sidebar-btn-active {
+    -fx-background-color: #6366f1; /* Indigo vif */
+    -fx-text-fill: white;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-width: 220;
+    -fx-padding: 12 15;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.sidebar-btn-disabled {
+    -fx-background-color: transparent;
+    -fx-text-fill: #94a3b8;
+    -fx-alignment: CENTER_LEFT;
+    -fx-pref-width: 220;
+    -fx-padding: 12 15;
+    -fx-opacity: 0.6;
 }
