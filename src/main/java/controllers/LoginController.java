@@ -217,9 +217,6 @@ public class LoginController {
                     // Générer un code de vérification (6 chiffres)
                     String code = PasswordValidator.generate2FACode();
                     
-                    // Enregistrer le code comme token de réinitialisation
-                    authService.generatePasswordResetToken(email);
-                    
                     // Envoyer l'email
                     boolean emailSent = emailService.sendPasswordResetEmail(email, code);
                     
@@ -230,8 +227,8 @@ public class LoginController {
                         successAlert.setContentText("Un code de vérification a été envoyé à votre adresse email.\n\nVérifiez votre boîte de réception.");
                         successAlert.showAndWait();
                         
-                        // Ouvrir le dialog de réinitialisation avec le code
-                        showResetPasswordDialog(code);
+                        // Ouvrir le dialog de réinitialisation avec le code et l'email
+                        showResetPasswordDialog(email, code);
                     } else {
                         // Si l'envoi échoue, afficher le code à l'écran (fallback)
                         Alert codeAlert = new Alert(Alert.AlertType.INFORMATION);
@@ -240,7 +237,7 @@ public class LoginController {
                         codeAlert.setContentText("Votre code de vérification: " + code + "\n\n(Configurez votre serveur SMTP dans EmailService.java pour activer l'envoi d'emails)");
                         codeAlert.showAndWait();
                         
-                        showResetPasswordDialog(code);
+                        showResetPasswordDialog(email, code);
                     }
                 } else {
                     showError("Email non trouvé");
@@ -255,7 +252,7 @@ public class LoginController {
     /**
      * Dialog pour réinitialiser le mot de passe
      */
-    private void showResetPasswordDialog(String expectedCode) {
+    private void showResetPasswordDialog(String email, String expectedCode) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Réinitialiser le mot de passe");
         dialog.setHeaderText("Entrez le code reçu par email et votre nouveau mot de passe");
@@ -315,11 +312,12 @@ public class LoginController {
             }
             
             try {
-                // Hasher et enregistrer le nouveau mot de passe
+                // Hasher le nouveau mot de passe
                 String hashedPassword = PasswordValidator.hashPassword(newPassword);
                 
-                // Mettre à jour directement dans la base (utiliser l'email stocké)
-                // Pour simplifier, on utilise le code comme référence
+                // Mettre à jour le mot de passe dans la base de données
+                utilisateurService.updatePassword(email, hashedPassword);
+                
                 Alert success = new Alert(Alert.AlertType.INFORMATION);
                 success.setTitle("Succès");
                 success.setHeaderText(null);

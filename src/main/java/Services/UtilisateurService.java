@@ -169,6 +169,19 @@ public class UtilisateurService {
         ps.executeUpdate();
     }
 
+    // Mettre à jour le mot de passe
+    public void updatePassword(String email, String hashedPassword) throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Connexion à la base de données non disponible");
+        }
+        
+        String query = "UPDATE utilisateur SET password = ? WHERE email = ?";
+        PreparedStatement ps = connection.prepareStatement(query);
+        ps.setString(1, hashedPassword);
+        ps.setString(2, email);
+        ps.executeUpdate();
+    }
+
     // Mapper ResultSet vers Utilisateur
     private Utilisateur mapResultSetToUtilisateur(ResultSet rs) throws SQLException {
         Utilisateur utilisateur = new Utilisateur();
