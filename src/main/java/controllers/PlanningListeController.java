@@ -2,9 +2,7 @@ package controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,6 +11,7 @@ import models.Planning;
 import models.Employe;
 import services.SERVICEPlanning;
 import services.EmployeeService;
+import api.WeatherAPI;
 
 import java.net.URL;
 import java.time.format.DateTimeFormatter;
@@ -33,6 +32,7 @@ public class PlanningListeController implements Initializable {
     @FXML private Label lblTotalJour;
     @FXML private Label lblTotalSoir;
     @FXML private Label lblTotalNuit;
+    @FXML private Label lblMeteo;
 
     private SERVICEPlanning planningService;
     private EmployeeService employeService;
@@ -40,12 +40,35 @@ public class PlanningListeController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        System.out.println("=== Initialisation PlanningListeController ===");
+
         planningService = new SERVICEPlanning();
         employeService = new EmployeeService();
         planningList = FXCollections.observableArrayList();
 
-        // Configuration des colonnes
+        // Configuration des colonnes avec formatage correct
+        configurerColonnes();
+
+        // Charger les données
+        chargerPlannings();
+
+        // Listener pour la sélection
+        tablePlannings.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldVal, newVal) -> {
+                    if (newVal != null) {
+                        System.out.println("✅ Planning sélectionné: ID " + newVal.getId());
+                        afficherMeteo(newVal);
+                    }
+                }
+        );
+
+        System.out.println("✅ Initialisation terminée");
+    }
+
+    private void configurerColonnes() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+
+        // Afficher le nom de l'employé au lieu de l'ID
         colEmploye.setCellValueFactory(cellData -> {
             Planning p = cellData.getValue();
             Employe emp = employeService.getEmployeById(p.getEmployeId());
@@ -53,6 +76,7 @@ public class PlanningListeController implements Initializable {
             return new javafx.beans.property.SimpleStringProperty(nom);
         });
 
+        // Formatage de la date
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         colDate.setCellValueFactory(cellData -> {
             Planning p = cellData.getValue();
@@ -61,6 +85,7 @@ public class PlanningListeController implements Initializable {
             );
         });
 
+        // Formatage de l'heure (HH:MM)
         colHeureDebut.setCellValueFactory(cellData -> {
             Planning p = cellData.getValue();
             return new javafx.beans.property.SimpleStringProperty(
@@ -76,9 +101,6 @@ public class PlanningListeController implements Initializable {
         });
 
         colTypeShift.setCellValueFactory(new PropertyValueFactory<>("typeShift"));
-
-        // Charger les données
-        chargerPlannings();
     }
 
     private void chargerPlannings() {
@@ -103,6 +125,42 @@ public class PlanningListeController implements Initializable {
         lblTotalJour.setText(String.valueOf(jour));
         lblTotalSoir.setText(String.valueOf(soir));
         lblTotalNuit.setText(String.valueOf(nuit));
+
+        System.out.println("📊 " + total + " plannings chargés");
+    }
+
+    private void afficherMeteo(Planning planning) {
+        try {
+            String date = planning.getDate().toString();
+            Employe emp = employeService.getEmployeById(planning.getEmployeId());
+            String employeName = (emp != null) ? emp.getUsername() : "Employé " + planning.getEmployeId();
+
+            // Récupérer la météo
+            String meteo = WeatherAPI.getWeatherForDate(date);
+
+            String dateFormatted = planning.getDate().toLocalDate()
+                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+            String message = "🌤️ Météo pour " + employeName + " le " + dateFormatted + " : " + meteo;
+            lblMeteo.setText(message);
+
+            // Changer la couleur selon la météo
+            if (meteo.contains("☀️")) {
+                lblMeteo.setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #ffeeba; -fx-border-radius: 8; -fx-font-size: 16px; -fx-font-weight: bold;");
+            } else if (meteo.contains("☁️")) {
+                lblMeteo.setStyle("-fx-background-color: #e2e3e5; -fx-text-fill: #383d41; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #d6d8db; -fx-border-radius: 8; -fx-font-size: 16px; -fx-font-weight: bold;");
+            } else if (meteo.contains("🌧️")) {
+                lblMeteo.setStyle("-fx-background-color: #d1ecf1; -fx-text-fill: #0c5460; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #bee5eb; -fx-border-radius: 8; -fx-font-size: 16px; -fx-font-weight: bold;");
+            } else {
+                lblMeteo.setStyle("-fx-background-color: #e6f7ff; -fx-text-fill: #0050b3; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #91d5ff; -fx-border-radius: 8; -fx-font-size: 16px; -fx-font-weight: bold;");
+            }
+
+            System.out.println("✅ Météo affichée: " + message);
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur météo: " + e.getMessage());
+            lblMeteo.setText("🌤️ Erreur de récupération de la météo");
+        }
     }
 
     @FXML
