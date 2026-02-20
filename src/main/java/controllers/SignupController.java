@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import models.Role;
 import models.Utilisateur;
+import utils.PasswordValidator;
 
 import java.io.IOException;
 
@@ -137,13 +138,15 @@ public class SignupController {
             return;
         }
 
-        if (!password.equals(confirmPassword)) {
-            showError("Les mots de passe ne correspondent pas");
+        // Validation du mot de passe avec politique forte
+        PasswordValidator.ValidationResult passwordValidation = PasswordValidator.validatePassword(password);
+        if (!passwordValidation.isValid()) {
+            showError(passwordValidation.getMessage());
             return;
         }
 
-        if (password.length() < 6) {
-            showError("Le mot de passe doit contenir au moins 6 caractères");
+        if (!password.equals(confirmPassword)) {
+            showError("Les mots de passe ne correspondent pas");
             return;
         }
 
@@ -159,9 +162,10 @@ public class SignupController {
             return;
         }
 
-        // Créer l'utilisateur
+        // Créer l'utilisateur avec mot de passe hashé
         try {
-            Utilisateur user = new Utilisateur(nom, prenom, email, tel, cin, password, Role.EMPLOYE);
+            String hashedPassword = PasswordValidator.hashPassword(password);
+            Utilisateur user = new Utilisateur(nom, prenom, email, tel, cin, hashedPassword, Role.EMPLOYE);
             utilisateurService.ajouter(user);
 
             // Afficher message de succès

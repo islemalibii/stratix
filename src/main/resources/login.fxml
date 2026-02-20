@@ -116,7 +116,7 @@
                   <VBox spacing="10.0">
                      <HBox alignment="CENTER_LEFT">
                         <Label text="Mot de passe" styleClass="login-field-label" HBox.hgrow="ALWAYS" />
-                        <Hyperlink text="Oublié ?" styleClass="forgot-password-link" />
+                        <Hyperlink text="Oublié ?" styleClass="forgot-password-link" onAction="#handleForgotPassword" />
                      </HBox>
                      <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="login-input-container">
                         <padding>

@@ -117,6 +117,10 @@ public class UtilisateurService {
 
     // Récupérer par email (pour login)
     public Utilisateur getByEmail(String email) throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Connexion à la base de données non disponible");
+        }
+        
         String query = "SELECT * FROM utilisateur WHERE email = ?";
         PreparedStatement ps = connection.prepareStatement(query);
         ps.setString(1, email);

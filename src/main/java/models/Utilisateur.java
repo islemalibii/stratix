@@ -19,6 +19,16 @@ public class Utilisateur {
     private LocalDate dateEmbauche;
     private String competences;
     private double salaire;
+    
+    // Champs pour authentification avancée
+    private int failedLoginAttempts;
+    private boolean accountLocked;
+    private LocalDate lockedUntil;
+    private String passwordResetToken;
+    private LocalDate passwordResetExpiry;
+    private boolean twoFactorEnabled;
+    private String twoFactorSecret;
+    private LocalDate lastPasswordChange;
 
     public Utilisateur() {}
 
@@ -86,6 +96,31 @@ public class Utilisateur {
 
     public double getSalaire() { return salaire; }
     public void setSalaire(double salaire) { this.salaire = salaire; }
+    
+    // Getters et Setters pour authentification avancée
+    public int getFailedLoginAttempts() { return failedLoginAttempts; }
+    public void setFailedLoginAttempts(int failedLoginAttempts) { this.failedLoginAttempts = failedLoginAttempts; }
+    
+    public boolean isAccountLocked() { return accountLocked; }
+    public void setAccountLocked(boolean accountLocked) { this.accountLocked = accountLocked; }
+    
+    public LocalDate getLockedUntil() { return lockedUntil; }
+    public void setLockedUntil(LocalDate lockedUntil) { this.lockedUntil = lockedUntil; }
+    
+    public String getPasswordResetToken() { return passwordResetToken; }
+    public void setPasswordResetToken(String passwordResetToken) { this.passwordResetToken = passwordResetToken; }
+    
+    public LocalDate getPasswordResetExpiry() { return passwordResetExpiry; }
+    public void setPasswordResetExpiry(LocalDate passwordResetExpiry) { this.passwordResetExpiry = passwordResetExpiry; }
+    
+    public boolean isTwoFactorEnabled() { return twoFactorEnabled; }
+    public void setTwoFactorEnabled(boolean twoFactorEnabled) { this.twoFactorEnabled = twoFactorEnabled; }
+    
+    public String getTwoFactorSecret() { return twoFactorSecret; }
+    public void setTwoFactorSecret(String twoFactorSecret) { this.twoFactorSecret = twoFactorSecret; }
+    
+    public LocalDate getLastPasswordChange() { return lastPasswordChange; }
+    public void setLastPasswordChange(LocalDate lastPasswordChange) { this.lastPasswordChange = lastPasswordChange; }
 
     public void authentifier() {
         // Logique d'authentification
