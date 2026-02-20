@@ -344,5 +344,29 @@ public class ProduitController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+        private void ajouterTooltipImage(ImageView imageView, produit produit) {
+            Tooltip tooltip = new Tooltip();
+            tooltip.setGraphic(new ImageView());
+            tooltip.setStyle("-fx-background-color: white; -fx-border-color: #ccc;");
+
+            imageView.setOnMouseEntered(event -> {
+                if (produit.getImage_path() != null && !produit.getImage_path().isEmpty()) {
+                    try {
+                        File imageFile = new File(produit.getImage_path());
+                        if (imageFile.exists()) {
+                            Image fullImage = new Image(imageFile.toURI().toString(), 200, 200, true, true);
+                            ImageView fullImageView = new ImageView(fullImage);
+                            fullImageView.setPreserveRatio(true);
+                            tooltip.setGraphic(fullImageView);
+                            tooltip.show(imageView, event.getScreenX(), event.getScreenY());
+                        }
+                    } catch (Exception e) {
+                        // Ignorer
+                    }
+                }
+            });
+
+            imageView.setOnMouseExited(event -> tooltip.hide());
+        }
     }
 }
