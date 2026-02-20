@@ -39,6 +39,9 @@ public class LoginController {
 
     @FXML
     private Label errorLabel;
+    
+    @FXML
+    private Label countdownLabel;
 
     @FXML
     private Button loginButton;
@@ -52,6 +55,7 @@ public class LoginController {
     private UtilisateurService utilisateurService;
     private AuthenticationService authService;
     private EmailService emailService;
+    private Timeline countdownTimeline;
 
     public void initialize() {
         utilisateurService = UtilisateurService.getInstance();
@@ -390,28 +394,34 @@ public class LoginController {
      * Afficher un compteur à rebours pour le verrouillage
      */
     private void showLockoutCountdown(AuthenticationService.LockStatus lockStatus) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Compte Verrouillé");
-        alert.setHeaderText("Trop de tentatives échouées");
+        // Désactiver les champs de saisie
+        emailField.setDisable(true);
+        passwordField.setDisable(true);
+        loginButton.setDisable(true);
         
-        // Label pour le compteur
-        Label countdownLabel = new Label();
-        countdownLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #EF4444;");
+        // Masquer l'erreur
+        errorLabel.setVisible(false);
         
-        Label messageLabel = new Label("Votre compte a été temporairement verrouillé.\nVeuillez patienter:");
-        messageLabel.setStyle("-fx-font-size: 14px;");
+        // Afficher le compteur
+        countdownLabel.setVisible(true);
         
-        VBox content = new VBox(10);
-        content.setAlignment(Pos.CENTER);
-        content.getChildren().addAll(messageLabel, countdownLabel);
+        // Arrêter le timeline précédent s'il existe
+        if (countdownTimeline != null) {
+            countdownTimeline.stop();
+        }
         
-        alert.getDialogPane().setContent(content);
+        // Calculer l'affichage initial
+        long initialSeconds = java.time.Duration.between(
+            LocalDateTime.now(), 
+            lockStatus.getUnlockTime()
+        ).getSeconds();
         
-        // Calculer le temps restant en secondes
-        long totalSeconds = lockStatus.getMinutesRemaining() * 60;
+        long minutes = initialSeconds / 60;
+        long seconds = initialSeconds % 60;
+        countdownLabel.setText(String.format("⏱️ Compte verrouillé. Réessayez dans %d:%02d", minutes, seconds));
         
         // Timeline pour mettre à jour le compteur chaque seconde
-        Timeline timeline = new Timeline(
+        countdownTimeline = new Timeline(
             new KeyFrame(Duration.seconds(1), e -> {
                 long currentSeconds = java.time.Duration.between(
                     LocalDateTime.now(), 
@@ -419,28 +429,22 @@ public class LoginController {
                 ).getSeconds();
                 
                 if (currentSeconds <= 0) {
-                    alert.close();
+                    // Déverrouillage
+                    countdownTimeline.stop();
+                    countdownLabel.setVisible(false);
+                    emailField.setDisable(false);
+                    passwordField.setDisable(false);
+                    loginButton.setDisable(false);
                     showError("Vous pouvez maintenant réessayer de vous connecter");
                 } else {
-                    long minutes = currentSeconds / 60;
-                    long seconds = currentSeconds % 60;
-                    countdownLabel.setText(String.format("%d:%02d", minutes, seconds));
+                    long mins = currentSeconds / 60;
+                    long secs = currentSeconds % 60;
+                    countdownLabel.setText(String.format("⏱️ Compte verrouillé. Réessayez dans %d:%02d", mins, secs));
                 }
             })
         );
         
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
-        
-        // Arrêter le timeline quand le dialog se ferme
-        alert.setOnCloseRequest(e -> timeline.stop());
-        
-        // Affichage initial
-        long minutes = totalSeconds / 60;
-        long seconds = totalSeconds % 60;
-        countdownLabel.setText(String.format("%d:%02d", minutes, seconds));
-        
-        alert.showAndWait();
-        timeline.stop();
+        countdownTimeline.setCycleCount(Animation.INDEFINITE);
+        countdownTimeline.play();
     }
 }

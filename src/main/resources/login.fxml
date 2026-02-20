@@ -125,6 +125,8 @@
                         <Label text="🔒" styleClass="input-icon" />
                         <PasswordField fx:id="passwordField" promptText="••••••••" styleClass="login-text-field" HBox.hgrow="ALWAYS" />
                      </HBox>
+                     <!-- Countdown Label -->
+                     <Label fx:id="countdownLabel" styleClass="countdown-label" visible="false" wrapText="true" />
                   </VBox>
                   
                   <!-- Error Label -->

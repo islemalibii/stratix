@@ -181,6 +181,18 @@
     -fx-background-radius: 6;
 }
 
+.countdown-label {
+    -fx-text-fill: #F59E0B;
+    -fx-font-size: 14;
+    -fx-font-weight: bold;
+    -fx-background-color: #FEF3C7;
+    -fx-padding: 10 14;
+    -fx-background-radius: 6;
+    -fx-border-color: #F59E0B;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+}
+
 /* ========================================
    SIGNUP PAGE - MATCHING DESIGN
    ======================================== */

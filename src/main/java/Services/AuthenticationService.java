@@ -94,7 +94,7 @@ public class AuthenticationService {
     }
 
     /**
-     * Verrouiller le compte
+     * Verrouiller le compte pour 15 minutes
      */
     private void lockAccount(String email) throws SQLException {
         LocalDateTime lockUntil = LocalDateTime.now().plusMinutes(LOCKOUT_DURATION_MINUTES);
