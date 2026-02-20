@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class service_ressourceTest {
+class service_ressourceTest {
 
     static service_ressource service;
     static int idRessourceTest;

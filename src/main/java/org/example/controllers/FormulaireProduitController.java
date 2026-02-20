@@ -5,7 +5,9 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.scene.input.KeyCode;
 import models.produit;
+import models.ressource;
 import service.service_produit;
 
 import java.time.LocalDate;
@@ -51,21 +53,40 @@ public class FormulaireProduitController {
         // Ajouter un listener pour gérer la sélection "Autre"
         categorieCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if ("Autre".equals(newVal)) {
-                // Rendre la ComboBox éditable et effacer le texte pour permettre la saisie
+                // Rendre la ComboBox éditable
                 categorieCombo.setEditable(true);
+
+                // Effacer le texte et mettre le focus sur l'éditeur
                 categorieCombo.getEditor().clear();
-                categorieCombo.getEditor().requestFocus();
+
+                // Utiliser Platform.runLater pour s'assurer que le focus est bien pris
+                javafx.application.Platform.runLater(() -> {
+                    categorieCombo.getEditor().requestFocus();
+                });
+
+                // Sélectionner tout le texte pour faciliter la saisie
+                categorieCombo.getEditor().selectAll();
             } else {
                 // Si ce n'est pas "Autre", on garde le comportement normal
                 categorieCombo.setEditable(false);
             }
         });
 
-        // Listener pour capturer la saisie manuelle quand "Autre" est sélectionné
-        categorieCombo.getEditor().textProperty().addListener((obs, oldVal, newVal) -> {
-            if (categorieCombo.isEditable() && newVal != null && !newVal.isEmpty()) {
-                // La valeur saisie sera utilisée comme catégorie personnalisée
-                System.out.println("Catégorie personnalisée : " + newVal);
+        // Permettre la validation avec Entrée quand on saisit une catégorie personnalisée
+        categorieCombo.getEditor().setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                // Validation implicite
+                categorieCombo.setValue(categorieCombo.getEditor().getText());
+            }
+        });
+
+        // Pour que la perte de focus valide aussi la saisie
+        categorieCombo.getEditor().focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) { // Perte de focus
+                String texteSaisi = categorieCombo.getEditor().getText();
+                if (texteSaisi != null && !texteSaisi.trim().isEmpty()) {
+                    categorieCombo.setValue(texteSaisi);
+                }
             }
         });
 
@@ -81,6 +102,7 @@ public class FormulaireProduitController {
         categorieCombo.setItems(FXCollections.observableArrayList(categoriesPredifinies));
         categorieCombo.getSelectionModel().clearSelection();
         categorieCombo.setEditable(false);
+        categorieCombo.getEditor().clear();
     }
 
     public void setModeModification(produit p) {
@@ -93,7 +115,7 @@ public class FormulaireProduitController {
 
         // Gérer la catégorie existante
         String categorieExistante = p.getCategorie();
-        if (categorieExistante != null) {
+        if (categorieExistante != null && !categorieExistante.isEmpty()) {
             // Vérifier si la catégorie existe dans la liste prédéfinie
             boolean estCategoriePredifinie = false;
             for (String cat : categoriesPredifinies) {
@@ -113,6 +135,12 @@ public class FormulaireProduitController {
                 categorieCombo.getEditor().setText(categorieExistante);
                 // Sélectionner "Autre" pour indiquer que c'est personnalisé
                 categorieCombo.getSelectionModel().select("Autre");
+
+                // Mettre le focus sur l'éditeur
+                javafx.application.Platform.runLater(() -> {
+                    categorieCombo.getEditor().requestFocus();
+                    categorieCombo.getEditor().selectAll();
+                });
             }
         }
 
@@ -133,8 +161,8 @@ public class FormulaireProduitController {
      * Récupère la valeur de la catégorie (sélectionnée ou saisie)
      */
     private String getCategorieValue() {
+        // Si la ComboBox est éditable, on prend la valeur de l'éditeur
         if (categorieCombo.isEditable()) {
-            // Si la ComboBox est éditable, on prend la valeur saisie
             String saisie = categorieCombo.getEditor().getText();
             if (saisie != null && !saisie.trim().isEmpty()) {
                 return saisie.trim();
@@ -184,6 +212,11 @@ public class FormulaireProduitController {
             } else {
                 serviceProduit.update(p);
                 showAlert(Alert.AlertType.INFORMATION, "Succès", "Produit modifié avec succès !");
+            }
+
+            // Ajouter la catégorie personnalisée à la liste pour une prochaine utilisation
+            if (categorie != null && !estDansCategoriesPredifinies(categorie)) {
+                ajouterCategoriePersonnalisee(categorie);
             }
 
             if (onProduitAjoute != null) {
@@ -253,12 +286,24 @@ public class FormulaireProduitController {
         alert.showAndWait();
     }
 
+    // Vérifier si une catégorie est dans la liste prédéfinie
+    private boolean estDansCategoriesPredifinies(String categorie) {
+        for (String cat : categoriesPredifinies) {
+            if (cat.equalsIgnoreCase(categorie)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Ajouter cette méthode pour sauvegarder les catégories personnalisées
     private void ajouterCategoriePersonnalisee(String nouvelleCategorie) {
         if (nouvelleCategorie != null && !nouvelleCategorie.isEmpty()) {
             // Vérifier si la catégorie n'existe pas déjà
             boolean existe = false;
-            for (String cat : categoriesPredifinies) {
+            ObservableList<String> itemsActuels = categorieCombo.getItems();
+
+            for (String cat : itemsActuels) {
                 if (cat.equalsIgnoreCase(nouvelleCategorie)) {
                     existe = true;
                     break;
@@ -267,9 +312,7 @@ public class FormulaireProduitController {
 
             if (!existe) {
                 // Ajouter à la liste des catégories pour une utilisation future
-                ObservableList<String> items = FXCollections.observableArrayList(categoriesPredifinies);
-                items.add(nouvelleCategorie);
-                categorieCombo.setItems(items);
+                itemsActuels.add(nouvelleCategorie);
             }
         }
     }
