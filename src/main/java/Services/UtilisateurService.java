@@ -33,9 +33,9 @@ public class UtilisateurService {
             throw new SQLException("Connexion à la base de données non disponible");
         }
         
-        String query = "INSERT INTO utilisateur (nom, prenom, email, tel, cin, password, role, date_ajout, " +
+        String query = "INSERT INTO utilisateur (nom, prenom, email, tel, cin, password, role, statut, date_ajout, " +
                       "department, poste, date_embauche, competences, salaire) " +
-                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         PreparedStatement ps = connection.prepareStatement(query);
         ps.setString(1, utilisateur.getNom());
@@ -45,19 +45,20 @@ public class UtilisateurService {
         ps.setInt(5, utilisateur.getCin());
         ps.setString(6, utilisateur.getPassword());
         ps.setString(7, utilisateur.getRole().name().toLowerCase());
-        ps.setDate(8, Date.valueOf(utilisateur.getDateAjout() != null ? utilisateur.getDateAjout() : LocalDate.now()));
+        ps.setString(8, utilisateur.getStatut() != null ? utilisateur.getStatut() : "actif");
+        ps.setDate(9, Date.valueOf(utilisateur.getDateAjout() != null ? utilisateur.getDateAjout() : LocalDate.now()));
         
         // Champs optionnels (NULL si non employé)
-        ps.setString(9, utilisateur.getDepartment());
-        ps.setString(10, utilisateur.getPoste());
-        ps.setDate(11, utilisateur.getDateEmbauche() != null ? Date.valueOf(utilisateur.getDateEmbauche()) : null);
-        ps.setString(12, utilisateur.getCompetences());
+        ps.setString(10, utilisateur.getDepartment());
+        ps.setString(11, utilisateur.getPoste());
+        ps.setDate(12, utilisateur.getDateEmbauche() != null ? Date.valueOf(utilisateur.getDateEmbauche()) : null);
+        ps.setString(13, utilisateur.getCompetences());
         
         // Salaire: NULL si 0.0 (pour admin/CEO)
         if (utilisateur.getSalaire() == 0.0) {
-            ps.setNull(13, Types.DECIMAL);
+            ps.setNull(14, Types.DECIMAL);
         } else {
-            ps.setDouble(13, utilisateur.getSalaire());
+            ps.setDouble(14, utilisateur.getSalaire());
         }
         
         ps.executeUpdate();
@@ -267,6 +268,13 @@ public class UtilisateurService {
         String roleStr = rs.getString("role");
         utilisateur.setRole(Role.valueOf(roleStr.toUpperCase()));
         
+        // Statut
+        try {
+            utilisateur.setStatut(rs.getString("statut"));
+        } catch (SQLException e) {
+            utilisateur.setStatut("actif"); // Par défaut si la colonne n'existe pas encore
+        }
+        
         // Date d'ajout
         Date dateAjout = rs.getDate("date_ajout");
         if (dateAjout != null) {
@@ -294,5 +302,48 @@ public class UtilisateurService {
         }
         
         return utilisateur;
+    }
+    
+    // Désactiver un utilisateur (au lieu de supprimer)
+    public void desactiver(int id) throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Connexion à la base de données non disponible");
+        }
+        
+        String query = "UPDATE utilisateur SET statut = 'inactif' WHERE id = ?";
+        PreparedStatement ps = connection.prepareStatement(query);
+        ps.setInt(1, id);
+        ps.executeUpdate();
+    }
+    
+    // Activer un utilisateur
+    public void activer(int id) throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Connexion à la base de données non disponible");
+        }
+        
+        String query = "UPDATE utilisateur SET statut = 'actif' WHERE id = ?";
+        PreparedStatement ps = connection.prepareStatement(query);
+        ps.setInt(1, id);
+        ps.executeUpdate();
+    }
+    
+    // Récupérer uniquement les utilisateurs actifs
+    public List<Utilisateur> getAllActifs() throws SQLException {
+        if (connection == null) {
+            throw new SQLException("Connexion à la base de données non disponible");
+        }
+        
+        List<Utilisateur> utilisateurs = new ArrayList<>();
+        String query = "SELECT * FROM utilisateur WHERE statut = 'actif'";
+        
+        Statement st = connection.createStatement();
+        ResultSet rs = st.executeQuery(query);
+        
+        while (rs.next()) {
+            utilisateurs.add(mapResultSetToUtilisateur(rs));
+        }
+        
+        return utilisateurs;
     }
 }

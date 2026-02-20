@@ -11,6 +11,7 @@ public class Utilisateur {
     private int cin;
     private String password;
     private Role role;
+    private String statut; // "actif" ou "inactif"
     private LocalDate dateAjout;
     
     // Champs pour employe/responsable (peuvent être NULL)
@@ -78,6 +79,9 @@ public class Utilisateur {
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    
+    public String getStatut() { return statut; }
+    public void setStatut(String statut) { this.statut = statut; }
 
     public LocalDate getDateAjout() { return dateAjout; }
     public void setDateAjout(LocalDate dateAjout) { this.dateAjout = dateAjout; }
@@ -143,6 +147,14 @@ public class Utilisateur {
     
     public boolean isCEO() {
         return role == Role.CEO;
+    }
+    
+    public boolean isActif() {
+        return "actif".equals(statut);
+    }
+    
+    public boolean isInactif() {
+        return "inactif".equals(statut);
     }
 
     @Override

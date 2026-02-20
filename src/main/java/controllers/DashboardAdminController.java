@@ -245,6 +245,18 @@ public class DashboardAdminController {
         Label roleLabel = new Label(user.getRole().toString());
         roleLabel.setPadding(new Insets(6, 16, 6, 16));
         roleLabel.getStyleClass().addAll("role-badge", getRoleBadgeClass(user.getRole()));
+        
+        // Statut badge
+        Label statutLabel = new Label(user.isActif() ? "✓ Actif" : "✗ Inactif");
+        statutLabel.setPadding(new Insets(4, 12, 4, 12));
+        statutLabel.setStyle(user.isActif() 
+            ? "-fx-background-color: #D1FAE5; -fx-text-fill: #065F46; -fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;"
+            : "-fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; -fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: bold;"
+        );
+        
+        HBox badgesBox = new HBox(8);
+        badgesBox.setAlignment(Pos.CENTER);
+        badgesBox.getChildren().addAll(roleLabel, statutLabel);
 
         // Details
         VBox detailsBox = new VBox(6);
@@ -284,15 +296,18 @@ public class DashboardAdminController {
         HBox.setHgrow(btnModifier, Priority.ALWAYS);
         btnModifier.setMaxWidth(Double.MAX_VALUE);
 
-        Button btnSupprimer = new Button("Supprimer");
-        btnSupprimer.getStyleClass().addAll("button-danger", "card-action-button-small");
-        btnSupprimer.setOnAction(e -> handleSupprimer(user));
-        HBox.setHgrow(btnSupprimer, Priority.ALWAYS);
-        btnSupprimer.setMaxWidth(Double.MAX_VALUE);
+        Button btnToggleStatut = new Button(user.isActif() ? "Désactiver" : "Activer");
+        btnToggleStatut.getStyleClass().addAll(
+            user.isActif() ? "button-danger" : "button-success", 
+            "card-action-button-small"
+        );
+        btnToggleStatut.setOnAction(e -> handleToggleStatut(user));
+        HBox.setHgrow(btnToggleStatut, Priority.ALWAYS);
+        btnToggleStatut.setMaxWidth(Double.MAX_VALUE);
 
-        actionsBox.getChildren().addAll(btnModifier, btnSupprimer);
+        actionsBox.getChildren().addAll(btnModifier, btnToggleStatut);
 
-        card.getChildren().addAll(avatarPane, nameLabel, roleLabel, detailsBox, actionsBox);
+        card.getChildren().addAll(avatarPane, nameLabel, badgesBox, detailsBox, actionsBox);
 
         return card;
     }
@@ -400,22 +415,36 @@ public class DashboardAdminController {
     }
 
     private void handleSupprimer(Utilisateur user) {
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmation.setTitle("Confirmation");
-        confirmation.setHeaderText("Supprimer l'utilisateur");
-        confirmation.setContentText("Êtes-vous sûr de vouloir supprimer " + 
-                                   user.getNom() + " " + user.getPrenom() + " ?");
+        // Désactiver au lieu de supprimer
+        handleToggleStatut(user);
+    }
+    
+    private void handleToggleStatut(Utilisateur user) {
+        try {
+            if (user.isActif()) {
+                // Confirmation avant désactivation
+                Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmation.setTitle("Confirmation");
+                confirmation.setHeaderText("Désactiver l'utilisateur");
+                confirmation.setContentText("Êtes-vous sûr de vouloir désactiver " + 
+                                           user.getNom() + " " + user.getPrenom() + " ?\n\n" +
+                                           "L'utilisateur ne pourra plus se connecter.");
 
-        Optional<ButtonType> result = confirmation.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                utilisateurService.supprimer(user.getId());
+                Optional<ButtonType> result = confirmation.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    utilisateurService.desactiver(user.getId());
+                    refreshCurrentView();
+                    showAlert("Succès", "Utilisateur désactivé avec succès");
+                }
+            } else {
+                // Activer directement sans confirmation
+                utilisateurService.activer(user.getId());
                 refreshCurrentView();
-                showAlert("Succès", "Utilisateur supprimé avec succès");
-            } catch (Exception e) {
-                showAlert("Erreur", "Impossible de supprimer l'utilisateur");
-                e.printStackTrace();
+                showAlert("Succès", "Utilisateur activé avec succès");
             }
+        } catch (Exception e) {
+            showAlert("Erreur", "Impossible de modifier le statut de l'utilisateur");
+            e.printStackTrace();
         }
     }
 

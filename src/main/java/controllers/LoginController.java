@@ -113,6 +113,12 @@ public class LoginController {
                     .orElse(null);
 
             if (user != null) {
+                // Vérifier si le compte est actif
+                if (user.isInactif()) {
+                    showError("Votre compte a été désactivé. Contactez l'administrateur.");
+                    return;
+                }
+                
                 // Réinitialiser les tentatives échouées
                 authService.resetFailedAttempts(email);
 
