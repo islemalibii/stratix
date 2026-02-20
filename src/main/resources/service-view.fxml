@@ -9,4 +9,7 @@
     <Tab text="Catégories">
         <fx:include source="categorie-tab.fxml"/>
     </Tab>
+    <Tab text="Statistiques">
+        <fx:include source="statistiques-tab.fxml"/>
+    </Tab>
 </TabPane>
