@@ -1,33 +1,32 @@
 package controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 
 import model.Service;
-import model.CategorieService;
 import service.PDFService;
 import service.ServiceService;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.ResourceBundle;
+import service.ExchangeRateService;
 
 public class ServiceTabController implements Initializable {
 
@@ -37,14 +36,18 @@ public class ServiceTabController implements Initializable {
     @FXML private VBox servicesListView;
     @FXML private VBox statisticsView;
 
-    // Services list controls
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filterType;
     @FXML private GridPane servicesGrid;
     @FXML private Button btnArchives;
     @FXML private Button btnRetour;
 
+    @FXML private TextField txtMontantDT;
+    @FXML private TextField txtMontantUSD;
+    @FXML private TextField txtMontantEUR;
+
     private ServiceService serviceService;
+    private ExchangeRateService exchangeRateService;
     private List<Service> allServices;
     private boolean modeArchive = false;
 
@@ -52,11 +55,24 @@ public class ServiceTabController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         try {
             serviceService = new ServiceService();
+            exchangeRateService = new ExchangeRateService();
+
             filterType.getItems().addAll("Tous", "Développement", "Formation", "Maintenance", "Conseil", "Support");
             filterType.setValue("Tous");
             chargerDonnees();
 
             showServicesList();
+
+            txtMontantDT.textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue.isEmpty()) {
+                    try {
+                        Double.parseDouble(newValue);
+                    } catch (NumberFormatException e) {
+                        txtMontantDT.setStyle("-fx-border-color: #e74c3c;");
+                    }
+                }
+            });
+
         } catch (SQLException e) {
             showAlert("Erreur", e.getMessage());
         }
@@ -86,6 +102,31 @@ public class ServiceTabController implements Initializable {
         btnStatsView.getStyleClass().add("sub-nav-button-active");
         btnServicesView.getStyleClass().remove("sub-nav-button-active");
         btnServicesView.getStyleClass().add("sub-nav-button");
+    }
+
+    @FXML
+    private void handleConvertir() {
+        try {
+            String montantText = txtMontantDT.getText().trim();
+            if (montantText.isEmpty()) {
+                showAlert("Erreur", "Veuillez saisir un montant en DT");
+                return;
+            }
+
+            double montantDT = Double.parseDouble(montantText);
+            Map<String, Double> conversions = exchangeRateService.convertirToutesDevises(montantDT);
+
+            txtMontantUSD.setText(String.format("%.2f", conversions.get("USD")));
+            txtMontantEUR.setText(String.format("%.2f", conversions.get("EUR")));
+
+            txtMontantDT.setStyle("");
+
+        } catch (NumberFormatException e) {
+            showAlert("Erreur", "Veuillez saisir un nombre valide");
+            txtMontantDT.setStyle("-fx-border-color: #e74c3c;");
+        } catch (Exception e) {
+            showAlert("Erreur", "Erreur de conversion: " + e.getMessage());
+        }
     }
 
     private void chargerDonnees() {

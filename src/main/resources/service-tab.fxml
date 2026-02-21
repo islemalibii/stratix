@@ -8,11 +8,22 @@
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ServiceTabController">
 
     <HBox styleClass="sub-nav-bar" spacing="5" alignment="CENTER_LEFT">
-        <Button text="📋 Liste des Services" fx:id="btnServicesView" onAction="#showServicesList" styleClass="sub-nav-button-active"/>
-        <Button text="📊 Statistiques" fx:id="btnStatsView" onAction="#showStatistics" styleClass="sub-nav-button"/>
+        <Button text=" Liste des Services" fx:id="btnServicesView" onAction="#showServicesList" styleClass="sub-nav-button-active"/>
+        <Button text=" Statistiques" fx:id="btnStatsView" onAction="#showStatistics" styleClass="sub-nav-button"/>
         <Region HBox.hgrow="ALWAYS"/>
-
     </HBox>
+
+    <VBox styleClass="converter-section" spacing="10">
+        <Label text="Convertisseur de Devises" styleClass="converter-title"/>
+        <HBox spacing="15" alignment="CENTER_LEFT">
+            <TextField fx:id="txtMontantDT" promptText="Montant en DT" prefWidth="150" styleClass="converter-field"/>
+            <Label text="TND" styleClass="converter-currency"/>
+            <Label text="→" styleClass="converter-arrow"/>
+            <TextField fx:id="txtMontantUSD" editable="false" prefWidth="150" styleClass="converter-field" promptText="USD"/>
+            <TextField fx:id="txtMontantEUR" editable="false" prefWidth="150" styleClass="converter-field" promptText="EUR"/>
+            <Button text="Convertir" onAction="#handleConvertir" styleClass="converter-button"/>
+        </HBox>
+    </VBox>
 
     <StackPane fx:id="contentPane" VBox.vgrow="ALWAYS">
         <VBox fx:id="servicesListView" spacing="20" managed="true" visible="true">
