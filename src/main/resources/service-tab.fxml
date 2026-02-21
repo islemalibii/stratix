@@ -5,29 +5,41 @@
 <?import javafx.scene.layout.*?>
 
 <VBox spacing="20" styleClass="modern-container" xmlns="http://javafx.com/javafx/17"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ServiceController">
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ServiceTabController">
 
-    <HBox alignment="CENTER_LEFT" spacing="15">
-        <Label text="GESTION DES SERVICES" styleClass="modern-title"/>
+    <HBox styleClass="sub-nav-bar" spacing="5" alignment="CENTER_LEFT">
+        <Button text="📋 Liste des Services" fx:id="btnServicesView" onAction="#showServicesList" styleClass="sub-nav-button-active"/>
+        <Button text="📊 Statistiques" fx:id="btnStatsView" onAction="#showStatistics" styleClass="sub-nav-button"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <TextField fx:id="searchField" promptText="Rechercher un service..." prefWidth="300" styleClass="modern-search"/>
-        <ComboBox fx:id="filterType" promptText="Tous" prefWidth="120" styleClass="modern-combo"/>
-        <Button text="Rechercher" onAction="#handleSearch" styleClass="modern-button-primary"/>
-    </HBox>
-
-    <HBox alignment="CENTER_RIGHT" spacing="10">
-        <Button text="📄 Exporter PDF" onAction="#handleExporterPDF" styleClass="modern-button-pdf"/>
-        <Button fx:id="btnArchives" text="📦 Archives" onAction="#handleVoirArchives" styleClass="modern-button-archive"/>
-        <Button fx:id="btnRetour" text="⬅ Retour" onAction="#handleRetour" styleClass="modern-button-retour" visible="false"/>
         <Button text="+ Nouveau service" onAction="#handleAjouter" styleClass="modern-button-add"/>
     </HBox>
 
-    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="modern-scroll">
-        <GridPane fx:id="servicesGrid" hgap="20" vgap="20" styleClass="cards-grid">
-            <padding>
-                <Insets top="10" right="10" bottom="10" left="10"/>
-            </padding>
-        </GridPane>
-    </ScrollPane>
+    <StackPane fx:id="contentPane" VBox.vgrow="ALWAYS">
+        <VBox fx:id="servicesListView" spacing="20" managed="true" visible="true">
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <TextField fx:id="searchField" promptText="Rechercher un service..." prefWidth="300" styleClass="modern-search"/>
+                <ComboBox fx:id="filterType" promptText="Tous" prefWidth="120" styleClass="modern-combo"/>
+                <Button text="Rechercher" onAction="#handleSearch" styleClass="modern-button-primary"/>
+            </HBox>
+
+            <HBox alignment="CENTER_RIGHT" spacing="10">
+                <Button text="📄 Exporter PDF" onAction="#handleExporterPDF" styleClass="modern-button-pdf"/>
+                <Button fx:id="btnArchives" text="📦 Archives" onAction="#handleVoirArchives" styleClass="modern-button-archive"/>
+                <Button fx:id="btnRetour" text="⬅ Retour" onAction="#handleRetour" styleClass="modern-button-retour" visible="false"/>
+            </HBox>
+
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="modern-scroll">
+                <GridPane fx:id="servicesGrid" hgap="20" vgap="20" styleClass="cards-grid">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+                </GridPane>
+            </ScrollPane>
+        </VBox>
+
+        <VBox fx:id="statisticsView" spacing="20" managed="false" visible="false">
+            <fx:include source="statistiques-tab.fxml"/>
+        </VBox>
+    </StackPane>
 
 </VBox>

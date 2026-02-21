@@ -1,15 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
-<TabPane tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
-    <Tab text="Services">
-        <fx:include source="service-tab.fxml"/>
-    </Tab>
-    <Tab text="Catégories">
-        <fx:include source="categorie-tab.fxml"/>
-    </Tab>
-    <Tab text="Statistiques">
-        <fx:include source="statistiques-tab.fxml"/>
-    </Tab>
-</TabPane>
+<VBox spacing="0" styleClass="main-window" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
+
+    <HBox styleClass="header" alignment="CENTER_LEFT" spacing="20" prefHeight="70">
+        <padding>
+            <Insets left="30" right="30"/>
+        </padding>
+        <Label text="stratiX" styleClass="app-title">
+            <font>
+                <Font name="System Bold" size="28"/>
+            </font>
+        </Label>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="admin" styleClass="user-label">
+            <graphic>
+                <Label text="👤" styleClass="user-icon"/>
+            </graphic>
+        </Label>
+    </HBox>
+
+    <HBox styleClass="nav-bar" spacing="30" alignment="CENTER_LEFT" prefHeight="50">
+        <padding>
+            <Insets left="30" right="30"/>
+        </padding>
+        <Button text="services" styleClass="nav-button" onAction="#showServices"/>
+        <Button text="services categories" styleClass="nav-button" onAction="#showCategories"/>
+        <Button text="product resources" styleClass="nav-button" onAction="#showResources"/>
+        <Button text="projet taches planning" styleClass="nav-button" onAction="#showPlanning"/>
+        <Button text="evenements" styleClass="nav-button" onAction="#showEvents"/>
+    </HBox>
+
+
+    <StackPane fx:id="contentArea" VBox.vgrow="ALWAYS" styleClass="content-area">
+
+    </StackPane>
+
+</VBox>
