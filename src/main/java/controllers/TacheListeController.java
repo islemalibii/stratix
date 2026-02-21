@@ -12,8 +12,9 @@ import models.Tache;
 import models.Employe;
 import services.SERVICETache;
 import services.EmployeeService;
-import services.PDFExportService;    // ← IMPORT AJOUTÉ
-import services.ExcelExportService;  // ← IMPORT AJOUTÉ
+import services.PDFExportService;
+import services.ExcelExportService;
+import controllers.StatsChartController;  // ← NOUVEL IMPORT
 
 import java.io.File;
 import java.net.URL;
@@ -188,6 +189,21 @@ public class TacheListeController implements Initializable {
             alert.setTitle("Erreur");
             alert.setHeaderText(null);
             alert.setContentText("❌ Erreur : " + e.getMessage());
+            alert.showAndWait();
+            e.printStackTrace();
+        }
+    }
+
+    // ← NOUVELLE MÉTHODE POUR LES STATISTIQUES
+    @FXML
+    private void showStatistics() {
+        try {
+            StatsChartController.showTaskStatistics();
+        } catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText(null);
+            alert.setContentText("❌ Erreur lors de l'affichage des statistiques: " + e.getMessage());
             alert.showAndWait();
             e.printStackTrace();
         }
