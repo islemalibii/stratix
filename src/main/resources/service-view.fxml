@@ -10,47 +10,40 @@
 
     <VBox styleClass="sidebar" prefWidth="250" spacing="0">
         <HBox styleClass="sidebar-header" alignment="CENTER_LEFT" prefHeight="80">
-            <padding>
-                <Insets left="25"/>
-            </padding>
+            <padding><Insets left="25"/></padding>
             <Label text="stratiX" styleClass="sidebar-title">
-                <font>
-                    <Font name="System Bold" size="24"/>
-                </font>
+                <font><Font name="System Bold" size="24"/></font>
             </Label>
         </HBox>
 
         <VBox styleClass="sidebar-menu" spacing="5" VBox.vgrow="ALWAYS">
-            <padding>
-                <Insets top="20" left="15" right="15" bottom="20"/>
-            </padding>
+            <padding><Insets top="20" left="15" right="15" bottom="20"/></padding>
 
-            <Button text=" services" styleClass="sidebar-button" onAction="#showServices" maxWidth="Infinity"/>
-            <Button text=" services categories" styleClass="sidebar-button" onAction="#showCategories" maxWidth="Infinity"/>
-            <Button text=" produit" styleClass="sidebar-button" onAction="#showResources" maxWidth="Infinity"/>
-            <Button text=" resource" styleClass="sidebar-button" onAction="#showResources" maxWidth="Infinity"/>
-            <Button text=" projet" styleClass="sidebar-button" onAction="#showPlanning" maxWidth="Infinity"/>
-            <Button text="taches" styleClass="sidebar-button" onAction="#showPlanning" maxWidth="Infinity"/>
-            <Button text="evenements" styleClass="sidebar-button" onAction="#showEvents" maxWidth="Infinity"/>
+            <Button text=" services" fx:id="btnServices" styleClass="sidebar-button" onAction="#showServices" maxWidth="Infinity"/>
+            <Button text=" services categories" fx:id="btnCategories" styleClass="sidebar-button" onAction="#showCategories" maxWidth="Infinity"/>
+            <Button text=" produit" fx:id="btnResources" styleClass="sidebar-button" onAction="#showResources" maxWidth="Infinity"/>
+            <Button text=" resource" fx:id="btnResource" styleClass="sidebar-button" onAction="#showResources" maxWidth="Infinity"/>
+            <Button text=" projet" fx:id="btnPlanning" styleClass="sidebar-button" onAction="#showPlanning" maxWidth="Infinity"/>
+            <Button text=" taches" fx:id="btnTaches" styleClass="sidebar-button" onAction="#showPlanning" maxWidth="Infinity"/>
+            <Button text=" evenements" fx:id="btnEvents" styleClass="sidebar-button" onAction="#showEvents" maxWidth="Infinity"/>
 
             <Region VBox.vgrow="ALWAYS"/>
+
 
             <VBox styleClass="user-section" spacing="10">
                 <Separator styleClass="user-separator"/>
                 <HBox styleClass="user-info-container" spacing="12" alignment="CENTER_LEFT">
-                    <Label text="👤" styleClass="user-avatar-large"/>
+                    <Label text="👤" fx:id="lblUserAvatar" styleClass="user-avatar-large"/>
                     <VBox spacing="3">
-                        <Label text="Admin User" styleClass="user-name-large"/>
-                        <Label text="Administrateur" styleClass="user-role-label"/>
+                        <Label fx:id="lblUserName" text="Utilisateur" styleClass="user-name-large"/>
+                        <Label fx:id="lblUserRole" text="Rôle" styleClass="user-role-label"/>
                     </VBox>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Button text="⚙️" styleClass="user-settings-button"/>
+                    <Button text="🚪" onAction="#handleLogout" styleClass="user-logout-button"/>
                 </HBox>
             </VBox>
         </VBox>
     </VBox>
 
-    <StackPane fx:id="contentArea" styleClass="content-area" HBox.hgrow="ALWAYS">
-    </StackPane>
-
+    <StackPane fx:id="contentArea" styleClass="content-area" HBox.hgrow="ALWAYS"/>
 </HBox>

@@ -1,32 +1,32 @@
 package controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.geometry.Pos;
+
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import model.Service;
+import model.UserRole;
 import service.PDFService;
 import service.ServiceService;
 import service.ExchangeRateService;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class ServiceTabController implements Initializable {
 
@@ -35,13 +35,14 @@ public class ServiceTabController implements Initializable {
     @FXML private StackPane contentPane;
     @FXML private VBox servicesListView;
     @FXML private VBox statisticsView;
-
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filterType;
     @FXML private GridPane servicesGrid;
     @FXML private Button btnArchives;
     @FXML private Button btnRetour;
-
+    @FXML private Button btnAjouter;
+    @FXML private Button btnExporterPDF;
+    @FXML private HBox actionButtonsBar;
     @FXML private TextField txtMontantDT;
     @FXML private TextField txtMontantUSD;
     @FXML private TextField txtMontantEUR;
@@ -63,18 +64,34 @@ public class ServiceTabController implements Initializable {
 
             showServicesList();
 
-            txtMontantDT.textProperty().addListener((observable, oldValue, newValue) -> {
-                if (!newValue.isEmpty()) {
-                    try {
-                        Double.parseDouble(newValue);
-                    } catch (NumberFormatException e) {
-                        txtMontantDT.setStyle("-fx-border-color: #e74c3c;");
-                    }
-                }
-            });
+            applyRoleRestrictions();
 
         } catch (SQLException e) {
             showAlert("Erreur", e.getMessage());
+        }
+    }
+
+    private void applyRoleRestrictions() {
+        if (UserRole.getInstance().isEmployee()) {
+            if (btnAjouter != null) {
+                btnAjouter.setVisible(false);
+                btnAjouter.setManaged(false);
+            }
+
+            if (btnArchives != null) {
+                btnArchives.setVisible(false);
+                btnArchives.setManaged(false);
+            }
+
+            if (btnExporterPDF != null) {
+                btnExporterPDF.setVisible(false);
+                btnExporterPDF.setManaged(false);
+            }
+
+            if (actionButtonsBar != null) {
+                actionButtonsBar.setVisible(false);
+                actionButtonsBar.setManaged(false);
+            }
         }
     }
 
@@ -119,33 +136,17 @@ public class ServiceTabController implements Initializable {
             txtMontantUSD.setText(String.format("%.2f", conversions.get("USD")));
             txtMontantEUR.setText(String.format("%.2f", conversions.get("EUR")));
 
-            txtMontantDT.setStyle("");
-
         } catch (NumberFormatException e) {
             showAlert("Erreur", "Veuillez saisir un nombre valide");
-            txtMontantDT.setStyle("-fx-border-color: #e74c3c;");
         } catch (Exception e) {
             showAlert("Erreur", "Erreur de conversion: " + e.getMessage());
         }
     }
 
-    private void chargerDonnees() {
-        try {
-            if (modeArchive) {
-                allServices = serviceService.afficherArchives();
-            } else {
-                allServices = serviceService.afficherAll();
-            }
-            afficherCartes(allServices);
-        } catch (SQLException e) {
-            showAlert("Erreur", e.getMessage());
-        }
-    }
-
     private void afficherCartes(List<Service> services) {
         servicesGrid.getChildren().clear();
-
         servicesGrid.getColumnConstraints().clear();
+
         for (int i = 0; i < 3; i++) {
             ColumnConstraints col = new ColumnConstraints();
             col.setPercentWidth(33.33);
@@ -162,6 +163,7 @@ public class ServiceTabController implements Initializable {
             card.setMaxWidth(Double.MAX_VALUE);
             card.setPrefWidth(Region.USE_COMPUTED_SIZE);
 
+            // Header
             HBox header = new HBox(10);
             header.getStyleClass().add("card-header");
             header.setAlignment(Pos.CENTER_LEFT);
@@ -178,6 +180,7 @@ public class ServiceTabController implements Initializable {
 
             header.getChildren().addAll(titre, spacer, categorie);
 
+            // Content
             VBox content = new VBox(8);
             content.getStyleClass().add("card-content");
 
@@ -187,10 +190,8 @@ public class ServiceTabController implements Initializable {
 
             Label budgetLabel = new Label("💰 Budget:");
             budgetLabel.getStyleClass().add("card-label");
-
             Label budgetValue = new Label(String.format("%,.0f DT", s.getBudget()));
             budgetValue.getStyleClass().add("card-budget");
-
             budgetRow.getChildren().addAll(budgetLabel, budgetValue);
 
             HBox periodRow = new HBox(10);
@@ -199,10 +200,8 @@ public class ServiceTabController implements Initializable {
 
             Label periodLabel = new Label("📅 Période:");
             periodLabel.getStyleClass().add("card-label");
-
             Label periodValue = new Label(s.getDateDebut() + " → " + s.getDateFin());
             periodValue.getStyleClass().add("card-value");
-
             periodRow.getChildren().addAll(periodLabel, periodValue);
 
             HBox respRow = new HBox(10);
@@ -223,34 +222,41 @@ public class ServiceTabController implements Initializable {
 
             Label respValue = new Label(responsableNom);
             respValue.getStyleClass().add("card-responsable");
-
             respRow.getChildren().addAll(respLabel, respValue);
 
             content.getChildren().addAll(budgetRow, periodRow, respRow);
 
+            // Actions selon le rôle
             HBox actions = new HBox(10);
             actions.getStyleClass().add("card-actions");
             actions.setAlignment(Pos.CENTER_RIGHT);
 
-            if (modeArchive) {
-                Button btnDesarchiver = new Button("Restaurer");
-                btnDesarchiver.getStyleClass().add("card-button-restore");
-                btnDesarchiver.setOnAction(e -> desarchiverService(s));
-                actions.getChildren().add(btnDesarchiver);
+            if (UserRole.getInstance().isAdmin()) {
+                // Admin : afficher les boutons d'action
+                if (modeArchive) {
+                    Button btnDesarchiver = new Button("Restaurer");
+                    btnDesarchiver.getStyleClass().add("card-button-restore");
+                    btnDesarchiver.setOnAction(e -> desarchiverService(s));
+                    actions.getChildren().add(btnDesarchiver);
+                } else {
+                    Button btnArchiver = new Button("Archiver");
+                    btnArchiver.getStyleClass().add("card-button-archive");
+                    btnArchiver.setOnAction(e -> archiverService(s));
+
+                    Button btnModifier = new Button("Modifier");
+                    btnModifier.getStyleClass().add("card-button-modify");
+                    btnModifier.setOnAction(e -> ouvrirModification(s));
+
+                    actions.getChildren().addAll(btnArchiver, btnModifier);
+                }
             } else {
-                Button btnArchiver = new Button("Archiver");
-                btnArchiver.getStyleClass().add("card-button-archive");
-                btnArchiver.setOnAction(e -> archiverService(s));
-
-                Button btnModifier = new Button("Modifier");
-                btnModifier.getStyleClass().add("card-button-modify");
-                btnModifier.setOnAction(e -> ouvrirModification(s));
-
-                actions.getChildren().addAll(btnArchiver, btnModifier);
+                // Employé : message de consultation seule
+                Label consultationLabel = new Label("🔍 Consultation seule");
+                consultationLabel.setStyle("-fx-text-fill: #95a5a6; -fx-font-size: 11px;");
+                actions.getChildren().add(consultationLabel);
             }
 
             card.getChildren().addAll(header, content, actions);
-
             servicesGrid.add(card, col, row);
 
             col++;
@@ -262,6 +268,8 @@ public class ServiceTabController implements Initializable {
     }
 
     private void archiverService(Service service) {
+        if (!UserRole.getInstance().isAdmin()) return;
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation");
         confirm.setContentText("Archiver ce service ?");
@@ -277,6 +285,8 @@ public class ServiceTabController implements Initializable {
     }
 
     private void desarchiverService(Service service) {
+        if (!UserRole.getInstance().isAdmin()) return;
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation");
         confirm.setContentText("Restaurer ce service ?");
@@ -291,8 +301,85 @@ public class ServiceTabController implements Initializable {
         }
     }
 
+    private void ouvrirModification(Service service) {
+        if (!UserRole.getInstance().isAdmin()) return;
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ajout-service.fxml"));
+            Parent root = loader.load();
+            AjoutController controller = loader.getController();
+            controller.setServiceService(serviceService);
+            controller.setServiceAModifier(service);
+            Stage stage = new Stage();
+            stage.setTitle("Modifier Service");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+            chargerDonnees();
+        } catch (Exception e) {
+            showAlert("Erreur", e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleAjouter() {
+        if (!UserRole.getInstance().isAdmin()) return;
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ajout-service.fxml"));
+            Parent root = loader.load();
+            AjoutController controller = loader.getController();
+            controller.setServiceService(serviceService);
+            Stage stage = new Stage();
+            stage.setTitle("Ajouter Service");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+            chargerDonnees();
+        } catch (Exception e) {
+            showAlert("Erreur", e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleExporterPDF() {
+        if (!UserRole.getInstance().isAdmin()) return;
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Exporter les services");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf"));
+        fileChooser.setInitialFileName("rapport_services_" +
+                LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".pdf");
+
+        File file = fileChooser.showSaveDialog(servicesGrid.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                PDFService.exporterServices(allServices, file.getAbsolutePath());
+                showAlert("Succès", "Rapport PDF exporté avec succès !\n" + file.getName());
+            } catch (IOException e) {
+                showAlert("Erreur", "Impossible d'exporter le PDF: " + e.getMessage());
+            }
+        }
+    }
+
+    private void chargerDonnees() {
+        try {
+            if (modeArchive) {
+                allServices = serviceService.afficherArchives();
+            } else {
+                allServices = serviceService.afficherAll();
+            }
+            afficherCartes(allServices);
+        } catch (SQLException e) {
+            showAlert("Erreur", e.getMessage());
+        }
+    }
+
     @FXML
     private void handleVoirArchives() {
+        if (!UserRole.getInstance().isAdmin()) return;
         modeArchive = true;
         chargerDonnees();
         btnArchives.setVisible(false);
@@ -324,63 +411,6 @@ public class ServiceTabController implements Initializable {
             afficherCartes(resultats);
         } catch (SQLException e) {
             showAlert("Erreur", "Erreur lors de la recherche: " + e.getMessage());
-        }
-    }
-
-    private void ouvrirModification(Service service) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ajout-service.fxml"));
-            Parent root = loader.load();
-            AjoutController controller = loader.getController();
-            controller.setServiceService(serviceService);
-            controller.setServiceAModifier(service);
-            Stage stage = new Stage();
-            stage.setTitle("Modifier Service");
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.showAndWait();
-            chargerDonnees();
-        } catch (Exception e) {
-            showAlert("Erreur", e.getMessage());
-        }
-    }
-
-    @FXML
-    private void handleAjouter() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ajout-service.fxml"));
-            Parent root = loader.load();
-            AjoutController controller = loader.getController();
-            controller.setServiceService(serviceService);
-            Stage stage = new Stage();
-            stage.setTitle("Ajouter Service");
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.showAndWait();
-            chargerDonnees();
-        } catch (Exception e) {
-            showAlert("Erreur", e.getMessage());
-        }
-    }
-
-    @FXML
-    private void handleExporterPDF() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Exporter les services");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf"));
-        fileChooser.setInitialFileName("rapport_services_" +
-                LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".pdf");
-
-        File file = fileChooser.showSaveDialog(servicesGrid.getScene().getWindow());
-
-        if (file != null) {
-            try {
-                PDFService.exporterServices(allServices, file.getAbsolutePath());
-                showAlert("Succès", "Rapport PDF exporté avec succès !\n" + file.getName());
-            } catch (IOException e) {
-                showAlert("Erreur", "Impossible d'exporter le PDF: " + e.getMessage());
-            }
         }
     }
 
