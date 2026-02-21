@@ -5,40 +5,58 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox spacing="0" styleClass="main-window" xmlns="http://javafx.com/javafx/17"
+<HBox spacing="0" styleClass="main-window" xmlns="http://javafx.com/javafx/17"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
 
-    <HBox styleClass="header" alignment="CENTER_LEFT" spacing="20" prefHeight="70">
-        <padding>
-            <Insets left="30" right="30"/>
-        </padding>
-        <Label text="stratiX" styleClass="app-title">
-            <font>
-                <Font name="System Bold" size="28"/>
-            </font>
-        </Label>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Label text="admin" styleClass="user-label">
-            <graphic>
-                <Label text="👤" styleClass="user-icon"/>
-            </graphic>
-        </Label>
-    </HBox>
+    <!-- Sidebar -->
+    <VBox styleClass="sidebar" prefWidth="250" spacing="0">
+        <!-- App Logo -->
+        <HBox styleClass="sidebar-header" alignment="CENTER_LEFT" prefHeight="80">
+            <padding>
+                <Insets left="25"/>
+            </padding>
+            <Label text="stratiX" styleClass="sidebar-title">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+        </HBox>
 
-    <HBox styleClass="nav-bar" spacing="30" alignment="CENTER_LEFT" prefHeight="50">
-        <padding>
-            <Insets left="30" right="30"/>
-        </padding>
-        <Button text="services" styleClass="nav-button" onAction="#showServices"/>
-        <Button text="services categories" styleClass="nav-button" onAction="#showCategories"/>
-        <Button text="product resources" styleClass="nav-button" onAction="#showResources"/>
-        <Button text="projet taches planning" styleClass="nav-button" onAction="#showPlanning"/>
-        <Button text="evenements" styleClass="nav-button" onAction="#showEvents"/>
-    </HBox>
+        <!-- Navigation Menu - Each item alone -->
+        <VBox styleClass="sidebar-menu" spacing="5" VBox.vgrow="ALWAYS">
+            <padding>
+                <Insets top="20" left="15" right="15" bottom="20"/>
+            </padding>
 
+            <Button text="📋 services" styleClass="sidebar-button" onAction="#showServices" maxWidth="Infinity"/>
+            <Button text="🏷️ services categories" styleClass="sidebar-button" onAction="#showCategories" maxWidth="Infinity"/>
+            <Button text="📦 produit" styleClass="sidebar-button" onAction="#showResources" maxWidth="Infinity"/>
+            <Button text="📦 resource" styleClass="sidebar-button" onAction="#showResources" maxWidth="Infinity"/>
+            <Button text="📅 projet" styleClass="sidebar-button" onAction="#showPlanning" maxWidth="Infinity"/>
+            <Button text="📅 taches" styleClass="sidebar-button" onAction="#showPlanning" maxWidth="Infinity"/>
+            <Button text="🎉 evenements" styleClass="sidebar-button" onAction="#showEvents" maxWidth="Infinity"/>
 
-    <StackPane fx:id="contentArea" VBox.vgrow="ALWAYS" styleClass="content-area">
+            <Region VBox.vgrow="ALWAYS"/>
 
+            <!-- User Section at Bottom -->
+            <VBox styleClass="user-section" spacing="10">
+                <Separator styleClass="user-separator"/>
+                <HBox styleClass="user-info-container" spacing="12" alignment="CENTER_LEFT">
+                    <Label text="👤" styleClass="user-avatar-large"/>
+                    <VBox spacing="3">
+                        <Label text="Admin User" styleClass="user-name-large"/>
+                        <Label text="Administrateur" styleClass="user-role-label"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="⚙️" styleClass="user-settings-button"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </VBox>
+
+    <!-- Main Content Area -->
+    <StackPane fx:id="contentArea" styleClass="content-area" HBox.hgrow="ALWAYS">
+        <!-- Services tab will be loaded here by default -->
     </StackPane>
 
-</VBox>
+</HBox>
