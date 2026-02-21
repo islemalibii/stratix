@@ -33,7 +33,7 @@
                            style="-fx-text-fill: #94a3b8; -fx-font-size: 16px;"/>
                 </VBox>
 
-                <!-- BARRE DE RECHERCHE AJOUTÉE ICI -->
+                <!-- BARRE DE RECHERCHE -->
                 <HBox style="-fx-background-color: rgba(255,255,255,0.15); -fx-background-radius: 30; -fx-padding: 5 20; -fx-spacing: 10;" alignment="CENTER">
                     <Label text="🔍" style="-fx-text-fill: #94a3b8; -fx-font-size: 18px;"/>
                     <TextField fx:id="searchField" promptText="Rechercher une tâche, un employé..."
@@ -48,13 +48,13 @@
                 </HBox>
             </HBox>
 
-            <!-- Sous-header avec indicateurs -->
+            <!-- Sous-header avec indicateurs - CORRIGÉ avec les bons fx:id -->
             <HBox style="-fx-background-color: white; -fx-padding: 15 35; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 0);" spacing="40">
                 <HBox spacing="15" alignment="CENTER_LEFT">
                     <Circle radius="20" fill="#3b82f6" opacity="0.15"/>
                     <VBox>
                         <Label text="Projets actifs" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
-                        <Label text="3" style="-fx-text-fill: #1e293b; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                        <Label fx:id="lblProjetsActifs" text="0" style="-fx-text-fill: #1e293b; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                     </VBox>
                 </HBox>
                 <Separator orientation="VERTICAL" style="-fx-background-color: #e2e8f0;"/>
@@ -62,7 +62,7 @@
                     <Circle radius="20" fill="#10b981" opacity="0.15"/>
                     <VBox>
                         <Label text="Taux complétion" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
-                        <Label text="38%" style="-fx-text-fill: #1e293b; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+                        <Label fx:id="lblTauxCompletion" text="0%" style="-fx-text-fill: #1e293b; -fx-font-size: 22px; -fx-font-weight: bold;"/>
                     </VBox>
                 </HBox>
                 <Separator orientation="VERTICAL" style="-fx-background-color: #e2e8f0;"/>
@@ -92,7 +92,7 @@
                     <Insets top="30" right="35" bottom="30" left="35"/>
                 </padding>
 
-                <!-- RÉSULTATS DE RECHERCHE (caché par défaut) -->
+                <!-- RÉSULTATS DE RECHERCHE -->
                 <VBox fx:id="searchResultsContainer" spacing="10" managed="false" visible="false" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);">
                     <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="🔍 Résultats de recherche"/>
                     <ListView fx:id="searchResultsList" prefHeight="150" style="-fx-background-radius: 10; -fx-border-radius: 10;"/>
@@ -196,47 +196,67 @@
                     </HBox>
                 </VBox>
 
-                <!-- Section 3: Graphique -->
-                <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);">
-                    <Label text="📊 RÉPARTITION DES TÂCHES" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                <!-- Section 3: Graphique et Citation -->
+                <HBox spacing="20">
+                    <!-- Graphique -->
+                    <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);" HBox.hgrow="ALWAYS">
+                        <Label text="📊 RÉPARTITION DES TÂCHES" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
 
-                    <HBox spacing="30" alignment="CENTER">
-                        <!-- Légende -->
-                        <VBox spacing="15">
-                            <HBox spacing="15" alignment="CENTER_LEFT">
-                                <Rectangle width="20" height="20" fill="#f59e0b" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
-                                <Label text="À faire" style="-fx-font-size: 14px; -fx-text-fill: #475569;"/>
-                                <Label fx:id="lblAFaireGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
-                            </HBox>
-                            <HBox spacing="15" alignment="CENTER_LEFT">
-                                <Rectangle width="20" height="20" fill="#3b82f6" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
-                                <Label text="En cours" style="-fx-font-size: 14px; -fx-text-fill: #475569;"/>
-                                <Label fx:id="lblEnCoursGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
-                            </HBox>
-                            <HBox spacing="15" alignment="CENTER_LEFT">
-                                <Rectangle width="20" height="20" fill="#10b981" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
-                                <Label text="Terminées" style="-fx-font-size: 14px; -fx-text-fill: #475569;"/>
-                                <Label fx:id="lblTermineesGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
-                            </HBox>
-                        </VBox>
+                        <HBox spacing="30" alignment="CENTER">
+                            <!-- Légende -->
+                            <VBox spacing="15">
+                                <HBox spacing="15" alignment="CENTER_LEFT">
+                                    <Rectangle width="20" height="20" fill="#f59e0b" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
+                                    <Label text="À faire" style="-fx-font-size: 14px; -fx-text-fill: #475569;"/>
+                                    <Label fx:id="lblAFaireGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
+                                </HBox>
+                                <HBox spacing="15" alignment="CENTER_LEFT">
+                                    <Rectangle width="20" height="20" fill="#3b82f6" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
+                                    <Label text="En cours" style="-fx-font-size: 14px; -fx-text-fill: #475569;"/>
+                                    <Label fx:id="lblEnCoursGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
+                                </HBox>
+                                <HBox spacing="15" alignment="CENTER_LEFT">
+                                    <Rectangle width="20" height="20" fill="#10b981" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
+                                    <Label text="Terminées" style="-fx-font-size: 14px; -fx-text-fill: #475569;"/>
+                                    <Label fx:id="lblTermineesGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
+                                </HBox>
+                            </VBox>
 
-                        <!-- Barres de progression -->
-                        <HBox spacing="20" alignment="BOTTOM_CENTER" prefHeight="120">
-                            <VBox alignment="BOTTOM_CENTER" spacing="5">
-                                <Rectangle fx:id="barAFaire" width="40" height="0" style="-fx-fill: #f59e0b; -fx-arc-width: 10; -fx-arc-height: 10;"/>
-                                <Label text="À faire" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
-                            </VBox>
-                            <VBox alignment="BOTTOM_CENTER" spacing="5">
-                                <Rectangle fx:id="barEnCours" width="40" height="0" style="-fx-fill: #3b82f6; -fx-arc-width: 10; -fx-arc-height: 10;"/>
-                                <Label text="En cours" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
-                            </VBox>
-                            <VBox alignment="BOTTOM_CENTER" spacing="5">
-                                <Rectangle fx:id="barTerminees" width="40" height="0" style="-fx-fill: #10b981; -fx-arc-width: 10; -fx-arc-height: 10;"/>
-                                <Label text="Terminées" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
-                            </VBox>
+                            <!-- Barres de progression -->
+                            <HBox spacing="20" alignment="BOTTOM_CENTER" prefHeight="120">
+                                <VBox alignment="BOTTOM_CENTER" spacing="5">
+                                    <Rectangle fx:id="barAFaire" width="40" height="0" style="-fx-fill: #f59e0b; -fx-arc-width: 10; -fx-arc-height: 10;"/>
+                                    <Label text="À faire" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                                </VBox>
+                                <VBox alignment="BOTTOM_CENTER" spacing="5">
+                                    <Rectangle fx:id="barEnCours" width="40" height="0" style="-fx-fill: #3b82f6; -fx-arc-width: 10; -fx-arc-height: 10;"/>
+                                    <Label text="En cours" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                                </VBox>
+                                <VBox alignment="BOTTOM_CENTER" spacing="5">
+                                    <Rectangle fx:id="barTerminees" width="40" height="0" style="-fx-fill: #10b981; -fx-arc-width: 10; -fx-arc-height: 10;"/>
+                                    <Label text="Terminées" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                                </VBox>
+                            </HBox>
                         </HBox>
-                    </HBox>
-                </VBox>
+                    </VBox>
+
+                    <!-- Citation du jour (NOUVEAU) -->
+                    <VBox spacing="15" style="-fx-background-color: linear-gradient(to right, #667eea, #764ba2); -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 0);" prefWidth="300">
+                        <HBox alignment="CENTER_LEFT" spacing="10">
+                            <Label text="💬" style="-fx-font-size: 28px; -fx-text-fill: white;"/>
+                            <Label text="CITATION DU JOUR" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                        </HBox>
+
+                        <Label fx:id="lblCitation" wrapText="true"
+                               style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-style: italic; -fx-padding: 10 0;"
+                               text="Chargement de la citation..."/>
+
+                        <HBox alignment="CENTER_RIGHT">
+                            <Button fx:id="btnRefreshQuote" text="↻ Nouvelle citation"
+                                    style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 8 15; -fx-background-radius: 20; -fx-cursor: hand;"/>
+                        </HBox>
+                    </VBox>
+                </HBox>
 
                 <!-- Boutons de navigation -->
                 <HBox spacing="20" alignment="CENTER" style="-fx-padding: 20 0 20 0;">

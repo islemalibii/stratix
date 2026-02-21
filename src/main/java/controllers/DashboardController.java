@@ -9,9 +9,11 @@ import javafx.scene.shape.Rectangle;
 import services.StatsService;
 import services.SERVICETache;
 import services.EmployeeService;
+import services.SERVICEPlanning;
 import models.DashboardStats;
 import models.Tache;
 import models.Employe;
+import api.QuoteAPI;
 
 import java.net.URL;
 import java.util.List;
@@ -33,6 +35,8 @@ public class DashboardController implements Initializable {
     // Mini indicateurs
     @FXML private Label lblTotalEmployesMini;
     @FXML private Label lblEnRetardMini;
+    @FXML private Label lblProjetsActifs;
+    @FXML private Label lblTauxCompletion;
 
     // Labels du graphique
     @FXML private Label lblAFaireGraph;
@@ -44,6 +48,10 @@ public class DashboardController implements Initializable {
     @FXML private Rectangle barEnCours;
     @FXML private Rectangle barTerminees;
 
+    // Citation
+    @FXML private Label lblCitation;
+    @FXML private Button btnRefreshQuote;
+
     // Recherche
     @FXML private TextField searchField;
     @FXML private VBox searchResultsContainer;
@@ -52,16 +60,23 @@ public class DashboardController implements Initializable {
     private StatsService statsService;
     private SERVICETache tacheService;
     private EmployeeService employeService;
+    private SERVICEPlanning planningService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("=== INITIALISATION DASHBOARD AVEC RECHERCHE ===");
+        System.out.println("=== INITIALISATION DASHBOARD ===");
 
         statsService = new StatsService();
         tacheService = new SERVICETache();
         employeService = new EmployeeService();
+        planningService = new SERVICEPlanning();
 
         chargerStatistiques();
+        chargerCitation();
+
+        if (btnRefreshQuote != null) {
+            btnRefreshQuote.setOnAction(e -> chargerCitation());
+        }
 
         // Listener pour la recherche
         if (searchField != null) {
@@ -94,6 +109,15 @@ public class DashboardController implements Initializable {
             lblTotalEmployesMini.setText(String.valueOf(stats.getTotalEmployes()));
             lblEnRetardMini.setText(String.valueOf(stats.getTachesEnRetard()));
 
+            // Projets actifs (valeur par défaut)
+            lblProjetsActifs.setText("3");
+
+            // Taux de complétion
+            int total = stats.getTotalTaches();
+            int terminees = stats.getTachesTerminees();
+            int taux = total > 0 ? (terminees * 100 / total) : 0;
+            lblTauxCompletion.setText(taux + "%");
+
             // Graphique
             lblAFaireGraph.setText(String.valueOf(stats.getTachesAFaire()));
             lblEnCoursGraph.setText(String.valueOf(stats.getTachesEnCours()));
@@ -111,6 +135,16 @@ public class DashboardController implements Initializable {
 
         } catch (Exception e) {
             System.err.println("❌ Erreur: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void chargerCitation() {
+        try {
+            String citation = QuoteAPI.getRandomQuote();
+            lblCitation.setText(citation);
+        } catch (Exception e) {
+            lblCitation.setText("“Le succès c'est d'aller d'échec en échec sans perdre son enthousiasme.” — Winston Churchill");
         }
     }
 
