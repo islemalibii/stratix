@@ -125,7 +125,7 @@ public class ModifyEventController {
         try {
             Stage stage = (Stage) titreField.getScene().getWindow();
             javafx.fxml.FXMLLoader loader =
-                    new javafx.fxml.FXMLLoader(getClass().getResource("/EventDetailsAdmin.fxml"));
+                    new javafx.fxml.FXMLLoader(getClass().getResource("/EventDashboard.fxml"));
             stage.setScene(new javafx.scene.Scene(loader.load()));
         } catch (IOException e) {
             System.err.println(e.getMessage());
