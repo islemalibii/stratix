@@ -21,6 +21,7 @@ public class MainController {
     private Parent tacheView;
     private Parent calendarView;
     private Parent whiteboardView;
+    private Parent empMainView;  // ← Pour l'espace employé
 
     @FXML
     public void initialize() {
@@ -31,84 +32,45 @@ public class MainController {
 
         try {
             // Dashboard
-            System.out.println("\n--- Chargement dashboard-view.fxml ---");
             URL dashboardUrl = getClass().getResource("/dashboard-view.fxml");
-            System.out.println("   URL: " + dashboardUrl);
             if (dashboardUrl != null) {
                 dashboardView = FXMLLoader.load(dashboardUrl);
                 System.out.println("   ✅ Dashboard chargé");
-            } else {
-                System.out.println("   ❌ dashboard-view.fxml non trouvé!");
             }
 
             // Planning
-            System.out.println("\n--- Chargement PlanningView.fxml ---");
             URL planningUrl = getClass().getResource("/PlanningView.fxml");
-            System.out.println("   URL: " + planningUrl);
             if (planningUrl != null) {
                 planningView = FXMLLoader.load(planningUrl);
                 System.out.println("   ✅ Planning chargé");
-            } else {
-                System.out.println("   ❌ PlanningView.fxml non trouvé!");
             }
 
             // Tâches
-            System.out.println("\n--- Chargement TacheView.fxml ---");
             URL tacheUrl = getClass().getResource("/TacheView.fxml");
-            System.out.println("   URL: " + tacheUrl);
             if (tacheUrl != null) {
                 tacheView = FXMLLoader.load(tacheUrl);
                 System.out.println("   ✅ Tâches chargé");
-            } else {
-                System.out.println("   ❌ TacheView.fxml non trouvé!");
             }
 
             // Calendar
-            System.out.println("\n--- Chargement calendar-view.fxml ---");
             URL calendarUrl = getClass().getResource("/calendar-view.fxml");
-            System.out.println("   URL: " + calendarUrl);
             if (calendarUrl != null) {
                 calendarView = FXMLLoader.load(calendarUrl);
                 System.out.println("   ✅ Calendar chargé");
-            } else {
-                System.out.println("   ❌ calendar-view.fxml non trouvé!");
             }
 
-            // Whiteboard - TESTS MULTIPLES
-            System.out.println("\n--- RECHERCHE WHITEBOARD ---");
+            // Whiteboard
+            URL whiteboardUrl = getClass().getResource("/WhiteboardView.fxml");
+            if (whiteboardUrl != null) {
+                whiteboardView = FXMLLoader.load(whiteboardUrl);
+                System.out.println("   ✅ Whiteboard chargé");
+            }
 
-            // Essai 1: /whiteboard-view.fxml
-            URL whiteboardUrl1 = getClass().getResource("/whiteboard-view.fxml");
-            System.out.println("   Essai 1 (/whiteboard-view.fxml): " + whiteboardUrl1);
-
-            // Essai 2: /WhiteboardView.fxml (avec majuscule)
-            URL whiteboardUrl2 = getClass().getResource("/WhiteboardView.fxml");
-            System.out.println("   Essai 2 (/WhiteboardView.fxml): " + whiteboardUrl2);
-
-            // Essai 3: /views/whiteboard-view.fxml
-            URL whiteboardUrl3 = getClass().getResource("/views/whiteboard-view.fxml");
-            System.out.println("   Essai 3 (/views/whiteboard-view.fxml): " + whiteboardUrl3);
-
-            // Essai 4: /views/WhiteboardView.fxml
-            URL whiteboardUrl4 = getClass().getResource("/views/WhiteboardView.fxml");
-            System.out.println("   Essai 4 (/views/WhiteboardView.fxml): " + whiteboardUrl4);
-
-            // Prendre le premier trouvé
-            if (whiteboardUrl1 != null) {
-                whiteboardView = FXMLLoader.load(whiteboardUrl1);
-                System.out.println("   ✅ Whiteboard chargé avec Essai 1");
-            } else if (whiteboardUrl2 != null) {
-                whiteboardView = FXMLLoader.load(whiteboardUrl2);
-                System.out.println("   ✅ Whiteboard chargé avec Essai 2");
-            } else if (whiteboardUrl3 != null) {
-                whiteboardView = FXMLLoader.load(whiteboardUrl3);
-                System.out.println("   ✅ Whiteboard chargé avec Essai 3");
-            } else if (whiteboardUrl4 != null) {
-                whiteboardView = FXMLLoader.load(whiteboardUrl4);
-                System.out.println("   ✅ Whiteboard chargé avec Essai 4");
-            } else {
-                System.out.println("   ❌ Whiteboard non trouvé dans tous les emplacements!");
-                System.out.println("   Vérifie que le fichier whiteboard-view.fxml est dans target/classes/");
+            // Espace Employé
+            URL empMainUrl = getClass().getResource("/EmpMainView.fxml");
+            if (empMainUrl != null) {
+                empMainView = FXMLLoader.load(empMainUrl);
+                System.out.println("   ✅ Espace Employé chargé");
             }
 
             System.out.println("\n=== RÉSULTAT FINAL ===");
@@ -117,6 +79,7 @@ public class MainController {
             System.out.println("Tâches: " + (tacheView != null ? "✅" : "❌"));
             System.out.println("Calendrier: " + (calendarView != null ? "✅" : "❌"));
             System.out.println("Whiteboard: " + (whiteboardView != null ? "✅" : "❌"));
+            System.out.println("Espace Employé: " + (empMainView != null ? "✅" : "❌"));
 
             // Afficher dashboard par défaut
             showDashboard();
@@ -133,8 +96,6 @@ public class MainController {
             instance.mainPane.getChildren().clear();
             instance.mainPane.getChildren().add(instance.dashboardView);
             System.out.println("🔄 Navigation vers Dashboard");
-        } else {
-            System.err.println("❌ Impossible d'afficher Dashboard");
         }
     }
 
@@ -143,8 +104,6 @@ public class MainController {
             instance.mainPane.getChildren().clear();
             instance.mainPane.getChildren().add(instance.planningView);
             System.out.println("🔄 Navigation vers Planning");
-        } else {
-            System.err.println("❌ Impossible d'afficher Planning");
         }
     }
 
@@ -153,8 +112,6 @@ public class MainController {
             instance.mainPane.getChildren().clear();
             instance.mainPane.getChildren().add(instance.tacheView);
             System.out.println("🔄 Navigation vers Tâches");
-        } else {
-            System.err.println("❌ Impossible d'afficher Tâches");
         }
     }
 
@@ -163,8 +120,6 @@ public class MainController {
             instance.mainPane.getChildren().clear();
             instance.mainPane.getChildren().add(instance.calendarView);
             System.out.println("🔄 Navigation vers Calendrier");
-        } else {
-            System.err.println("❌ Impossible d'afficher Calendrier");
         }
     }
 
@@ -173,8 +128,17 @@ public class MainController {
             instance.mainPane.getChildren().clear();
             instance.mainPane.getChildren().add(instance.whiteboardView);
             System.out.println("🔄 Navigation vers Whiteboard");
+        }
+    }
+
+    // NOUVELLE MÉTHODE
+    public static void showEmpMain() {
+        if (instance != null && instance.mainPane != null && instance.empMainView != null) {
+            instance.mainPane.getChildren().clear();
+            instance.mainPane.getChildren().add(instance.empMainView);
+            System.out.println("🔄 Retour à l'accueil employé");
         } else {
-            System.err.println("❌ Impossible d'afficher Whiteboard - whiteboardView est null");
+            System.err.println("❌ Impossible d'afficher l'accueil employé");
         }
     }
 

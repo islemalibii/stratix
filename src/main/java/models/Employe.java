@@ -8,17 +8,23 @@ public class Employe {
     private String password;
     private String role;
     private String dateAjout;
-
-    // Champs supplémentaires optionnels (peuvent être null selon le rôle)
+    private String statut;
     private String department;
     private String poste;
     private String dateEmbauche;
     private double salaire;
     private String competences;
 
+    // Champs de sécurité
+    private int failedLoginAttempts;
+    private boolean accountLocked;
+    private String lockedUntil;
+    private boolean twoFactorEnabled;
+    private String twoFactorSecret;
+
     public Employe() {}
 
-    // Getters et Setters basiques
+    // Getters et Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -40,7 +46,9 @@ public class Employe {
     public String getDateAjout() { return dateAjout; }
     public void setDateAjout(String dateAjout) { this.dateAjout = dateAjout; }
 
-    // Champs optionnels
+    public String getStatut() { return statut; }
+    public void setStatut(String statut) { this.statut = statut; }
+
     public String getDepartment() { return department; }
     public void setDepartment(String department) { this.department = department; }
 
@@ -56,24 +64,24 @@ public class Employe {
     public String getCompetences() { return competences; }
     public void setCompetences(String competences) { this.competences = competences; }
 
+    public int getFailedLoginAttempts() { return failedLoginAttempts; }
+    public void setFailedLoginAttempts(int failedLoginAttempts) { this.failedLoginAttempts = failedLoginAttempts; }
+
+    public boolean isAccountLocked() { return accountLocked; }
+    public void setAccountLocked(boolean accountLocked) { this.accountLocked = accountLocked; }
+
+    public String getLockedUntil() { return lockedUntil; }
+    public void setLockedUntil(String lockedUntil) { this.lockedUntil = lockedUntil; }
+
+    public boolean isTwoFactorEnabled() { return twoFactorEnabled; }
+    public void setTwoFactorEnabled(boolean twoFactorEnabled) { this.twoFactorEnabled = twoFactorEnabled; }
+
+    public String getTwoFactorSecret() { return twoFactorSecret; }
+    public void setTwoFactorSecret(String twoFactorSecret) { this.twoFactorSecret = twoFactorSecret; }
+
     // Méthodes utilitaires
     public String getDisplayName() {
-        if (username != null && !username.isEmpty()) {
-            return username;
-        }
-        return "Employé " + id;
-    }
-
-    public String getFullInfo() {
-        StringBuilder info = new StringBuilder();
-        info.append(username);
-        if (poste != null && !poste.isEmpty()) {
-            info.append(" (").append(poste).append(")");
-        }
-        if (department != null && !department.isEmpty()) {
-            info.append(" - ").append(department);
-        }
-        return info.toString();
+        return username != null ? username : "Employé " + id;
     }
 
     @Override
