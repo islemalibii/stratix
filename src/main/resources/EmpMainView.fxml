@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controllers.EmpMainController"
+            style="-fx-background-color: linear-gradient(to bottom, #f0f9ff, #e6f0fa);">
+
+    <!-- Header simple SANS le label -->
+    <top>
+        <VBox style="-fx-background-color: #1e293b; -fx-padding: 20 30;">
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <Label text="👤 Espace Employé"
+                       style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;">
+                    <font><Font name="Segoe UI Bold" size="28"/></font>
+                </Label>
+
+                <!-- PLUS DE LABEL ICI -->
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button text="📋 Mes Tâches" onAction="#showMesTaches"
+                        style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 20; -fx-cursor: hand;"/>
+                <Button text="📅 Mon Planning" onAction="#showMonPlanning"
+                        style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 20; -fx-cursor: hand;"/>
+                <Button text="🔒 Déconnexion" onAction="#logout"
+                        style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 20; -fx-cursor: hand;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <StackPane fx:id="mainPane" />
+    </center>
+</BorderPane>

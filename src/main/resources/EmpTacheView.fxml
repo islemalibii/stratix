@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="20" style="-fx-padding: 30; -fx-background-color: #f8fafc;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.EmpTacheController">
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label style="-fx-font-size: 32px;" text="📋" />
+        <Label style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="TOUTES LES TÂCHES" />
+        <Region HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <TableView fx:id="tableTaches" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #e2e8f0;" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colTitre" prefWidth="200" text="Titre" />
+            <TableColumn fx:id="colDescription" prefWidth="300" text="Description" />
+            <TableColumn fx:id="colDeadline" prefWidth="100" text="Deadline" />
+            <TableColumn fx:id="colStatut" prefWidth="100" text="Statut" />
+            <TableColumn fx:id="colPriorite" prefWidth="80" text="Priorité" />
+            <TableColumn fx:id="colEmployeId" prefWidth="80" text="Employé ID" />
+        </columns>
+    </TableView>
+
+</VBox>
