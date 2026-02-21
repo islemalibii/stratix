@@ -44,6 +44,13 @@
                         <Label fx:id="descriptionLabel" styleClass="card-description" wrapText="true" />
                     </ScrollPane>
                 </VBox>
+                <Separator />
+
+                <VBox spacing="10">
+                    <Label text="Feedbacks :" styleClass="input-label" />
+
+                    <VBox fx:id="feedbackContainer" spacing="8" />
+                </VBox>
 
                 <HBox spacing="15" alignment="BOTTOM_RIGHT" style="-fx-padding: 10 0 0 0;">
                     <Button text="Modifier" onAction="#handleEdit" styleClass="btn-modify-card" prefWidth="180" prefHeight="40" />

@@ -6,15 +6,22 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import models.Evenement;
+import models.EventFeedback;
+import models.enums.EventStatus;
 import services.ServiceEvenemnet;
+import services.ServiceEventFeedback;
+
 import java.io.IOException;
+import java.util.List;
 
 public class EventDetailsAdminController {
 
     @FXML private ImageView eventImageView;
     @FXML private Label titleLabel, dateLabel, locationLabel, typeLabel, descriptionLabel, statusTextLabel, statusBadge;
+    @FXML private VBox feedbackContainer;
 
     private Evenement currentEvent;
     private ServiceEvenemnet service = new ServiceEvenemnet();
@@ -38,6 +45,16 @@ public class EventDetailsAdminController {
             statusBadge.getStyleClass().add("status-" + e.getStatut().name().toLowerCase());
         }
 
+        //load ratings if terminer l event
+        if (e.getStatut() == EventStatus.terminer) {
+            System.out.println("Event is TERMINE, loading feedbacks...");
+            loadFeedbacks(e.getId());
+        } else {
+            System.out.println("Event is not TERMINE, hiding feedbacks");
+            feedbackContainer.setVisible(false);
+        }
+
+
         try {
             String imagePath = (e.getImageUrl() == null || e.getImageUrl().isEmpty())
                     ? "/images/placeholder.png" : e.getImageUrl();
@@ -48,6 +65,27 @@ public class EventDetailsAdminController {
             eventImageView.setClip(clip);
         } catch (Exception ex) {
             System.out.println("Erreur image: " + ex.getMessage());
+        }
+    }
+
+    private void loadFeedbacks(int eventId) {
+        ServiceEventFeedback sf = new ServiceEventFeedback();
+        List<EventFeedback> feedbacks = sf.getByEvent(eventId);
+
+        System.out.println("Fetched feedbacks count: " + feedbacks.size());
+
+        feedbackContainer.getChildren().clear();
+
+        if (feedbacks.isEmpty()) {
+            Label empty = new Label("Aucun feedback pour cet événement.");
+            feedbackContainer.getChildren().add(empty);
+            return;
+        }
+
+        for (EventFeedback f : feedbacks) {
+            Label lbl = new Label("⭐ " + f.getRating() + " - " + f.getCommentaire());
+            lbl.setStyle("-fx-font-size:14; -fx-padding:5;");
+            feedbackContainer.getChildren().add(lbl);
         }
     }
 
