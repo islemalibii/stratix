@@ -5,53 +5,63 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox prefWidth="500.0" spacing="20.0" styleClass="form-container" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ModifierProjetController">
+<VBox prefWidth="550.0" spacing="15.0" styleClass="form-container" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ModifierProjetController">
     <padding>
-        <Insets top="30" right="30" bottom="30" left="30"/>
+        <Insets top="20" right="30" bottom="20" left="30"/>
     </padding>
 
     <children>
         <Label text="Modifier le Projet" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2d3748;" />
         <Separator prefWidth="200.0" />
 
-        <VBox spacing="8.0">
-            <Label text="Nom du projet" styleClass="input-label" />
+        <VBox spacing="5.0">
+            <Label text="Nom du projet" styleClass="input-label" style="-fx-font-weight: bold;" />
             <TextField fx:id="txtNom" styleClass="modern-input" promptText="Ex: Refonte Site Web" />
         </VBox>
 
-        <VBox spacing="8.0">
-            <Label text="Description" styleClass="input-label" />
-            <TextArea fx:id="txtDescription" prefHeight="100.0" styleClass="modern-input" wrapText="true" />
+        <VBox spacing="5.0">
+            <Label text="Description" styleClass="input-label" style="-fx-font-weight: bold;" />
+            <TextArea fx:id="txtDescription" prefHeight="80.0" styleClass="modern-input" wrapText="true" />
         </VBox>
 
-        <GridPane hgap="20.0" vgap="15.0">
+        <GridPane hgap="20.0" vgap="10.0">
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             </columnConstraints>
             <children>
-                <VBox spacing="8.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
                     <Label text="Date Début" styleClass="input-label" />
-                    <DatePicker fx:id="dateDebut" maxWidth="Infinity" styleClass="modern-datepicker" />
+                    <DatePicker fx:id="dateDebut" maxWidth="Infinity" />
                 </VBox>
-                <VBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                     <Label text="Date Fin" styleClass="input-label" />
-                    <DatePicker fx:id="dateFin" maxWidth="Infinity" styleClass="modern-datepicker" />
+                    <DatePicker fx:id="dateFin" maxWidth="Infinity" />
                 </VBox>
-                <VBox spacing="8.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <VBox spacing="5.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
                     <Label text="Budget (DT)" styleClass="input-label" />
-                    <TextField fx:id="txtBudget" styleClass="modern-input" />
+                    <TextField fx:id="txtBudget" />
                 </VBox>
-                <VBox spacing="8.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <VBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <Label text="Progression (%)" styleClass="input-label" />
-                    <TextField fx:id="txtProgression" styleClass="modern-input" />
+                    <TextField fx:id="txtProgression" />
                 </VBox>
             </children>
         </GridPane>
 
-        <VBox spacing="8.0">
-            <Label text="Statut du projet" styleClass="input-label" />
-            <ChoiceBox fx:id="comboStatut" maxWidth="Infinity" styleClass="modern-choicebox">
+        <VBox spacing="5.0">
+            <Label text="Chef de Projet (Responsable)" styleClass="input-label" style="-fx-font-weight: bold;" />
+            <ComboBox fx:id="cbResponsable" maxWidth="Infinity" promptText="Sélectionner le chef d'équipe" />
+        </VBox>
+
+        <VBox spacing="5.0">
+            <Label text="Membres de l'équipe (Ctrl + Clic pour modifier)" styleClass="input-label" style="-fx-font-weight: bold;" />
+            <ListView fx:id="lvMembres" prefHeight="100.0" />
+        </VBox>
+
+        <VBox spacing="5.0">
+            <Label text="Statut du projet" styleClass="input-label" style="-fx-font-weight: bold;" />
+            <ChoiceBox fx:id="comboStatut" maxWidth="Infinity">
                 <items>
                     <FXCollections fx:factory="observableArrayList">
                         <String fx:value="Planifié" />
@@ -64,8 +74,8 @@
         </VBox>
 
         <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-padding: 10 0 0 0;">
-            <Button onAction="#handleAnnuler" styleClass="btn-cancel" text="Annuler" />
-            <Button onAction="#handleEnregistrer" styleClass="btn-save" text="Enregistrer les modifications" />
+            <Button onAction="#handleAnnuler" style="-fx-background-color: #e2e8f0;" text="Annuler" />
+            <Button onAction="#handleEnregistrer" style="-fx-background-color: #3182ce; -fx-text-fill: white; -fx-font-weight: bold;" text="Enregistrer les modifications" />
         </HBox>
     </children>
 </VBox>
