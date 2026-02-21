@@ -17,38 +17,42 @@
             fx:controller="controllers.DashboardController"
             style="-fx-background-color: linear-gradient(to bottom, #f0f9ff, #e6f0fa);">
 
-    <!-- Header avec barre de recherche -->
+    <!-- Header avec barre de recherche et DÉCONNEXION -->
     <top>
         <VBox>
-            <!-- Bandeau supérieur avec dégradé et RECHERCHE -->
+            <!-- Bandeau supérieur avec dégradé -->
             <HBox alignment="CENTER_LEFT" style="-fx-background-color: linear-gradient(to right, #1e293b, #0f172a); -fx-padding: 25 35;">
                 <VBox spacing="8" HBox.hgrow="ALWAYS">
                     <Label text="📊 TABLEAU DE BORD"
                            style="-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold; -fx-letter-spacing: 1px;">
-                        <font>
-                            <Font name="Segoe UI Bold" size="32"/>
-                        </font>
+                        <font><Font name="Segoe UI Bold" size="32"/></font>
                     </Label>
                     <Label text="Vue d'ensemble de votre activité"
                            style="-fx-text-fill: #94a3b8; -fx-font-size: 16px;"/>
                 </VBox>
 
-                <!-- BARRE DE RECHERCHE -->
+                <!-- Barre de recherche -->
                 <HBox style="-fx-background-color: rgba(255,255,255,0.15); -fx-background-radius: 30; -fx-padding: 5 20; -fx-spacing: 10;" alignment="CENTER">
                     <Label text="🔍" style="-fx-text-fill: #94a3b8; -fx-font-size: 18px;"/>
-                    <TextField fx:id="searchField" promptText="Rechercher une tâche, un employé..."
+                    <TextField fx:id="searchField" promptText="Rechercher..."
                                style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: #94a3b8; -fx-border-color: transparent; -fx-font-size: 14px;"
                                prefWidth="250"/>
                 </HBox>
 
-                <!-- Badge de statut -->
-                <HBox style="-fx-background-color: rgba(255,255,255,0.15); -fx-background-radius: 50; -fx-padding: 12 25; -fx-spacing: 10;" alignment="CENTER">
-                    <Circle radius="6" fill="#4ade80"/>
-                    <Label text="Système opérationnel" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                <!-- Badge de statut et DÉCONNEXION -->
+                <HBox spacing="15" alignment="CENTER">
+                    <HBox style="-fx-background-color: rgba(255,255,255,0.15); -fx-background-radius: 50; -fx-padding: 12 25; -fx-spacing: 10;" alignment="CENTER">
+                        <Circle radius="6" fill="#4ade80"/>
+                        <Label text="Système opérationnel" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                    </HBox>
+
+                    <!-- BOUTON DÉCONNEXION -->
+                    <Button text="🔒 Déconnexion" onAction="#logout"
+                            style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 30; -fx-cursor: hand;"/>
                 </HBox>
             </HBox>
 
-            <!-- Sous-header avec indicateurs - CORRIGÉ avec les bons fx:id -->
+            <!-- Sous-header avec indicateurs -->
             <HBox style="-fx-background-color: white; -fx-padding: 15 35; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 0);" spacing="40">
                 <HBox spacing="15" alignment="CENTER_LEFT">
                     <Circle radius="20" fill="#3b82f6" opacity="0.15"/>
@@ -104,8 +108,6 @@
                            style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-background-color: white; -fx-padding: 10 20; -fx-background-radius: 50; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 0);"/>
 
                     <HBox spacing="20" style="-fx-alignment: center;">
-
-                        <!-- Carte Total Tâches -->
                         <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5); -fx-min-width: 200; -fx-min-height: 180;" HBox.hgrow="ALWAYS">
                             <HBox alignment="CENTER_LEFT" spacing="15">
                                 <Circle radius="30" fill="#3b82f6" opacity="0.15"/>
@@ -114,8 +116,6 @@
                             <Label text="Total Tâches" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                             <Label fx:id="lblTotalTaches" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
                         </VBox>
-
-                        <!-- Carte En cours -->
                         <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5); -fx-min-width: 200; -fx-min-height: 180;" HBox.hgrow="ALWAYS">
                             <HBox alignment="CENTER_LEFT" spacing="15">
                                 <Circle radius="30" fill="#f59e0b" opacity="0.15"/>
@@ -124,8 +124,6 @@
                             <Label text="En cours" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                             <Label fx:id="lblEnCours" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
                         </VBox>
-
-                        <!-- Carte Terminées -->
                         <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5); -fx-min-width: 200; -fx-min-height: 180;" HBox.hgrow="ALWAYS">
                             <HBox alignment="CENTER_LEFT" spacing="15">
                                 <Circle radius="30" fill="#10b981" opacity="0.15"/>
@@ -134,8 +132,6 @@
                             <Label text="Terminées" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                             <Label fx:id="lblTerminees" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
                         </VBox>
-
-                        <!-- Carte À faire -->
                         <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5); -fx-min-width: 200; -fx-min-height: 180;" HBox.hgrow="ALWAYS">
                             <HBox alignment="CENTER_LEFT" spacing="15">
                                 <Circle radius="30" fill="#f59e0b" opacity="0.15"/>
@@ -153,8 +149,6 @@
                            style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-background-color: white; -fx-padding: 10 20; -fx-background-radius: 50; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 0);"/>
 
                     <HBox spacing="20" style="-fx-alignment: center;">
-
-                        <!-- Carte Total Employés -->
                         <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5); -fx-min-width: 200; -fx-min-height: 180;" HBox.hgrow="ALWAYS">
                             <HBox alignment="CENTER_LEFT" spacing="15">
                                 <Circle radius="30" fill="#8b5cf6" opacity="0.15"/>
@@ -163,8 +157,6 @@
                             <Label text="Total Employés" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                             <Label fx:id="lblTotalEmployes" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #8b5cf6;"/>
                         </VBox>
-
-                        <!-- Carte En poste -->
                         <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5); -fx-min-width: 200; -fx-min-height: 180;" HBox.hgrow="ALWAYS">
                             <HBox alignment="CENTER_LEFT" spacing="15">
                                 <Circle radius="30" fill="#10b981" opacity="0.15"/>
@@ -173,8 +165,6 @@
                             <Label text="En poste" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                             <Label fx:id="lblEnPoste" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
                         </VBox>
-
-                        <!-- Carte Absents -->
                         <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5); -fx-min-width: 200; -fx-min-height: 180;" HBox.hgrow="ALWAYS">
                             <HBox alignment="CENTER_LEFT" spacing="15">
                                 <Circle radius="30" fill="#ef4444" opacity="0.15"/>
@@ -183,8 +173,6 @@
                             <Label text="Absents" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                             <Label fx:id="lblAbsents" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #ef4444;"/>
                         </VBox>
-
-                        <!-- Carte En retard -->
                         <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5); -fx-min-width: 200; -fx-min-height: 180;" HBox.hgrow="ALWAYS">
                             <HBox alignment="CENTER_LEFT" spacing="15">
                                 <Circle radius="30" fill="#ef4444" opacity="0.15"/>
@@ -203,7 +191,6 @@
                         <Label text="📊 RÉPARTITION DES TÂCHES" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
 
                         <HBox spacing="30" alignment="CENTER">
-                            <!-- Légende -->
                             <VBox spacing="15">
                                 <HBox spacing="15" alignment="CENTER_LEFT">
                                     <Rectangle width="20" height="20" fill="#f59e0b" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
@@ -221,8 +208,6 @@
                                     <Label fx:id="lblTermineesGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
                                 </HBox>
                             </VBox>
-
-                            <!-- Barres de progression -->
                             <HBox spacing="20" alignment="BOTTOM_CENTER" prefHeight="120">
                                 <VBox alignment="BOTTOM_CENTER" spacing="5">
                                     <Rectangle fx:id="barAFaire" width="40" height="0" style="-fx-fill: #f59e0b; -fx-arc-width: 10; -fx-arc-height: 10;"/>
@@ -240,7 +225,7 @@
                         </HBox>
                     </VBox>
 
-                    <!-- Citation du jour (NOUVEAU) -->
+                    <!-- Citation du jour -->
                     <VBox spacing="15" style="-fx-background-color: linear-gradient(to right, #667eea, #764ba2); -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 0);" prefWidth="300">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <Label text="💬" style="-fx-font-size: 28px; -fx-text-fill: white;"/>

@@ -1,10 +1,14 @@
 package controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 
 import services.StatsService;
 import services.SERVICETache;
@@ -14,6 +18,7 @@ import models.DashboardStats;
 import models.Tache;
 import models.Employe;
 import api.QuoteAPI;
+import utiles.SessionManager;
 
 import java.net.URL;
 import java.util.List;
@@ -176,7 +181,40 @@ public class DashboardController implements Initializable {
         }
     }
 
-    @FXML private void openTaches() { MainController.showTaches(); }
-    @FXML private void openPlanning() { MainController.showPlanning(); }
-    @FXML private void openCalendar() { MainController.showCalendar(); }
+    @FXML
+    private void openTaches() {
+        System.out.println("🔄 Navigation vers Tâches");
+        MainController.showTaches();
+    }
+
+    @FXML
+    private void openPlanning() {
+        System.out.println("🔄 Navigation vers Planning");
+        MainController.showPlanning();
+    }
+
+    @FXML
+    private void openCalendar() {
+        System.out.println("🔄 Navigation vers Calendrier");
+        MainController.showCalendar();
+    }
+
+    // NOUVELLE MÉTHODE DE DÉCONNEXION
+    @FXML
+    private void logout() {
+        try {
+            System.out.println("🔒 Déconnexion...");
+            SessionManager.logout();
+
+            Parent root = FXMLLoader.load(getClass().getResource("/PagePrincipaleView.fxml"));
+            Stage stage = (Stage) lblTotalTaches.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setMaximized(true);
+            stage.show();
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur lors de la déconnexion: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
