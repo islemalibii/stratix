@@ -7,7 +7,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -60,52 +59,74 @@ public class ProduitController {
         listViewProduits.setCellFactory(param -> new ListCell<produit>() {
             private final ImageView imageView = new ImageView();
             private final GridPane gridPane = new GridPane();
+            private final VBox contentBox = new VBox(5);
             private final HBox cellBox = new HBox(15);
 
             // Labels pour les noms d'attributs
             private final Label nomAttribut = new Label("Nom:");
+            private final Label typeAttribut = new Label("Type:");
             private final Label categorieAttribut = new Label("Catégorie:");
             private final Label prixAttribut = new Label("Prix:");
             private final Label stockAttribut = new Label("Stock:");
-            private final Label dateAttribut = new Label("Date:");
+            private final Label dateCreationAttribut = new Label("Date création:");
+            private final Label dateFabricationAttribut = new Label("Date fabrication:");
+            private final Label datePeremptionAttribut = new Label("Date péremption:");
+            private final Label dateGarantieAttribut = new Label("Garantie:");
             private final Label ressourcesAttribut = new Label("Ressources:");
 
             // Labels pour les valeurs
             private final Label nomValeur = new Label();
             private final Label descriptionValeur = new Label();
+            private final Label typeValeur = new Label();
             private final Label categorieValeur = new Label();
             private final Label prixValeur = new Label();
             private final Label stockValeur = new Label();
-            private final Label dateValeur = new Label();
+            private final Label dateCreationValeur = new Label();
+            private final Label dateFabricationValeur = new Label();
+            private final Label datePeremptionValeur = new Label();
+            private final Label dateGarantieValeur = new Label();
             private final Label ressourcesValeur = new Label();
+
+            // Label pour le statut
+            private final Label statutLabel = new Label();
 
             {
                 // Configuration de l'ImageView
-                imageView.setFitHeight(100);
-                imageView.setFitWidth(100);
+                imageView.setFitHeight(120);
+                imageView.setFitWidth(120);
                 imageView.setPreserveRatio(true);
                 imageView.setStyle("-fx-border-color: #ddd; -fx-border-width: 1; -fx-border-radius: 5;");
 
                 // Style pour les noms d'attributs
                 String attributStyle = "-fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-size: 12px;";
                 nomAttribut.setStyle(attributStyle);
+                typeAttribut.setStyle(attributStyle);
                 categorieAttribut.setStyle(attributStyle);
                 prixAttribut.setStyle(attributStyle);
                 stockAttribut.setStyle(attributStyle);
-                dateAttribut.setStyle(attributStyle);
+                dateCreationAttribut.setStyle(attributStyle);
+                dateFabricationAttribut.setStyle(attributStyle);
+                datePeremptionAttribut.setStyle(attributStyle);
+                dateGarantieAttribut.setStyle(attributStyle);
                 ressourcesAttribut.setStyle(attributStyle);
 
                 // Style pour les valeurs
                 String valeurStyle = "-fx-text-fill: #27ae60; -fx-font-size: 12px;";
-                nomValeur.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;");
+                nomValeur.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;");
                 descriptionValeur.setStyle("-fx-text-fill: #666; -fx-font-size: 11px; -fx-font-style: italic;");
+                typeValeur.setStyle(valeurStyle);
                 categorieValeur.setStyle(valeurStyle);
                 prixValeur.setStyle(valeurStyle);
-                dateValeur.setStyle(valeurStyle);
+                dateCreationValeur.setStyle(valeurStyle);
+                dateFabricationValeur.setStyle(valeurStyle);
+                datePeremptionValeur.setStyle(valeurStyle);
+                dateGarantieValeur.setStyle(valeurStyle);
                 ressourcesValeur.setStyle(valeurStyle);
 
+                statutLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+
                 descriptionValeur.setWrapText(true);
-                descriptionValeur.setMaxWidth(250);
+                descriptionValeur.setMaxWidth(300);
 
                 // Configuration du GridPane
                 gridPane.setHgap(10);
@@ -113,35 +134,69 @@ public class ProduitController {
                 gridPane.setPadding(new Insets(5));
 
                 // Ajout des composants au GridPane
+                int row = 0;
+
                 // Ligne 0: Nom
-                gridPane.add(nomAttribut, 0, 0);
-                gridPane.add(nomValeur, 1, 0);
-                gridPane.add(descriptionValeur, 1, 1);
-                GridPane.setColumnSpan(descriptionValeur, 2);
+                gridPane.add(nomAttribut, 0, row);
+                gridPane.add(nomValeur, 1, row);
+                row++;
 
-                // Ligne 2: Catégorie
-                gridPane.add(categorieAttribut, 0, 2);
-                gridPane.add(categorieValeur, 1, 2);
+                // Ligne 1: Description (occupe 2 colonnes)
+                gridPane.add(descriptionValeur, 0, row, 2, 1);
+                row++;
 
-                // Ligne 3: Prix
-                gridPane.add(prixAttribut, 0, 3);
-                gridPane.add(prixValeur, 1, 3);
+                // Ligne 2: Type
+                gridPane.add(typeAttribut, 0, row);
+                gridPane.add(typeValeur, 1, row);
+                row++;
 
-                // Ligne 4: Stock
-                gridPane.add(stockAttribut, 0, 4);
-                gridPane.add(stockValeur, 1, 4);
+                // Ligne 3: Catégorie
+                gridPane.add(categorieAttribut, 0, row);
+                gridPane.add(categorieValeur, 1, row);
+                row++;
 
-                // Ligne 5: Date
-                gridPane.add(dateAttribut, 0, 5);
-                gridPane.add(dateValeur, 1, 5);
+                // Ligne 4: Prix
+                gridPane.add(prixAttribut, 0, row);
+                gridPane.add(prixValeur, 1, row);
+                row++;
 
-                // Ligne 6: Ressources
-                gridPane.add(ressourcesAttribut, 0, 6);
-                gridPane.add(ressourcesValeur, 1, 6);
+                // Ligne 5: Stock
+                gridPane.add(stockAttribut, 0, row);
+                gridPane.add(stockValeur, 1, row);
+                row++;
 
-                cellBox.getChildren().addAll(imageView, gridPane);
-                cellBox.setStyle("-fx-padding: 10; -fx-border-color: transparent transparent #ecf0f1 transparent;");
-                cellBox.setSpacing(15);
+                // Ligne 6: Date création
+                gridPane.add(dateCreationAttribut, 0, row);
+                gridPane.add(dateCreationValeur, 1, row);
+                row++;
+
+                // Ligne 7: Date fabrication
+                gridPane.add(dateFabricationAttribut, 0, row);
+                gridPane.add(dateFabricationValeur, 1, row);
+                row++;
+
+                // Ligne 8: Date péremption
+                gridPane.add(datePeremptionAttribut, 0, row);
+                gridPane.add(datePeremptionValeur, 1, row);
+                row++;
+
+                // Ligne 9: Date garantie
+                gridPane.add(dateGarantieAttribut, 0, row);
+                gridPane.add(dateGarantieValeur, 1, row);
+                row++;
+
+                // Ligne 10: Ressources
+                gridPane.add(ressourcesAttribut, 0, row);
+                gridPane.add(ressourcesValeur, 1, row);
+                row++;
+
+                // Ajouter le statut dans une VBox séparée
+                contentBox.getChildren().addAll(gridPane, statutLabel);
+                contentBox.setSpacing(10);
+
+                cellBox.getChildren().addAll(imageView, contentBox);
+                cellBox.setStyle("-fx-padding: 15; -fx-border-color: transparent transparent #ecf0f1 transparent; -fx-background-color: white;");
+                cellBox.setSpacing(20);
             }
 
             @Override
@@ -152,38 +207,100 @@ public class ProduitController {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    // Remplir les valeurs
+                    // Remplir les valeurs de base
                     nomValeur.setText(produit.getNom());
 
                     String description = produit.getDescription();
-                    if (description != null && description.length() > 50) {
-                        description = description.substring(0, 47) + "...";
+                    if (description != null && description.length() > 80) {
+                        description = description.substring(0, 77) + "...";
                     }
                     descriptionValeur.setText(description != null ? description : "Pas de description");
 
+                    typeValeur.setText(produit.getType_produit() != null ? produit.getType_produit() : "Non spécifié");
                     categorieValeur.setText(produit.getCategorie() != null ? produit.getCategorie() : "Non spécifiée");
                     prixValeur.setText(String.format("%.2f DT", produit.getPrix()));
 
+                    // Stock avec couleur
                     String stockText = String.format("%d (min: %d)",
                             produit.getStock_actuel(), produit.getStock_min());
                     stockValeur.setText(stockText);
 
                     if (produit.getStock_actuel() <= produit.getStock_min()) {
-                        stockValeur.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+                        stockValeur.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-font-size: 12px;");
                     } else {
-                        stockValeur.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                        stockValeur.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 12px;");
                     }
 
-                    dateValeur.setText(produit.getDate_creation() != null ? produit.getDate_creation() : "Non spécifiée");
+                    // Dates
+                    dateCreationValeur.setText(produit.getDate_creation() != null ? produit.getDate_creation() : "Non spécifiée");
+                    dateFabricationValeur.setText(produit.getDate_fabrication() != null ? produit.getDate_fabrication() : "Non spécifiée");
 
+                    // Date péremption avec statut
+                    if (produit.getDate_peremption() != null) {
+                        datePeremptionValeur.setText(produit.getDate_peremption());
+                        if (produit.estPerime()) {
+                            datePeremptionValeur.setStyle("-fx-text-fill: red; -fx-font-weight: bold; -fx-font-size: 12px;");
+                        } else if (produit.estBientotPerime(30)) {
+                            datePeremptionValeur.setStyle("-fx-text-fill: orange; -fx-font-weight: bold; -fx-font-size: 12px;");
+                        } else {
+                            datePeremptionValeur.setStyle("-fx-text-fill: green; -fx-font-size: 12px;");
+                        }
+                    } else {
+                        datePeremptionValeur.setText("Non spécifiée");
+                        datePeremptionValeur.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
+                    }
+
+                    // Date garantie avec statut
+                    if (produit.getDate_garantie() != null) {
+                        dateGarantieValeur.setText(produit.getDate_garantie());
+                        if (produit.garantieExpiree()) {
+                            dateGarantieValeur.setStyle("-fx-text-fill: red; -fx-font-weight: bold; -fx-font-size: 12px;");
+                        } else {
+                            dateGarantieValeur.setStyle("-fx-text-fill: #27ae60; -fx-font-size: 12px;");
+                        }
+                    } else {
+                        dateGarantieValeur.setText("Non spécifiée");
+                        dateGarantieValeur.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
+                    }
+
+                    // Ressources
                     String ressources = produit.getRessources_necessaires();
-                    if (ressources != null && ressources.length() > 30) {
-                        ressources = ressources.substring(0, 27) + "...";
+                    if (ressources != null && ressources.length() > 50) {
+                        ressources = ressources.substring(0, 47) + "...";
                     }
                     ressourcesValeur.setText(ressources != null ? ressources : "Aucune");
 
+                    // Statut global du produit
+                    String statut = "";
+                    String statutStyle = "";
+
+                    if (produit.estPerime()) {
+                        statut = "⚠ PRODUIT PÉRIMÉ ⚠";
+                        statutStyle = "-fx-background-color: #ffebee; -fx-text-fill: #c62828; -fx-padding: 5; -fx-background-radius: 5;";
+                    } else if (produit.estBientotPerime(30)) {
+                        statut = "⚠ Bientôt périmé (moins de 30 jours)";
+                        statutStyle = "-fx-background-color: #fff3e0; -fx-text-fill: #ef6c00; -fx-padding: 5; -fx-background-radius: 5;";
+                    } else if (produit.garantieExpiree()) {
+                        statut = "⚠ Garantie expirée";
+                        statutStyle = "-fx-background-color: #ffebee; -fx-text-fill: #c62828; -fx-padding: 5; -fx-background-radius: 5;";
+                    } else if (produit.getStock_actuel() <= produit.getStock_min()) {
+                        statut = "⚠ Stock faible";
+                        statutStyle = "-fx-background-color: #fff3e0; -fx-text-fill: #ef6c00; -fx-padding: 5; -fx-background-radius: 5;";
+                    } else {
+                        statut = "✓ Produit en bon état";
+                        statutStyle = "-fx-background-color: #e8f5e8; -fx-text-fill: #2e7d32; -fx-padding: 5; -fx-background-radius: 5;";
+                    }
+
+                    statutLabel.setText(statut);
+                    statutLabel.setStyle(statutStyle);
+                    statutLabel.setMaxWidth(Double.MAX_VALUE);
+                    statutLabel.setAlignment(javafx.geometry.Pos.CENTER);
+
                     // Charger l'image
                     chargerImageProduit(produit, imageView);
+
+                    // Ajouter le tooltip pour l'image
+                    ajouterTooltipImage(imageView, produit);
 
                     setGraphic(cellBox);
                 }
@@ -281,38 +398,45 @@ public class ProduitController {
     private void mettreAJourStatistiques() {
         int total = produitsList.size();
         int stockFaible = 0;
+        int produitsPerimes = 0;
+        int produitsBientotPerimes = 0;
         double valeurStock = 0;
 
         for (produit p : produitsList) {
             if (p.getStock_actuel() <= p.getStock_min()) {
                 stockFaible++;
             }
+            if (p.estPerime()) {
+                produitsPerimes++;
+            }
+            if (p.estBientotPerime(30)) {
+                produitsBientotPerimes++;
+            }
             valeurStock += p.getPrix() * p.getStock_actuel();
         }
 
         statsTotal.setText("Total produits: " + total);
         statsStockFaible.setText("Stock faible: " + stockFaible);
-        statsValeurStock.setText(String.format("Valeur stock: %.2f DT", valeurStock));
+
+        String statsCompletes = String.format("Valeur stock: %.2f DT | Périmés: %d | Bientôt périmés: %d",
+                valeurStock, produitsPerimes, produitsBientotPerimes);
+        statsValeurStock.setText(statsCompletes);
     }
 
     /**
      * Ouvre le formulaire d'ajout de produit
-     * CORRECTION: Utilise ajouterProduit.fxml au lieu de FormulaireProduit.fxml
      */
     @FXML
     private void ouvrirAjoutProduit() {
         try {
-            // Charger le bon fichier FXML - ajouterProduit.fxml
             URL fxmlUrl = getClass().getResource("/fxml/ajouterProduit.fxml");
             if (fxmlUrl == null) {
-                // Essayer sans le dossier fxml
                 fxmlUrl = getClass().getResource("/ajouterProduit.fxml");
             }
 
             if (fxmlUrl == null) {
                 showAlert(Alert.AlertType.ERROR, "Erreur",
-                        "Fichier ajouterProduit.fxml introuvable!\n" +
-                                "Vérifiez qu'il est dans src/main/resources/fxml/");
+                        "Fichier ajouterProduit.fxml introuvable!");
                 return;
             }
 
@@ -337,7 +461,6 @@ public class ProduitController {
 
     /**
      * Ouvre le formulaire de modification de produit
-     * CORRECTION: Utilise ajouterProduit.fxml au lieu de FormulaireProduit.fxml
      */
     @FXML
     private void ouvrirModifierProduit() {
@@ -348,7 +471,6 @@ public class ProduitController {
         }
 
         try {
-            // Charger le bon fichier FXML - ajouterProduit.fxml
             URL fxmlUrl = getClass().getResource("/fxml/ajouterProduit.fxml");
             if (fxmlUrl == null) {
                 fxmlUrl = getClass().getResource("/ajouterProduit.fxml");
@@ -407,12 +529,9 @@ public class ProduitController {
                     }
                 }
 
-                // Supprimer le produit
                 serviceProduit.delete(selected);
-
                 rafraichirListe();
-                showAlert(Alert.AlertType.INFORMATION, "Succès",
-                        "Produit supprimé avec succès");
+                showAlert(Alert.AlertType.INFORMATION, "Succès", "Produit supprimé avec succès");
 
             } catch (Exception e) {
                 showAlert(Alert.AlertType.ERROR, "Erreur",

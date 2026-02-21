@@ -12,8 +12,6 @@ import models.produit;
 import service.service_produit;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,7 +48,7 @@ public class FormulaireProduitController {
     @FXML
     private Button btnValider;
 
-    // Nouveaux composants pour l'image
+    // Composants pour l'image
     @FXML
     private ImageView imageView;
     @FXML
@@ -59,6 +57,18 @@ public class FormulaireProduitController {
     private Button btnSupprimerImage;
     @FXML
     private Label cheminImageLabel;
+
+    // NOUVEAUX COMPOSANTS
+    @FXML
+    private ComboBox<String> typeProduitCombo;
+    @FXML
+    private DatePicker dateFabricationPicker;
+    @FXML
+    private DatePicker datePeremptionPicker;
+    @FXML
+    private DatePicker dateGarantiePicker;
+    @FXML
+    private Label statutPeremptionLabel;
 
     private service_produit serviceProduit = new service_produit();
     private Runnable onProduitAjoute;
@@ -75,7 +85,7 @@ public class FormulaireProduitController {
 
     @FXML
     public void initialize() {
-        // Initialisation de la ComboBox
+        // Initialisation de la ComboBox des catégories
         categorieCombo.setItems(FXCollections.observableArrayList(categoriesPredifinies));
 
         // Cacher le champ de catégorie personnalisée au démarrage
@@ -92,6 +102,33 @@ public class FormulaireProduitController {
             } else {
                 autreCategorieContainer.setVisible(false);
                 autreCategorieContainer.setManaged(false);
+            }
+        });
+
+        // Initialisation de la ComboBox des types de produit
+        typeProduitCombo.setItems(FXCollections.observableArrayList(
+                "Général", "Alimentaire", "Médicament", "Électronique", "Cosmétique", "Autre"
+        ));
+
+        // Listener pour changer les champs selon le type
+        typeProduitCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if ("Alimentaire".equals(newVal) || "Médicament".equals(newVal) || "Cosmétique".equals(newVal)) {
+                // Ces types ont une date de péremption
+                datePeremptionPicker.setDisable(false);
+                datePeremptionPicker.setPromptText("Date de péremption");
+                dateGarantiePicker.setDisable(true);
+                dateGarantiePicker.setValue(null);
+            } else if ("Électronique".equals(newVal)) {
+                // Ces types ont une date de garantie
+                dateGarantiePicker.setDisable(false);
+                dateGarantiePicker.setPromptText("Date de fin de garantie");
+                datePeremptionPicker.setDisable(true);
+                datePeremptionPicker.setValue(null);
+            } else {
+                datePeremptionPicker.setDisable(true);
+                datePeremptionPicker.setValue(null);
+                dateGarantiePicker.setDisable(true);
+                dateGarantiePicker.setValue(null);
             }
         });
 
@@ -119,26 +156,21 @@ public class FormulaireProduitController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choisir une image");
 
-        // Filtrer pour n'afficher que les images
         FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter(
                 "Images", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp");
         fileChooser.getExtensionFilters().add(imageFilter);
 
-        // Afficher la boîte de dialogue
         File file = fileChooser.showOpenDialog(btnChoisirImage.getScene().getWindow());
 
         if (file != null) {
             selectedImageFile = file;
 
-            // Afficher un aperçu de l'image
             try {
                 Image image = new Image(file.toURI().toString());
                 imageView.setImage(image);
                 imageView.setFitHeight(150);
                 imageView.setFitWidth(150);
                 imageView.setPreserveRatio(true);
-
-                // Afficher le nom du fichier
                 cheminImageLabel.setText(file.getName());
             } catch (Exception e) {
                 showAlert(Alert.AlertType.ERROR, "Erreur",
@@ -167,7 +199,6 @@ public class FormulaireProduitController {
         }
 
         try {
-            // Créer un nom de fichier unique basé sur l'ID et le nom original
             String extension = "";
             String fileName = sourceFile.getName();
             int dotIndex = fileName.lastIndexOf('.');
@@ -178,7 +209,6 @@ public class FormulaireProduitController {
             String newFileName = "produit_" + produitId + "_" + System.currentTimeMillis() + extension;
             Path destinationPath = Paths.get(IMAGES_DIRECTORY, newFileName);
 
-            // Copier le fichier
             Files.copy(sourceFile.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
 
             return destinationPath.toString();
@@ -195,6 +225,7 @@ public class FormulaireProduitController {
         titreFormulaire.setText("Ajouter un produit");
         btnValider.setText("Ajouter");
         dateCreationPicker.setValue(LocalDate.now());
+        dateCreationPicker.setDisable(true); // Date système automatique
 
         // Réinitialiser les champs
         idField.clear();
@@ -208,6 +239,15 @@ public class FormulaireProduitController {
         stockActuelField.clear();
         stockMinField.clear();
         ressourcesField.clear();
+
+        // Réinitialiser les nouveaux champs
+        typeProduitCombo.getSelectionModel().clearSelection();
+        dateFabricationPicker.setValue(null);
+        datePeremptionPicker.setValue(null);
+        dateGarantiePicker.setValue(null);
+        datePeremptionPicker.setDisable(true);
+        dateGarantiePicker.setDisable(true);
+        statutPeremptionLabel.setText("");
 
         // Réinitialiser l'image
         supprimerImage();
@@ -247,10 +287,50 @@ public class FormulaireProduitController {
         prixField.setText(String.valueOf(p.getPrix()));
         stockActuelField.setText(String.valueOf(p.getStock_actuel()));
         stockMinField.setText(String.valueOf(p.getStock_min()));
+
+        // Date de création (non modifiable)
         if (p.getDate_creation() != null) {
             dateCreationPicker.setValue(LocalDate.parse(p.getDate_creation()));
+            dateCreationPicker.setDisable(true);
         }
+
         ressourcesField.setText(p.getRessources_necessaires());
+
+        // NOUVEAUX CHAMPS
+        if (p.getType_produit() != null) {
+            typeProduitCombo.setValue(p.getType_produit());
+        }
+
+        if (p.getDate_fabrication() != null) {
+            dateFabricationPicker.setValue(LocalDate.parse(p.getDate_fabrication()));
+        }
+
+        if (p.getDate_peremption() != null) {
+            datePeremptionPicker.setValue(LocalDate.parse(p.getDate_peremption()));
+            datePeremptionPicker.setDisable(false);
+
+            // Afficher le statut de péremption
+            if (p.estPerime()) {
+                statutPeremptionLabel.setText("PÉRIMÉ");
+                statutPeremptionLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            } else if (p.estBientotPerime(30)) {
+                statutPeremptionLabel.setText("Bientôt périmé (moins de 30 jours)");
+                statutPeremptionLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
+            } else {
+                statutPeremptionLabel.setText("Valide");
+                statutPeremptionLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+            }
+        }
+
+        if (p.getDate_garantie() != null) {
+            dateGarantiePicker.setValue(LocalDate.parse(p.getDate_garantie()));
+            dateGarantiePicker.setDisable(false);
+
+            if (p.garantieExpiree()) {
+                statutPeremptionLabel.setText("GARANTIE EXPIRÉE");
+                statutPeremptionLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            }
+        }
 
         // Charger l'image si elle existe
         currentImagePath = p.getImage_path();
@@ -314,21 +394,38 @@ public class FormulaireProduitController {
             p.setDate_creation(dateCreationPicker.getValue().toString());
             p.setRessources_necessaires(ressourcesField.getText().trim());
 
+            // NOUVEAUX CHAMPS
+            p.setType_produit(typeProduitCombo.getValue());
+
+            if (dateFabricationPicker.getValue() != null) {
+                p.setDate_fabrication(dateFabricationPicker.getValue().toString());
+            }
+
+            if (datePeremptionPicker.getValue() != null) {
+                p.setDate_peremption(datePeremptionPicker.getValue().toString());
+            }
+
+            if (dateGarantiePicker.getValue() != null) {
+                p.setDate_garantie(dateGarantiePicker.getValue().toString());
+            }
+
+            // Validation des dates
+            if (!validerDates(p)) {
+                return;
+            }
+
             if (isNewProduct) {
                 // Ajout d'un nouveau produit
                 if (selectedImageFile != null) {
-                    // Étape 1: Ajouter le produit sans image d'abord
-                    p.setImage_path(null); // Important: mettre à null pour l'insertion
-                    serviceProduit.add(p); // L'ID est maintenant généré
+                    p.setImage_path(null);
+                    serviceProduit.add(p);
 
-                    // Étape 2: Copier l'image avec l'ID généré
                     String imagePath = copyImageToAppDirectory(selectedImageFile, p.getId());
                     if (imagePath != null) {
                         p.setImage_path(imagePath);
-                        serviceProduit.update(p); // Mise à jour avec l'image
+                        serviceProduit.update(p);
                     }
                 } else {
-                    // Ajout sans image
                     p.setImage_path(null);
                     serviceProduit.add(p);
                 }
@@ -337,11 +434,9 @@ public class FormulaireProduitController {
             } else {
                 // Modification du produit
                 if (selectedImageFile != null) {
-                    // Nouvelle image sélectionnée
                     String imagePath = copyImageToAppDirectory(selectedImageFile, p.getId());
                     p.setImage_path(imagePath);
                 } else {
-                    // Conserver l'image existante
                     p.setImage_path(currentImagePath);
                 }
 
@@ -360,6 +455,37 @@ public class FormulaireProduitController {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Valide les dates entre elles
+     */
+    private boolean validerDates(produit p) {
+        // Validation date fabrication
+        if (p.getDate_fabrication() != null) {
+            LocalDate dateFab = LocalDate.parse(p.getDate_fabrication());
+            if (dateFab.isAfter(LocalDate.now())) {
+                showAlert(Alert.AlertType.ERROR, "Erreur",
+                        "La date de fabrication ne peut pas être dans le futur");
+                return false;
+            }
+        }
+
+        // Validation date péremption
+        if (p.getDate_peremption() != null) {
+            LocalDate datePer = LocalDate.parse(p.getDate_peremption());
+            if (p.getDate_fabrication() != null) {
+                LocalDate dateFab = LocalDate.parse(p.getDate_fabrication());
+                if (datePer.isBefore(dateFab)) {
+                    showAlert(Alert.AlertType.ERROR, "Erreur",
+                            "La date de péremption doit être après la date de fabrication");
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     @FXML
     private void annulerFormulaire() {
         fermerFormulaire();
@@ -382,28 +508,37 @@ public class FormulaireProduitController {
             return false;
         }
 
+        if (typeProduitCombo.getValue() == null) {
+            showAlert(Alert.AlertType.ERROR, "Erreur", "Le type de produit est obligatoire");
+            return false;
+        }
+
         try {
             Double.parseDouble(prixField.getText().trim());
         } catch (NumberFormatException e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Le prix doit être un nombre valide");
             return false;
         }
+
         try {
             Integer.parseInt(stockActuelField.getText().trim());
         } catch (NumberFormatException e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Le stock actuel doit être un nombre valide");
             return false;
         }
+
         try {
             Integer.parseInt(stockMinField.getText().trim());
         } catch (NumberFormatException e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Le stock minimum doit être un nombre valide");
             return false;
         }
+
         if (dateCreationPicker.getValue() == null) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "La date de création est obligatoire");
             return false;
         }
+
         return true;
     }
 

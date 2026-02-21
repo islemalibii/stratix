@@ -126,6 +126,32 @@
                     <TextArea fx:id="ressourcesField" promptText="Ressources nécessaires..."
                               prefRowCount="2" wrapText="true"
                               GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+                    <!-- Ligne 9: Type de produit -->
+                    <Label text="Type produit :" style="-fx-font-weight: bold;"
+                           GridPane.rowIndex="9" GridPane.columnIndex="0"/>
+                    <ComboBox fx:id="typeProduitCombo" promptText="Choisir le type"
+                              prefWidth="300"
+                              GridPane.rowIndex="9" GridPane.columnIndex="1"/>
+
+                    <!-- Ligne 10: Date fabrication -->
+                    <Label text="Date fabrication :" style="-fx-font-weight: bold;"
+                           GridPane.rowIndex="10" GridPane.columnIndex="0"/>
+                    <DatePicker fx:id="dateFabricationPicker" promptText="jj/mm/aaaa"
+                                GridPane.rowIndex="10" GridPane.columnIndex="1"/>
+
+                    <!-- Ligne 11: Date péremption -->
+                    <Label text="Date péremption :" style="-fx-font-weight: bold;"
+                           GridPane.rowIndex="11" GridPane.columnIndex="0"/>
+                    <VBox GridPane.rowIndex="11" GridPane.columnIndex="1" spacing="5">
+                        <DatePicker fx:id="datePeremptionPicker" promptText="jj/mm/aaaa" maxWidth="Infinity"/>
+                        <Label fx:id="statutPeremptionLabel" text="" style="-fx-font-size: 11px;"/>
+                    </VBox>
+
+                    <!-- Ligne 12: Date garantie -->
+                    <Label text="Date garantie :" style="-fx-font-weight: bold;"
+                           GridPane.rowIndex="12" GridPane.columnIndex="0"/>
+                    <DatePicker fx:id="dateGarantiePicker" promptText="jj/mm/aaaa"
+                                GridPane.rowIndex="12" GridPane.columnIndex="1"/>
                 </GridPane>
 
                 <!-- Séparateur -->
