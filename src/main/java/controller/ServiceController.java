@@ -1,10 +1,15 @@
 package controller;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -16,19 +21,16 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import model.Service;
 import service.PDFService;
 import service.ServiceService;
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.ResourceBundle;
 
 public class ServiceController implements Initializable {
 
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filterType;
-    @FXML private VBox servicesContainer;
+    @FXML private GridPane servicesGrid;
     @FXML private Button btnArchives;
     @FXML private Button btnRetour;
 
@@ -55,39 +57,81 @@ public class ServiceController implements Initializable {
             } else {
                 allServices = serviceService.afficherAll();
             }
-            afficherLignes(allServices);
+            afficherCartes(allServices);
         } catch (SQLException e) {
             showAlert("Erreur", e.getMessage());
         }
     }
 
-    private void afficherLignes(List<Service> services) {
-        servicesContainer.getChildren().clear();
+    private void afficherCartes(List<Service> services) {
+        servicesGrid.getChildren().clear();
+
+        servicesGrid.getColumnConstraints().clear();
+        for (int i = 0; i < 3; i++) {
+            ColumnConstraints col = new ColumnConstraints();
+            col.setPercentWidth(33.33);
+            col.setHgrow(Priority.ALWAYS);
+            servicesGrid.getColumnConstraints().add(col);
+        }
+
+        int col = 0;
+        int row = 0;
+
         for (Service s : services) {
-            HBox row = new HBox(10);
-            row.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-border-color: #ecf0f1; -fx-border-width: 0 0 1 0; -fx-alignment: center-left;");
-            row.setPrefHeight(50);
+            VBox card = new VBox(12);
+            card.getStyleClass().add("service-card");
+            card.setMaxWidth(Double.MAX_VALUE);
+            card.setPrefWidth(Region.USE_COMPUTED_SIZE);
+
+            HBox header = new HBox(10);
+            header.getStyleClass().add("card-header");
+            header.setAlignment(Pos.CENTER_LEFT);
 
             Label titre = new Label(s.getTitre());
-            titre.setStyle("-fx-font-weight: bold; -fx-min-width: 150; -fx-text-fill: #2c3e50;");
-            titre.setPrefWidth(200);
+            titre.getStyleClass().add("card-title");
+
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
 
             String catName = (s.getCategorie() != null) ? s.getCategorie().getNom() : "Non catégorisé";
             Label categorie = new Label(catName);
-            categorie.setStyle("-fx-text-fill: #7f8c8d; -fx-font-style: italic; -fx-min-width: 100;");
-            categorie.setPrefWidth(120);
+            categorie.getStyleClass().add("card-category");
 
-            Label budget = new Label(String.format("%,.0f DT", s.getBudget()));
-            budget.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-min-width: 80;");
-            budget.setPrefWidth(120);
+            header.getChildren().addAll(titre, spacer, categorie);
 
-            Label dateDebut = new Label(s.getDateDebut());
-            dateDebut.setStyle("-fx-text-fill: #7f8c8d; -fx-min-width: 100;");
-            dateDebut.setPrefWidth(120);
+            VBox content = new VBox(8);
+            content.getStyleClass().add("card-content");
 
-            Label dateFin = new Label(s.getDateFin());
-            dateFin.setStyle("-fx-text-fill: #7f8c8d; -fx-min-width: 100;");
-            dateFin.setPrefWidth(120);
+            HBox budgetRow = new HBox(10);
+            budgetRow.getStyleClass().add("card-row");
+            budgetRow.setAlignment(Pos.CENTER_LEFT);
+
+            Label budgetLabel = new Label("💰 Budget:");
+            budgetLabel.getStyleClass().add("card-label");
+
+            Label budgetValue = new Label(String.format("%,.0f DT", s.getBudget()));
+            budgetValue.getStyleClass().add("card-budget");
+
+            budgetRow.getChildren().addAll(budgetLabel, budgetValue);
+
+            HBox periodRow = new HBox(10);
+            periodRow.getStyleClass().add("card-row");
+            periodRow.setAlignment(Pos.CENTER_LEFT);
+
+            Label periodLabel = new Label("📅 Période:");
+            periodLabel.getStyleClass().add("card-label");
+
+            Label periodValue = new Label(s.getDateDebut() + " → " + s.getDateFin());
+            periodValue.getStyleClass().add("card-value");
+
+            periodRow.getChildren().addAll(periodLabel, periodValue);
+
+            HBox respRow = new HBox(10);
+            respRow.getStyleClass().add("card-row");
+            respRow.setAlignment(Pos.CENTER_LEFT);
+
+            Label respLabel = new Label("👤 Responsable:");
+            respLabel.getStyleClass().add("card-label");
 
             String responsableNom = "Non assigné";
             if (s.getUtilisateurId() > 0) {
@@ -98,39 +142,43 @@ public class ServiceController implements Initializable {
                 }
             }
 
-            Label resp = new Label(responsableNom);
-            resp.setStyle("-fx-text-fill: #7f8c8d; -fx-min-width: 100; -fx-alignment: center;");
-            resp.setPrefWidth(100);
+            Label respValue = new Label(responsableNom);
+            respValue.getStyleClass().add("card-responsable");
 
-            Region spacer = new Region();
-            HBox.setHgrow(spacer, Priority.ALWAYS);
+            respRow.getChildren().addAll(respLabel, respValue);
 
-            HBox actions = new HBox(5);
+            content.getChildren().addAll(budgetRow, periodRow, respRow);
+
+            HBox actions = new HBox(10);
+            actions.getStyleClass().add("card-actions");
             actions.setAlignment(Pos.CENTER_RIGHT);
-            actions.setPrefWidth(200);
 
             if (modeArchive) {
                 Button btnDesarchiver = new Button("Restaurer");
-                btnDesarchiver.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;");
-                btnDesarchiver.setPrefWidth(90);
+                btnDesarchiver.getStyleClass().add("card-button-restore");
                 btnDesarchiver.setOnAction(e -> desarchiverService(s));
                 actions.getChildren().add(btnDesarchiver);
             } else {
                 Button btnArchiver = new Button("Archiver");
-                btnArchiver.setStyle("-fx-background-color: #7f8c8d; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;");
-                btnArchiver.setPrefWidth(80);
+                btnArchiver.getStyleClass().add("card-button-archive");
                 btnArchiver.setOnAction(e -> archiverService(s));
 
                 Button btnModifier = new Button("Modifier");
-                btnModifier.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;");
-                btnModifier.setPrefWidth(80);
+                btnModifier.getStyleClass().add("card-button-modify");
                 btnModifier.setOnAction(e -> ouvrirModification(s));
 
                 actions.getChildren().addAll(btnArchiver, btnModifier);
             }
 
-            row.getChildren().addAll(titre, categorie, budget, dateDebut, dateFin, resp, spacer, actions);
-            servicesContainer.getChildren().add(row);
+            card.getChildren().addAll(header, content, actions);
+
+            servicesGrid.add(card, col, row);
+
+            col++;
+            if (col >= 3) {
+                col = 0;
+                row++;
+            }
         }
     }
 
@@ -194,7 +242,7 @@ public class ServiceController implements Initializable {
             } else {
                 resultats = serviceService.rechercher(texteRecherche, categorieFiltre);
             }
-            afficherLignes(resultats);
+            afficherCartes(resultats);
         } catch (SQLException e) {
             showAlert("Erreur", "Erreur lors de la recherche: " + e.getMessage());
         }
@@ -236,12 +284,6 @@ public class ServiceController implements Initializable {
         }
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
     @FXML
     private void handleExporterPDF() {
         FileChooser fileChooser = new FileChooser();
@@ -251,7 +293,7 @@ public class ServiceController implements Initializable {
         fileChooser.setInitialFileName("rapport_services_" +
                 LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".pdf");
 
-        File file = fileChooser.showSaveDialog(servicesContainer.getScene().getWindow());
+        File file = fileChooser.showSaveDialog(servicesGrid.getScene().getWindow());
 
         if (file != null) {
             try {
@@ -261,5 +303,12 @@ public class ServiceController implements Initializable {
                 showAlert("Erreur", "Impossible d'exporter le PDF: " + e.getMessage());
             }
         }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
