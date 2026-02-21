@@ -7,8 +7,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -16,6 +18,7 @@ import javafx.stage.Stage;
 import models.produit;
 import service.service_produit;
 
+import javafx.geometry.Insets;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -56,37 +59,89 @@ public class ProduitController {
     private void configurerAffichageProduits() {
         listViewProduits.setCellFactory(param -> new ListCell<produit>() {
             private final ImageView imageView = new ImageView();
-            private final Label nomLabel = new Label();
-            private final Label descriptionLabel = new Label();
-            private final Label prixLabel = new Label();
-            private final Label stockLabel = new Label();
-            private final VBox infoBox = new VBox(5);
+            private final GridPane gridPane = new GridPane();
             private final HBox cellBox = new HBox(15);
+
+            // Labels pour les noms d'attributs
+            private final Label nomAttribut = new Label("Nom:");
+            private final Label categorieAttribut = new Label("Catégorie:");
+            private final Label prixAttribut = new Label("Prix:");
+            private final Label stockAttribut = new Label("Stock:");
+            private final Label dateAttribut = new Label("Date:");
+            private final Label ressourcesAttribut = new Label("Ressources:");
+
+            // Labels pour les valeurs
+            private final Label nomValeur = new Label();
+            private final Label descriptionValeur = new Label();
+            private final Label categorieValeur = new Label();
+            private final Label prixValeur = new Label();
+            private final Label stockValeur = new Label();
+            private final Label dateValeur = new Label();
+            private final Label ressourcesValeur = new Label();
 
             {
                 // Configuration de l'ImageView
-                imageView.setFitHeight(60);
-                imageView.setFitWidth(60);
+                imageView.setFitHeight(100);
+                imageView.setFitWidth(100);
                 imageView.setPreserveRatio(true);
                 imageView.setStyle("-fx-border-color: #ddd; -fx-border-width: 1; -fx-border-radius: 5;");
 
-                // Configuration des labels
-                nomLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-                descriptionLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
-                descriptionLabel.setWrapText(true);
-                descriptionLabel.setMaxWidth(300);
+                // Style pour les noms d'attributs
+                String attributStyle = "-fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-size: 12px;";
+                nomAttribut.setStyle(attributStyle);
+                categorieAttribut.setStyle(attributStyle);
+                prixAttribut.setStyle(attributStyle);
+                stockAttribut.setStyle(attributStyle);
+                dateAttribut.setStyle(attributStyle);
+                ressourcesAttribut.setStyle(attributStyle);
 
-                prixLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+                // Style pour les valeurs
+                String valeurStyle = "-fx-text-fill: #27ae60; -fx-font-size: 12px;";
+                nomValeur.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #2c3e50;");
+                descriptionValeur.setStyle("-fx-text-fill: #666; -fx-font-size: 11px; -fx-font-style: italic;");
+                categorieValeur.setStyle(valeurStyle);
+                prixValeur.setStyle(valeurStyle);
+                dateValeur.setStyle(valeurStyle);
+                ressourcesValeur.setStyle(valeurStyle);
 
-                // Style du stock selon le niveau
-                stockLabel.setStyle("-fx-font-size: 12px;");
+                descriptionValeur.setWrapText(true);
+                descriptionValeur.setMaxWidth(250);
 
-                // Organisation des informations
-                infoBox.getChildren().addAll(nomLabel, descriptionLabel, prixLabel, stockLabel);
-                infoBox.setSpacing(3);
+                // Configuration du GridPane
+                gridPane.setHgap(10);
+                gridPane.setVgap(5);
+                gridPane.setPadding(new Insets(5));
 
-                cellBox.getChildren().addAll(imageView, infoBox);
+                // Ajout des composants au GridPane
+                // Ligne 0: Nom
+                gridPane.add(nomAttribut, 0, 0);
+                gridPane.add(nomValeur, 1, 0);
+                gridPane.add(descriptionValeur, 1, 1);
+                GridPane.setColumnSpan(descriptionValeur, 2);
+
+                // Ligne 2: Catégorie
+                gridPane.add(categorieAttribut, 0, 2);
+                gridPane.add(categorieValeur, 1, 2);
+
+                // Ligne 3: Prix
+                gridPane.add(prixAttribut, 0, 3);
+                gridPane.add(prixValeur, 1, 3);
+
+                // Ligne 4: Stock
+                gridPane.add(stockAttribut, 0, 4);
+                gridPane.add(stockValeur, 1, 4);
+
+                // Ligne 5: Date
+                gridPane.add(dateAttribut, 0, 5);
+                gridPane.add(dateValeur, 1, 5);
+
+                // Ligne 6: Ressources
+                gridPane.add(ressourcesAttribut, 0, 6);
+                gridPane.add(ressourcesValeur, 1, 6);
+
+                cellBox.getChildren().addAll(imageView, gridPane);
                 cellBox.setStyle("-fx-padding: 10; -fx-border-color: transparent transparent #ecf0f1 transparent;");
+                cellBox.setSpacing(15);
             }
 
             @Override
@@ -97,35 +152,38 @@ public class ProduitController {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    // Définir le nom
-                    nomLabel.setText(produit.getNom());
+                    // Remplir les valeurs
+                    nomValeur.setText(produit.getNom());
 
-                    // Description (limitée en longueur)
                     String description = produit.getDescription();
                     if (description != null && description.length() > 50) {
                         description = description.substring(0, 47) + "...";
                     }
-                    descriptionLabel.setText(description != null ? description : "Pas de description");
+                    descriptionValeur.setText(description != null ? description : "Pas de description");
 
-                    // Prix formaté
-                    prixLabel.setText(String.format("%.2f DT", produit.getPrix()));
+                    categorieValeur.setText(produit.getCategorie() != null ? produit.getCategorie() : "Non spécifiée");
+                    prixValeur.setText(String.format("%.2f DT", produit.getPrix()));
 
-                    // Stock avec couleur selon le niveau
-                    String stockText = String.format("Stock: %d (min: %d)",
+                    String stockText = String.format("%d (min: %d)",
                             produit.getStock_actuel(), produit.getStock_min());
-                    stockLabel.setText(stockText);
+                    stockValeur.setText(stockText);
 
                     if (produit.getStock_actuel() <= produit.getStock_min()) {
-                        stockLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+                        stockValeur.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
                     } else {
-                        stockLabel.setStyle("-fx-text-fill: #27ae60;");
+                        stockValeur.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
                     }
+
+                    dateValeur.setText(produit.getDate_creation() != null ? produit.getDate_creation() : "Non spécifiée");
+
+                    String ressources = produit.getRessources_necessaires();
+                    if (ressources != null && ressources.length() > 30) {
+                        ressources = ressources.substring(0, 27) + "...";
+                    }
+                    ressourcesValeur.setText(ressources != null ? ressources : "Aucune");
 
                     // Charger l'image
                     chargerImageProduit(produit, imageView);
-
-                    // Ajouter le tooltip pour voir l'image en grand
-                    ajouterTooltipImage(imageView, produit);
 
                     setGraphic(cellBox);
                 }
