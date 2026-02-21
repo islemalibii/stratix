@@ -13,37 +13,47 @@
 
     <!-- Header -->
     <VBox layoutX="0" layoutY="0" prefWidth="1000" style="-fx-background-color: #2c3e50;">
-        <HBox alignment="CENTER_LEFT" prefHeight="70" prefWidth="821.0" spacing="20" style="-fx-padding: 0 30;">
+        <HBox alignment="CENTER_LEFT" prefHeight="70" spacing="20" style="-fx-padding: 0 30;">
             <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" text="📅 GESTION DU PLANNING" />
-      
-          <!-- Bouton pour voir la liste -->
-          <Button onAction="#openPlanningList" style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 12 20; -fx-background-radius: 8; -fx-cursor: hand;" text="📋 Voir la liste des plannings" />
+
+            <!-- Bouton pour voir la liste -->
+            <Button onAction="#openPlanningList" style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 12 20; -fx-background-radius: 8; -fx-cursor: hand;" text="📋 Voir la liste des plannings" />
         </HBox>
     </VBox>
 
     <!-- Statistiques -->
     <HBox layoutX="30" layoutY="90" prefWidth="940" spacing="20">
         <!-- Total Employés -->
-        <VBox spacing="5" style="-fx-background-color: #eff6ff; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);" HBox.hgrow="ALWAYS">
+        <VBox spacing="5" style="-fx-background-color: #B3EBF2; -fx-padding: 15; -fx-background-radius: 10;" HBox.hgrow="ALWAYS">
             <Label style="-fx-font-size: 14px; -fx-text-fill: #1e40af;" text="Employés total" />
             <Label fx:id="lblTotalEmployes" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1e40af;" text="0" />
         </VBox>
 
         <!-- En poste -->
-        <VBox spacing="5" style="-fx-background-color: #f0fdf4; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);" HBox.hgrow="ALWAYS">
+        <VBox spacing="5" style="-fx-background-color: #f0fdf4; -fx-padding: 15; -fx-background-radius: 10;" HBox.hgrow="ALWAYS">
             <Label style="-fx-font-size: 14px; -fx-text-fill: #166534;" text="En poste" />
             <Label fx:id="lblEnPoste" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #166534;" text="0" />
         </VBox>
 
         <!-- Absents -->
-        <VBox spacing="5" style="-fx-background-color: #fef2f2; -fx-padding: 15; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);" HBox.hgrow="ALWAYS">
+        <VBox spacing="5" style="-fx-background-color: #fef2f2; -fx-padding: 15; -fx-background-radius: 10;" HBox.hgrow="ALWAYS">
             <Label style="-fx-font-size: 14px; -fx-text-fill: #991b1b;" text="Absents" />
             <Label fx:id="lblAbsents" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #991b1b;" text="0" />
         </VBox>
     </HBox>
 
+    <!-- Titre section -->
+    <Label layoutX="254.0" layoutY="213.0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="➕ AJOUTER UN PLANNING" />
+
     <!-- Formulaire -->
-    <VBox layoutX="272.0" layoutY="248.0" prefHeight="451.0" prefWidth="590.0" spacing="15" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+    <VBox layoutX="230.0" layoutY="252.0" prefHeight="451.0" prefWidth="590.0" spacing="15" style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+
+        <!-- Boutons rapides pour les congés -->
+        <HBox alignment="CENTER" spacing="10">
+            <Button onAction="#demandeConge" style="-fx-background-color: #fbbf24; -fx-text-fill: #92400e; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 8; -fx-cursor: hand;" text="➕ Congé" />
+            <Button onAction="#demandeMaladie" style="-fx-background-color: #f87171; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 8; -fx-cursor: hand;" text="🏥 Maladie" />
+            <Button onAction="#demandeFormation" style="-fx-background-color: #60a5fa; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 8; -fx-cursor: hand;" text="📚 Formation" />
+        </HBox>
 
         <!-- Employé -->
         <VBox spacing="5">
@@ -84,7 +94,4 @@
 
         <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 11px;" text="* Champs obligatoires" />
     </VBox>
-
-       <!-- Titre section -->
-    <Label layoutX="434.0" layoutY="210.0" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="➕ AJOUTER UN PLANNING" />
 </AnchorPane>

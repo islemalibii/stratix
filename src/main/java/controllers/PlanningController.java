@@ -15,7 +15,9 @@ import services.SERVICEPlanning;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public class PlanningController {
 
@@ -29,6 +31,8 @@ public class PlanningController {
     @FXML private Label lblTotalEmployes;
     @FXML private Label lblEnPoste;
     @FXML private Label lblAbsents;
+    @FXML private Label lblConges;      // Nouveau
+    @FXML private Label lblMaladie;      // Nouveau
 
     private SERVICEPlanning service = new SERVICEPlanning();
     private EmployeeService employeService = new EmployeeService();
@@ -38,11 +42,11 @@ public class PlanningController {
     public void initialize() {
         System.out.println("=== Initialisation PlanningController ===");
 
-        // Charger les employés dans la ComboBox
+        // Charger les employés
         List<Employe> employes = employeService.getAllEmployes();
         cmbEmploye.setItems(FXCollections.observableArrayList(employes));
 
-        // Afficher le nom dans la ComboBox
+        // Configuration de la ComboBox
         cmbEmploye.setCellFactory(param -> new ListCell<Employe>() {
             @Override
             protected void updateItem(Employe emp, boolean empty) {
@@ -50,8 +54,7 @@ public class PlanningController {
                 if (empty || emp == null) {
                     setText(null);
                 } else {
-                    String poste = (emp.getPoste() != null && !emp.getPoste().isEmpty()) ? " - " + emp.getPoste() : "";
-                    setText(emp.getUsername() + poste);
+                    setText(emp.getDisplayName());
                 }
             }
         });
@@ -63,19 +66,39 @@ public class PlanningController {
                 if (empty || emp == null) {
                     setText(null);
                 } else {
-                    String poste = (emp.getPoste() != null && !emp.getPoste().isEmpty()) ? " - " + emp.getPoste() : "";
-                    setText(emp.getUsername() + poste);
+                    setText(emp.getDisplayName());
                 }
             }
         });
 
-        cbTypeShift.getItems().addAll("JOUR", "SOIR", "NUIT");
+        // Types de shift incluant les congés
+        cbTypeShift.getItems().addAll(
+                "JOUR", "SOIR", "NUIT",
+                "CONGE", "MALADIE", "FORMATION", "AUTRE"
+        );
+
+        // Ajouter un listener pour désactiver les heures quand on choisit un congé
+        cbTypeShift.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && (newVal.equals("CONGE") || newVal.equals("MALADIE"))) {
+                txtHeureDebut.setText("00:00");
+                txtHeureFin.setText("23:59");
+                txtHeureDebut.setDisable(true);
+                txtHeureFin.setDisable(true);
+            } else if (newVal != null && newVal.equals("FORMATION")) {
+                txtHeureDebut.setText("09:00");
+                txtHeureFin.setText("17:00");
+                txtHeureDebut.setDisable(false);
+                txtHeureFin.setDisable(false);
+            } else {
+                txtHeureDebut.setDisable(false);
+                txtHeureFin.setDisable(false);
+            }
+        });
 
         // Charger les statistiques
         chargerStatistiques();
 
         System.out.println("✅ PlanningController initialisé");
-        System.out.println("   Total employés: " + employes.size());
     }
 
     @FXML
@@ -87,12 +110,22 @@ public class PlanningController {
             Employe selectedEmploye = cmbEmploye.getValue();
             p.setEmployeId(selectedEmploye.getId());
             p.setDate(Date.valueOf(dpDate.getValue()));
-            p.setHeureDebut(Time.valueOf(txtHeureDebut.getText() + ":00"));
-            p.setHeureFin(Time.valueOf(txtHeureFin.getText() + ":00"));
-            p.setTypeShift(cbTypeShift.getValue());
+
+            String type = cbTypeShift.getValue();
+
+            // Gestion spéciale pour les congés
+            if (type.equals("CONGE") || type.equals("MALADIE")) {
+                p.setHeureDebut(Time.valueOf("00:00:00"));
+                p.setHeureFin(Time.valueOf("23:59:00"));
+            } else {
+                p.setHeureDebut(Time.valueOf(txtHeureDebut.getText() + ":00"));
+                p.setHeureFin(Time.valueOf(txtHeureFin.getText() + ":00"));
+            }
+
+            p.setTypeShift(type);
 
             service.addPlanning(p);
-            showAlert("Succès", "✅ Planning ajouté avec succès !");
+            showAlert("Succès", "✅ " + getTypeLabel(type) + " ajouté avec succès !");
             viderFormulaire();
             chargerStatistiques();
 
@@ -101,6 +134,16 @@ public class PlanningController {
         } catch (Exception e) {
             showAlert("Erreur", "Erreur : " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private String getTypeLabel(String type) {
+        switch(type) {
+            case "CONGE": return "Congé";
+            case "MALADIE": return "Arrêt maladie";
+            case "FORMATION": return "Formation";
+            case "AUTRE": return "Absence";
+            default: return "Planning";
         }
     }
 
@@ -119,9 +162,18 @@ public class PlanningController {
             Employe selectedEmploye = cmbEmploye.getValue();
             p.setEmployeId(selectedEmploye.getId());
             p.setDate(Date.valueOf(dpDate.getValue()));
-            p.setHeureDebut(Time.valueOf(txtHeureDebut.getText() + ":00"));
-            p.setHeureFin(Time.valueOf(txtHeureFin.getText() + ":00"));
-            p.setTypeShift(cbTypeShift.getValue());
+
+            String type = cbTypeShift.getValue();
+
+            if (type.equals("CONGE") || type.equals("MALADIE")) {
+                p.setHeureDebut(Time.valueOf("00:00:00"));
+                p.setHeureFin(Time.valueOf("23:59:00"));
+            } else {
+                p.setHeureDebut(Time.valueOf(txtHeureDebut.getText() + ":00"));
+                p.setHeureFin(Time.valueOf(txtHeureFin.getText() + ":00"));
+            }
+
+            p.setTypeShift(type);
 
             service.updatePlanning(p);
             showAlert("Succès", "✅ Planning modifié avec succès !");
@@ -154,9 +206,35 @@ public class PlanningController {
     }
 
     @FXML
+    private void demandeConge() {
+        cbTypeShift.setValue("CONGE");
+        txtHeureDebut.setText("00:00");
+        txtHeureFin.setText("23:59");
+        txtHeureDebut.setDisable(true);
+        txtHeureFin.setDisable(true);
+    }
+
+    @FXML
+    private void demandeMaladie() {
+        cbTypeShift.setValue("MALADIE");
+        txtHeureDebut.setText("00:00");
+        txtHeureFin.setText("23:59");
+        txtHeureDebut.setDisable(true);
+        txtHeureFin.setDisable(true);
+    }
+
+    @FXML
+    private void demandeFormation() {
+        cbTypeShift.setValue("FORMATION");
+        txtHeureDebut.setText("09:00");
+        txtHeureFin.setText("17:00");
+        txtHeureDebut.setDisable(false);
+        txtHeureFin.setDisable(false);
+    }
+
+    @FXML
     private void openPlanningList() {
         try {
-            System.out.println("Ouverture de la liste des plannings...");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/PlanningListeView.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
@@ -178,27 +256,29 @@ public class PlanningController {
             showAlert("Erreur", "❌ La date est requise !");
             return false;
         }
-        if (txtHeureDebut.getText().trim().isEmpty()) {
-            showAlert("Erreur", "❌ L'heure de début est requise !");
-            return false;
-        }
-        if (txtHeureFin.getText().trim().isEmpty()) {
-            showAlert("Erreur", "❌ L'heure de fin est requise !");
-            return false;
-        }
         if (cbTypeShift.getValue() == null) {
-            showAlert("Erreur", "❌ Le type de shift est requis !");
+            showAlert("Erreur", "❌ Le type est requis !");
             return false;
         }
 
-        // Validation du format d'heure (HH:MM)
-        if (!txtHeureDebut.getText().matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")) {
-            showAlert("Erreur", "❌ Format d'heure début invalide. Utilisez HH:MM (ex: 08:30)");
-            return false;
-        }
-        if (!txtHeureFin.getText().matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")) {
-            showAlert("Erreur", "❌ Format d'heure fin invalide. Utilisez HH:MM (ex: 17:30)");
-            return false;
+        String type = cbTypeShift.getValue();
+        if (!type.equals("CONGE") && !type.equals("MALADIE") && !type.equals("FORMATION") && !type.equals("AUTRE")) {
+            if (txtHeureDebut.getText().trim().isEmpty()) {
+                showAlert("Erreur", "❌ L'heure de début est requise !");
+                return false;
+            }
+            if (txtHeureFin.getText().trim().isEmpty()) {
+                showAlert("Erreur", "❌ L'heure de fin est requise !");
+                return false;
+            }
+            if (!txtHeureDebut.getText().matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")) {
+                showAlert("Erreur", "❌ Format d'heure début invalide. Utilisez HH:MM");
+                return false;
+            }
+            if (!txtHeureFin.getText().matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$")) {
+                showAlert("Erreur", "❌ Format d'heure fin invalide. Utilisez HH:MM");
+                return false;
+            }
         }
 
         return true;
@@ -209,6 +289,25 @@ public class PlanningController {
             lblTotalEmployes.setText(String.valueOf(employeService.getAllEmployes().size()));
             lblEnPoste.setText(String.valueOf(service.compterEnPoste()));
             lblAbsents.setText(String.valueOf(service.compterAbsents()));
+
+            // Compter les congés et maladies du mois
+            int conges = 0, maladies = 0, formations = 0;
+            List<Planning> plannings = service.getAllPlannings();
+            LocalDate debutMois = LocalDate.now().withDayOfMonth(1);
+            LocalDate finMois = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
+
+            for (Planning p : plannings) {
+                LocalDate date = p.getDate().toLocalDate();
+                if (date.isAfter(debutMois.minusDays(1)) && date.isBefore(finMois.plusDays(1))) {
+                    if ("CONGE".equals(p.getTypeShift())) conges++;
+                    if ("MALADIE".equals(p.getTypeShift())) maladies++;
+                    if ("FORMATION".equals(p.getTypeShift())) formations++;
+                }
+            }
+
+            if (lblConges != null) lblConges.setText(String.valueOf(conges));
+            if (lblMaladie != null) lblMaladie.setText(String.valueOf(maladies));
+
         } catch (Exception e) {
             System.err.println("Erreur chargement statistiques: " + e.getMessage());
         }
@@ -218,7 +317,9 @@ public class PlanningController {
         cmbEmploye.setValue(null);
         dpDate.setValue(null);
         txtHeureDebut.clear();
+        txtHeureDebut.setDisable(false);
         txtHeureFin.clear();
+        txtHeureFin.setDisable(false);
         cbTypeShift.setValue(null);
         selectedPlanningId = -1;
     }
