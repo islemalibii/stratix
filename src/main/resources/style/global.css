@@ -1,4 +1,3 @@
-/* GLOBAL THEME */
 .root {
     -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
 }
@@ -8,7 +7,7 @@
     -fx-padding: 30;
 }
 
-/* CARDS */
+
 .card {
     -fx-background-color: white;
     -fx-background-radius: 15;
@@ -22,7 +21,6 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 10);
 }
 
-/* TEXT STYLES */
 .heading-large {
     -fx-font-size: 28px;
     -fx-font-weight: bold;
@@ -51,7 +49,6 @@
     -fx-font-size: 11px;
 }
 
-/* INPUTS */
 .text-input, .date-picker, .combo-box {
     -fx-background-color: #F8FAFC;
     -fx-border-color: #E2E8F0;
@@ -63,7 +60,6 @@
     -fx-padding: 10;
 }
 
-/* BUTTONS */
 .btn-primary {
     -fx-background-color: #2196F3;
     -fx-text-fill: white;
@@ -114,7 +110,6 @@
     -fx-cursor: hand;
 }
 
-/* TABLE COMPONENTS */
 .table-header {
     -fx-padding: 0 25;
     -fx-background-color: #F1F5F9;
@@ -126,7 +121,6 @@
     -fx-background: transparent;
     -fx-border-color: transparent;
 }
-/* Styles spécifiques aux compteurs du Dashboard */
 .stat-value {
     -fx-font-size: 26px;
     -fx-font-weight: bold;
@@ -145,13 +139,11 @@
     -fx-text-fill: #DC2626;
 }
 
-/* Label des stats (le petit texte au dessus) */
 .stat-label {
     -fx-font-weight: bold;
     -fx-text-fill: #64748B;
 }
 
-/* Personnalisation du ScrollPane pour qu'il soit invisible */
 .scroll-pane {
     -fx-background-color: transparent;
     -fx-background: transparent;
@@ -163,14 +155,12 @@
 }
 
 
-/* Styling for the archived row container */
 .archive-row {
     -fx-background-color: white;
     -fx-background-radius: 12;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 5);
 }
 
-/* Hover effect to make it feel "Fresh" */
 .archive-row:hover {
     -fx-background-color: #F8FAFC;
     -fx-border-color: #CBD5E1;
@@ -200,7 +190,6 @@
     -fx-background-radius: 20;
 }
 
-/* Container for each event row */
 .event-row {
     -fx-background-color: white;
     -fx-background-radius: 15;
@@ -214,7 +203,6 @@
     -fx-border-radius: 15;
 }
 
-/* Text styles */
 .event-title {
     -fx-font-weight: bold;
     -fx-text-fill: #1E293B;
@@ -229,12 +217,11 @@
     -fx-text-fill: #475569;
 }
 
-/* Status Labels */
 .status-planned { -fx-text-fill: #27AE60; -fx-font-weight: bold; -fx-font-size: 11; }
 .status-finished { -fx-text-fill: #3498DB; -fx-font-weight: bold; -fx-font-size: 11; }
 .status-cancelled { -fx-text-fill: #E74C3C; -fx-font-weight: bold; -fx-font-size: 11; }
 
-/* Action Buttons */
+
 .btn-modify {
     -fx-background-color: #2196F3;
     -fx-text-fill: white;
@@ -253,7 +240,7 @@
 
 
 .btn-restore {
-    -fx-background-color: #10B981; /* Vert */
+    -fx-background-color: #10B981;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-radius: 8;
@@ -265,7 +252,7 @@
 }
 
 .btn-delete-permanent {
-    -fx-background-color: #EF4444; /* Rouge */
+    -fx-background-color: #EF4444;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-radius: 8;
@@ -277,7 +264,6 @@
 }
 
 
-/* Style de la carte principale */
 .event-card {
     -fx-background-color: white;
     -fx-background-radius: 15;
@@ -293,7 +279,6 @@
     -fx-translate-y: -5;
 }
 
-/* Texte de la carte */
 .card-title {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
@@ -311,7 +296,6 @@
     -fx-font-style: italic;
 }
 
-/* Badges de statut */
 .status-badge {
     -fx-padding: 4 12;
     -fx-background-radius: 10;
@@ -324,7 +308,6 @@
 .status-terminer { -fx-background-color: #1e90ff; }
 .status-annuler { -fx-background-color: #ff4757; }
 
-/* Boutons sur la carte */
 .btn-modify-card {
     -fx-background-color: #DE8D21;
     -fx-text-fill: white;
@@ -362,17 +345,17 @@
 }
 
 .sidebar-btn-active {
-    -fx-background-color: #e7f1ff; /* Bleu très clair */
-    -fx-text-fill: #007bff;        /* Bleu primaire */
+    -fx-background-color: #e7f1ff;
+    -fx-text-fill: #007bff;
     -fx-font-weight: bold;
 }
 
 .sidebar {
-    -fx-background-color: #ffffff; /* Fond blanc pur */
-    -fx-padding: 30 15 30 15;      /* Espacement interne */
-    -fx-border-color: #edf2f7;      /* Bordure très légère à droite */
+    -fx-background-color: #ffffff;
+    -fx-padding: 30 15 30 15;
+    -fx-border-color: #edf2f7;
     -fx-border-width: 0 1 0 0;
-    -fx-pref-width: 260px;          /* Largeur fixe pour la stabilité */
+    -fx-pref-width: 260px;
 }
 
 .sidebar-brand {
