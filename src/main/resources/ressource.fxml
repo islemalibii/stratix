@@ -22,6 +22,20 @@
     <!-- Centre avec ListView -->
     <center>
         <VBox spacing="15" style="-fx-padding: 20;">
+
+            <!-- Barre de recherche AJOUTÉE -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Rechercher:" style="-fx-font-weight: bold; -fx-font-size: 14;"/>
+                <TextField fx:id="searchField" promptText="Nom, type ou fournisseur..."
+                           HBox.hgrow="ALWAYS" prefWidth="250"/>
+                <Button fx:id="btnSearch" text="Rechercher"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-cursor: hand;"/>
+                <Button fx:id="btnClearSearch" text="Effacer"
+                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-cursor: hand;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
+
+            <!-- Boutons d'action -->
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Liste des ressources" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
                 <Region HBox.hgrow="ALWAYS"/>
@@ -31,7 +45,7 @@
                 <Button text="Rafraîchir" style="-fx-background-color: #3498db; -fx-text-fill: white;" onAction="#rafraichirListe"/>
             </HBox>
 
-            <!-- Remplacer TableView par ListView -->
+            <!-- ListView pour les ressources -->
             <ListView fx:id="listViewRessources" VBox.vgrow="ALWAYS"/>
 
         </VBox>

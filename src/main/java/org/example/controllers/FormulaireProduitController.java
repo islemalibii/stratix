@@ -8,6 +8,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import models.produit;
 import service.service_produit;
 
@@ -18,6 +19,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class FormulaireProduitController {
 
@@ -58,9 +61,7 @@ public class FormulaireProduitController {
     @FXML
     private Label cheminImageLabel;
 
-    // NOUVEAUX COMPOSANTS
-    @FXML
-    private ComboBox<String> typeProduitCombo;
+    // Date Pickers
     @FXML
     private DatePicker dateFabricationPicker;
     @FXML
@@ -82,6 +83,9 @@ public class FormulaireProduitController {
     private final String[] categoriesPredifinies = {
             "Électronique", "Informatique", "Bureau", "Mobilier", "Consommable", "Autre"
     };
+
+    // Formateur de date pour l'affichage
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @FXML
     public void initialize() {
@@ -105,37 +109,63 @@ public class FormulaireProduitController {
             }
         });
 
-        // Initialisation de la ComboBox des types de produit
-        typeProduitCombo.setItems(FXCollections.observableArrayList(
-                "Général", "Alimentaire", "Médicament", "Électronique", "Cosmétique", "Autre"
-        ));
-
-        // Listener pour changer les champs selon le type
-        typeProduitCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if ("Alimentaire".equals(newVal) || "Médicament".equals(newVal) || "Cosmétique".equals(newVal)) {
-                // Ces types ont une date de péremption
-                datePeremptionPicker.setDisable(false);
-                datePeremptionPicker.setPromptText("Date de péremption");
-                dateGarantiePicker.setDisable(true);
-                dateGarantiePicker.setValue(null);
-            } else if ("Électronique".equals(newVal)) {
-                // Ces types ont une date de garantie
-                dateGarantiePicker.setDisable(false);
-                dateGarantiePicker.setPromptText("Date de fin de garantie");
-                datePeremptionPicker.setDisable(true);
-                datePeremptionPicker.setValue(null);
-            } else {
-                datePeremptionPicker.setDisable(true);
-                datePeremptionPicker.setValue(null);
-                dateGarantiePicker.setDisable(true);
-                dateGarantiePicker.setValue(null);
-            }
-        });
-
         // Créer le répertoire d'images s'il n'existe pas
         createImagesDirectory();
 
+        // Configurer tous les DatePickers avec le bon format
+        configurerDatePicker(dateCreationPicker);
+        configurerDatePicker(dateFabricationPicker);
+        configurerDatePicker(datePeremptionPicker);
+        configurerDatePicker(dateGarantiePicker);
+
+        // Initialiser la date de création avec la date du jour
+        dateCreationPicker.setValue(LocalDate.now());
+
+        // Désactiver l'édition manuelle pour la date de création (système)
+        dateCreationPicker.setEditable(false);
+        dateCreationPicker.setDisable(true);
+
         System.out.println("Formulaire initialisé");
+    }
+
+    /**
+     * Configure un DatePicker avec un convertisseur de date français
+     */
+    private void configurerDatePicker(DatePicker datePicker) {
+        datePicker.setConverter(new StringConverter<LocalDate>() {
+            @Override
+            public String toString(LocalDate date) {
+                if (date != null) {
+                    return dateFormatter.format(date);
+                } else {
+                    return "";
+                }
+            }
+
+            @Override
+            public LocalDate fromString(String string) {
+                if (string != null && !string.isEmpty()) {
+                    try {
+                        return LocalDate.parse(string, dateFormatter);
+                    } catch (DateTimeParseException e) {
+                        // Essayer le format par défaut
+                        try {
+                            return LocalDate.parse(string);
+                        } catch (DateTimeParseException ex) {
+                            return null;
+                        }
+                    }
+                } else {
+                    return null;
+                }
+            }
+        });
+
+        // Rendre éditable (sauf pour dateCreationPicker qui sera désactivé après)
+        datePicker.setEditable(true);
+
+        // Ajouter un prompt text en français
+        datePicker.setPromptText("jj/mm/aaaa");
     }
 
     /**
@@ -224,8 +254,6 @@ public class FormulaireProduitController {
     public void setModeAjout() {
         titreFormulaire.setText("Ajouter un produit");
         btnValider.setText("Ajouter");
-        dateCreationPicker.setValue(LocalDate.now());
-        dateCreationPicker.setDisable(true); // Date système automatique
 
         // Réinitialiser les champs
         idField.clear();
@@ -240,14 +268,20 @@ public class FormulaireProduitController {
         stockMinField.clear();
         ressourcesField.clear();
 
-        // Réinitialiser les nouveaux champs
-        typeProduitCombo.getSelectionModel().clearSelection();
+        // Date système automatique - toujours la date du jour
+        dateCreationPicker.setValue(LocalDate.now());
+        dateCreationPicker.setDisable(true);
+
+        // Réinitialiser les autres dates
         dateFabricationPicker.setValue(null);
         datePeremptionPicker.setValue(null);
         dateGarantiePicker.setValue(null);
-        datePeremptionPicker.setDisable(true);
-        dateGarantiePicker.setDisable(true);
         statutPeremptionLabel.setText("");
+
+        // Activer les autres DatePickers
+        dateFabricationPicker.setDisable(false);
+        datePeremptionPicker.setDisable(false);
+        dateGarantiePicker.setDisable(false);
 
         // Réinitialiser l'image
         supprimerImage();
@@ -289,48 +323,65 @@ public class FormulaireProduitController {
         stockMinField.setText(String.valueOf(p.getStock_min()));
 
         // Date de création (non modifiable)
-        if (p.getDate_creation() != null) {
-            dateCreationPicker.setValue(LocalDate.parse(p.getDate_creation()));
-            dateCreationPicker.setDisable(true);
+        if (p.getDate_creation() != null && !p.getDate_creation().isEmpty()) {
+            try {
+                dateCreationPicker.setValue(LocalDate.parse(p.getDate_creation()));
+            } catch (Exception e) {
+                dateCreationPicker.setValue(LocalDate.now());
+            }
+        } else {
+            dateCreationPicker.setValue(LocalDate.now());
         }
+        dateCreationPicker.setDisable(true);
 
         ressourcesField.setText(p.getRessources_necessaires());
 
-        // NOUVEAUX CHAMPS
-        if (p.getType_produit() != null) {
-            typeProduitCombo.setValue(p.getType_produit());
-        }
-
-        if (p.getDate_fabrication() != null) {
-            dateFabricationPicker.setValue(LocalDate.parse(p.getDate_fabrication()));
-        }
-
-        if (p.getDate_peremption() != null) {
-            datePeremptionPicker.setValue(LocalDate.parse(p.getDate_peremption()));
-            datePeremptionPicker.setDisable(false);
-
-            // Afficher le statut de péremption
-            if (p.estPerime()) {
-                statutPeremptionLabel.setText("PÉRIMÉ");
-                statutPeremptionLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
-            } else if (p.estBientotPerime(30)) {
-                statutPeremptionLabel.setText("Bientôt périmé (moins de 30 jours)");
-                statutPeremptionLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
-            } else {
-                statutPeremptionLabel.setText("Valide");
-                statutPeremptionLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+        // Charger les dates
+        if (p.getDate_fabrication() != null && !p.getDate_fabrication().isEmpty()) {
+            try {
+                dateFabricationPicker.setValue(LocalDate.parse(p.getDate_fabrication()));
+            } catch (Exception e) {
+                dateFabricationPicker.setValue(null);
             }
         }
 
-        if (p.getDate_garantie() != null) {
-            dateGarantiePicker.setValue(LocalDate.parse(p.getDate_garantie()));
-            dateGarantiePicker.setDisable(false);
+        if (p.getDate_peremption() != null && !p.getDate_peremption().isEmpty()) {
+            try {
+                datePeremptionPicker.setValue(LocalDate.parse(p.getDate_peremption()));
 
-            if (p.garantieExpiree()) {
-                statutPeremptionLabel.setText("GARANTIE EXPIRÉE");
-                statutPeremptionLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+                // Afficher le statut de péremption
+                if (p.estPerime()) {
+                    statutPeremptionLabel.setText("PÉRIMÉ");
+                    statutPeremptionLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+                } else if (p.estBientotPerime(30)) {
+                    statutPeremptionLabel.setText("Bientôt périmé (moins de 30 jours)");
+                    statutPeremptionLabel.setStyle("-fx-text-fill: orange; -fx-font-weight: bold;");
+                } else {
+                    statutPeremptionLabel.setText("Valide");
+                    statutPeremptionLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+                }
+            } catch (Exception e) {
+                datePeremptionPicker.setValue(null);
             }
         }
+
+        if (p.getDate_garantie() != null && !p.getDate_garantie().isEmpty()) {
+            try {
+                dateGarantiePicker.setValue(LocalDate.parse(p.getDate_garantie()));
+
+                if (p.garantieExpiree()) {
+                    statutPeremptionLabel.setText("GARANTIE EXPIRÉE");
+                    statutPeremptionLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+                }
+            } catch (Exception e) {
+                dateGarantiePicker.setValue(null);
+            }
+        }
+
+        // Activer les autres DatePickers
+        dateFabricationPicker.setDisable(false);
+        datePeremptionPicker.setDisable(false);
+        dateGarantiePicker.setDisable(false);
 
         // Charger l'image si elle existe
         currentImagePath = p.getImage_path();
@@ -391,12 +442,17 @@ public class FormulaireProduitController {
             p.setPrix(Double.parseDouble(prixField.getText().trim()));
             p.setStock_actuel(Integer.parseInt(stockActuelField.getText().trim()));
             p.setStock_min(Integer.parseInt(stockMinField.getText().trim()));
-            p.setDate_creation(dateCreationPicker.getValue().toString());
+
+            // Date de création (toujours définie)
+            if (dateCreationPicker.getValue() != null) {
+                p.setDate_creation(dateCreationPicker.getValue().toString());
+            } else {
+                p.setDate_creation(LocalDate.now().toString());
+            }
+
             p.setRessources_necessaires(ressourcesField.getText().trim());
 
-            // NOUVEAUX CHAMPS
-            p.setType_produit(typeProduitCombo.getValue());
-
+            // Dates optionnelles
             if (dateFabricationPicker.getValue() != null) {
                 p.setDate_fabrication(dateFabricationPicker.getValue().toString());
             }
@@ -460,27 +516,53 @@ public class FormulaireProduitController {
      * Valide les dates entre elles
      */
     private boolean validerDates(produit p) {
-        // Validation date fabrication
-        if (p.getDate_fabrication() != null) {
-            LocalDate dateFab = LocalDate.parse(p.getDate_fabrication());
-            if (dateFab.isAfter(LocalDate.now())) {
-                showAlert(Alert.AlertType.ERROR, "Erreur",
-                        "La date de fabrication ne peut pas être dans le futur");
-                return false;
-            }
-        }
-
-        // Validation date péremption
-        if (p.getDate_peremption() != null) {
-            LocalDate datePer = LocalDate.parse(p.getDate_peremption());
-            if (p.getDate_fabrication() != null) {
+        try {
+            // Validation date fabrication
+            if (p.getDate_fabrication() != null && !p.getDate_fabrication().isEmpty()) {
                 LocalDate dateFab = LocalDate.parse(p.getDate_fabrication());
-                if (datePer.isBefore(dateFab)) {
+                if (dateFab.isAfter(LocalDate.now())) {
                     showAlert(Alert.AlertType.ERROR, "Erreur",
-                            "La date de péremption doit être après la date de fabrication");
+                            "La date de fabrication ne peut pas être dans le futur");
                     return false;
                 }
             }
+
+            // Validation date péremption
+            if (p.getDate_peremption() != null && !p.getDate_peremption().isEmpty()) {
+                LocalDate datePer = LocalDate.parse(p.getDate_peremption());
+
+                // Vérifier que la date de péremption n'est pas avant la date de fabrication
+                if (p.getDate_fabrication() != null && !p.getDate_fabrication().isEmpty()) {
+                    LocalDate dateFab = LocalDate.parse(p.getDate_fabrication());
+                    if (datePer.isBefore(dateFab)) {
+                        showAlert(Alert.AlertType.ERROR, "Erreur",
+                                "La date de péremption doit être après la date de fabrication");
+                        return false;
+                    }
+                }
+
+                // Avertir si le produit est déjà périmé
+                if (datePer.isBefore(LocalDate.now())) {
+                    showAlert(Alert.AlertType.WARNING, "Attention",
+                            "Ce produit est déjà périmé !");
+                    // On continue quand même (juste un avertissement)
+                }
+            }
+
+            // Validation date garantie
+            if (p.getDate_garantie() != null && !p.getDate_garantie().isEmpty()) {
+                LocalDate dateGar = LocalDate.parse(p.getDate_garantie());
+                if (dateGar.isBefore(LocalDate.now())) {
+                    showAlert(Alert.AlertType.WARNING, "Attention",
+                            "La garantie de ce produit est déjà expirée !");
+                    // On continue quand même (juste un avertissement)
+                }
+            }
+
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Erreur de validation des dates: " + e.getMessage());
+            return false;
         }
 
         return true;
@@ -508,11 +590,6 @@ public class FormulaireProduitController {
             return false;
         }
 
-        if (typeProduitCombo.getValue() == null) {
-            showAlert(Alert.AlertType.ERROR, "Erreur", "Le type de produit est obligatoire");
-            return false;
-        }
-
         try {
             Double.parseDouble(prixField.getText().trim());
         } catch (NumberFormatException e) {
@@ -534,9 +611,9 @@ public class FormulaireProduitController {
             return false;
         }
 
+        // La date de création est toujours définie (soit par le système, soit par la modification)
         if (dateCreationPicker.getValue() == null) {
-            showAlert(Alert.AlertType.ERROR, "Erreur", "La date de création est obligatoire");
-            return false;
+            dateCreationPicker.setValue(LocalDate.now());
         }
 
         return true;

@@ -12,10 +12,8 @@ public class service_produit implements service<produit> {
 
     @Override
     public void add(produit p) {
-        String req = "INSERT INTO produit(nom, description, categorie, prix, stock_actuel, stock_min, " +
-                "date_creation, ressources_necessaires, image_path, type_produit, " +
-                "date_fabrication, date_peremption, date_garantie) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        // CORRECTION: Supprimer type_produit de la requête
+        String req = "INSERT INTO produit(nom, description, categorie, prix, stock_actuel, stock_min, date_creation, ressources_necessaires, image_path, date_fabrication, date_peremption, date_garantie) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
             Connection cnx = database.getInstance().getCnx();
@@ -37,26 +35,23 @@ public class service_produit implements service<produit> {
                 ps.setNull(9, java.sql.Types.VARCHAR);
             }
 
-            // Nouveaux champs
-            ps.setString(10, p.getType_produit());
-
             // Dates (peuvent être null)
-            if (p.getDate_fabrication() != null) {
-                ps.setDate(11, Date.valueOf(p.getDate_fabrication()));
+            if (p.getDate_fabrication() != null && !p.getDate_fabrication().isEmpty()) {
+                ps.setDate(10, Date.valueOf(p.getDate_fabrication()));
+            } else {
+                ps.setNull(10, java.sql.Types.DATE);
+            }
+
+            if (p.getDate_peremption() != null && !p.getDate_peremption().isEmpty()) {
+                ps.setDate(11, Date.valueOf(p.getDate_peremption()));
             } else {
                 ps.setNull(11, java.sql.Types.DATE);
             }
 
-            if (p.getDate_peremption() != null) {
-                ps.setDate(12, Date.valueOf(p.getDate_peremption()));
+            if (p.getDate_garantie() != null && !p.getDate_garantie().isEmpty()) {
+                ps.setDate(12, Date.valueOf(p.getDate_garantie()));
             } else {
                 ps.setNull(12, java.sql.Types.DATE);
-            }
-
-            if (p.getDate_garantie() != null) {
-                ps.setDate(13, Date.valueOf(p.getDate_garantie()));
-            } else {
-                ps.setNull(13, java.sql.Types.DATE);
             }
 
             int affectedRows = ps.executeUpdate();
@@ -78,7 +73,8 @@ public class service_produit implements service<produit> {
     @Override
     public List<produit> getAll() {
         List<produit> list = new ArrayList<>();
-        String req = "SELECT * FROM produit";
+        // CORRECTION: Enlever type_produit de la requête SELECT
+        String req = "SELECT id, nom, description, categorie, prix, stock_actuel, stock_min, date_creation, ressources_necessaires, image_path, date_fabrication, date_peremption, date_garantie FROM produit";
 
         try {
             Connection cnx = database.getInstance().getCnx();
@@ -103,19 +99,14 @@ public class service_produit implements service<produit> {
 
                 p.setRessources_necessaires(rs.getString("ressources_necessaires"));
 
+                // Image
                 try {
                     p.setImage_path(rs.getString("image_path"));
                 } catch (SQLException e) {
                     p.setImage_path(null);
                 }
 
-                // NOUVEAUX CHAMPS
-                try {
-                    p.setType_produit(rs.getString("type_produit"));
-                } catch (SQLException e) {
-                    p.setType_produit("Général");
-                }
-
+                // Dates
                 Date dateFab = rs.getDate("date_fabrication");
                 if (dateFab != null) {
                     p.setDate_fabrication(dateFab.toString());
@@ -141,12 +132,11 @@ public class service_produit implements service<produit> {
 
         return list;
     }
+
     @Override
     public void update(produit p) {
-        String req = "UPDATE produit SET nom=?, description=?, categorie=?, prix=?, " +
-                "stock_actuel=?, stock_min=?, date_creation=?, ressources_necessaires=?, " +
-                "image_path=?, type_produit=?, date_fabrication=?, date_peremption=?, " +
-                "date_garantie=? WHERE id=?";
+        // CORRECTION: Supprimer type_produit de la requête UPDATE
+        String req = "UPDATE produit SET nom=?, description=?, categorie=?, prix=?, stock_actuel=?, stock_min=?, date_creation=?, ressources_necessaires=?, image_path=?, date_fabrication=?, date_peremption=?, date_garantie=? WHERE id=?";
 
         try {
             Connection cnx = database.getInstance().getCnx();
@@ -168,29 +158,26 @@ public class service_produit implements service<produit> {
                 ps.setNull(9, java.sql.Types.VARCHAR);
             }
 
-            // Nouveaux champs
-            ps.setString(10, p.getType_produit());
-
             // Dates
-            if (p.getDate_fabrication() != null) {
-                ps.setDate(11, Date.valueOf(p.getDate_fabrication()));
+            if (p.getDate_fabrication() != null && !p.getDate_fabrication().isEmpty()) {
+                ps.setDate(10, Date.valueOf(p.getDate_fabrication()));
+            } else {
+                ps.setNull(10, java.sql.Types.DATE);
+            }
+
+            if (p.getDate_peremption() != null && !p.getDate_peremption().isEmpty()) {
+                ps.setDate(11, Date.valueOf(p.getDate_peremption()));
             } else {
                 ps.setNull(11, java.sql.Types.DATE);
             }
 
-            if (p.getDate_peremption() != null) {
-                ps.setDate(12, Date.valueOf(p.getDate_peremption()));
+            if (p.getDate_garantie() != null && !p.getDate_garantie().isEmpty()) {
+                ps.setDate(12, Date.valueOf(p.getDate_garantie()));
             } else {
                 ps.setNull(12, java.sql.Types.DATE);
             }
 
-            if (p.getDate_garantie() != null) {
-                ps.setDate(13, Date.valueOf(p.getDate_garantie()));
-            } else {
-                ps.setNull(13, java.sql.Types.DATE);
-            }
-
-            ps.setInt(14, p.getId());
+            ps.setInt(13, p.getId());
 
             int rows = ps.executeUpdate();
 

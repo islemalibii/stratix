@@ -8,7 +8,7 @@
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.controllers.FormulaireProduitController"
-            prefHeight="750" prefWidth="550"
+            prefHeight="850" prefWidth="600"
             style="-fx-background-color: white;">
 
     <top>
@@ -22,12 +22,10 @@
         <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-border-color: transparent;">
             <VBox spacing="15" style="-fx-padding: 25;">
 
-                <!-- SECTION IMAGE AJOUTÉE -->
+                <!-- SECTION IMAGE -->
                 <TitledPane text="Image du produit" expanded="true"
                             style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6; -fx-border-radius: 5;">
                     <VBox spacing="10" alignment="CENTER" style="-fx-padding: 15;">
-
-                        <!-- ImageView pour l'aperçu -->
                         <ImageView fx:id="imageView" fitHeight="150" fitWidth="200"
                                    preserveRatio="true"
                                    style="-fx-border-color: #ced4da; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-color: #f8f9fa;">
@@ -35,12 +33,8 @@
                                 <Insets bottom="10"/>
                             </VBox.margin>
                         </ImageView>
-
-                        <!-- Label pour afficher le nom du fichier -->
                         <Label fx:id="cheminImageLabel" text="Aucune image sélectionnée"
                                style="-fx-text-fill: #6c757d; -fx-font-style: italic;"/>
-
-                        <!-- Boutons pour gérer l'image -->
                         <HBox spacing="10" alignment="CENTER">
                             <Button fx:id="btnChoisirImage" text="Choisir une image"
                                     onAction="#choisirImage"
@@ -49,7 +43,6 @@
                                     onAction="#supprimerImage"
                                     style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15;"/>
                         </HBox>
-
                         <Label text="Formats supportés: PNG, JPG, JPEG, GIF, BMP"
                                style="-fx-text-fill: #95a5a6; -fx-font-size: 11;"/>
                     </VBox>
@@ -114,11 +107,12 @@
                     <TextField fx:id="stockMinField" promptText="Ex: 10"
                                GridPane.rowIndex="6" GridPane.columnIndex="1"/>
 
-                    <!-- Ligne 7: Date création -->
+                    <!-- Ligne 7: Date création (SYSTÈME - NON MODIFIABLE) -->
                     <Label text="Date création :" style="-fx-font-weight: bold;"
                            GridPane.rowIndex="7" GridPane.columnIndex="0"/>
                     <DatePicker fx:id="dateCreationPicker" promptText="jj/mm/aaaa"
-                                GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                                GridPane.rowIndex="7" GridPane.columnIndex="1"
+                                editable="false"/>
 
                     <!-- Ligne 8: Ressources nécessaires -->
                     <Label text="Ressources :" style="-fx-font-weight: bold;"
@@ -126,35 +120,31 @@
                     <TextArea fx:id="ressourcesField" promptText="Ressources nécessaires..."
                               prefRowCount="2" wrapText="true"
                               GridPane.rowIndex="8" GridPane.columnIndex="1"/>
-                    <!-- Ligne 9: Type de produit -->
-                    <Label text="Type produit :" style="-fx-font-weight: bold;"
-                           GridPane.rowIndex="9" GridPane.columnIndex="0"/>
-                    <ComboBox fx:id="typeProduitCombo" promptText="Choisir le type"
-                              prefWidth="300"
-                              GridPane.rowIndex="9" GridPane.columnIndex="1"/>
 
-                    <!-- Ligne 10: Date fabrication -->
+                    <!-- Ligne 9: Date fabrication -->
                     <Label text="Date fabrication :" style="-fx-font-weight: bold;"
-                           GridPane.rowIndex="10" GridPane.columnIndex="0"/>
+                           GridPane.rowIndex="9" GridPane.columnIndex="0"/>
                     <DatePicker fx:id="dateFabricationPicker" promptText="jj/mm/aaaa"
-                                GridPane.rowIndex="10" GridPane.columnIndex="1"/>
+                                GridPane.rowIndex="9" GridPane.columnIndex="1"
+                                editable="true"/>
 
-                    <!-- Ligne 11: Date péremption -->
+                    <!-- Ligne 10: Date péremption -->
                     <Label text="Date péremption :" style="-fx-font-weight: bold;"
-                           GridPane.rowIndex="11" GridPane.columnIndex="0"/>
-                    <VBox GridPane.rowIndex="11" GridPane.columnIndex="1" spacing="5">
-                        <DatePicker fx:id="datePeremptionPicker" promptText="jj/mm/aaaa" maxWidth="Infinity"/>
+                           GridPane.rowIndex="10" GridPane.columnIndex="0"/>
+                    <VBox GridPane.rowIndex="10" GridPane.columnIndex="1" spacing="5">
+                        <DatePicker fx:id="datePeremptionPicker" promptText="jj/mm/aaaa"
+                                    maxWidth="Infinity" editable="true"/>
                         <Label fx:id="statutPeremptionLabel" text="" style="-fx-font-size: 11px;"/>
                     </VBox>
 
-                    <!-- Ligne 12: Date garantie -->
+                    <!-- Ligne 11: Date garantie -->
                     <Label text="Date garantie :" style="-fx-font-weight: bold;"
-                           GridPane.rowIndex="12" GridPane.columnIndex="0"/>
+                           GridPane.rowIndex="11" GridPane.columnIndex="0"/>
                     <DatePicker fx:id="dateGarantiePicker" promptText="jj/mm/aaaa"
-                                GridPane.rowIndex="12" GridPane.columnIndex="1"/>
+                                GridPane.rowIndex="11" GridPane.columnIndex="1"
+                                editable="true"/>
                 </GridPane>
 
-                <!-- Séparateur -->
                 <Separator/>
 
                 <!-- Boutons -->
@@ -170,7 +160,6 @@
         </ScrollPane>
     </center>
 
-    <!-- Pied de page -->
     <bottom>
         <HBox style="-fx-background-color: #ecf0f1; -fx-padding: 10;" alignment="CENTER">
             <Label text="* Tous les champs sont obligatoires" style="-fx-text-fill: #7f8c8d; -fx-font-style: italic;"/>

@@ -2,6 +2,7 @@ package org.example.controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,10 +21,8 @@ import java.util.ResourceBundle;
 
 public class RessourceController implements Initializable {
 
-    // REMPLACER TableView par ListView
     @FXML
-    private ListView<ressource> listViewRessources;  // ← Changé ici
-
+    private ListView<ressource> listViewRessources;
     @FXML
     private Label statsTotal;
     @FXML
@@ -31,8 +30,17 @@ public class RessourceController implements Initializable {
     @FXML
     private Label statsTypes;
 
+    // Nouveaux champs pour la recherche
+    @FXML
+    private TextField searchField;
+    @FXML
+    private Button btnSearch;
+    @FXML
+    private Button btnClearSearch;
+
     private service_ressource serviceRessource = new service_ressource();
     private ObservableList<ressource> observableList = FXCollections.observableArrayList();
+    private FilteredList<ressource> filteredData;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -41,33 +49,118 @@ public class RessourceController implements Initializable {
         // Configuration du ListView avec des cellules personnalisées
         listViewRessources.setCellFactory(param -> new RessourceListCell());
 
-        // Permettre la sélection (utile pour modifier/supprimer)
+        // Permettre la sélection
         listViewRessources.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
         // Charger les données
         chargerDonnees();
+
+        // Configurer la recherche
+        configurerRecherche();
+    }
+
+    private void configurerRecherche() {
+        filteredData = new FilteredList<>(observableList, p -> true);
+
+        // Configurer le listener sur le champ de recherche
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filtrerRessources(newValue);
+        });
+
+        // Bouton de recherche
+        btnSearch.setOnAction(e -> filtrerRessources(searchField.getText()));
+
+        // Bouton pour effacer la recherche
+        btnClearSearch.setOnAction(e -> {
+            searchField.clear();
+            filtrerRessources("");
+        });
+
+        // Lier la ListView à la liste filtrée
+        listViewRessources.setItems(filteredData);
+    }
+
+    private void filtrerRessources(String texteRecherche) {
+        filteredData.setPredicate(ressource -> {
+            // Si le champ de recherche est vide, afficher toutes les ressources
+            if (texteRecherche == null || texteRecherche.isEmpty()) {
+                return true;
+            }
+
+            // Convertir en minuscules pour une recherche insensible à la casse
+            String lowerCaseFilter = texteRecherche.toLowerCase();
+
+            // Recherche par nom
+            if (ressource.getNom() != null && ressource.getNom().toLowerCase().contains(lowerCaseFilter)) {
+                return true;
+            }
+
+            // Recherche par type
+            if (ressource.getType_ressource() != null &&
+                    ressource.getType_ressource().toLowerCase().contains(lowerCaseFilter)) {
+                return true;
+            }
+
+            // Recherche par fournisseur
+            if (ressource.getFournisseur() != null &&
+                    ressource.getFournisseur().toLowerCase().contains(lowerCaseFilter)) {
+                return true;
+            }
+
+            return false;
+        });
+
+        // Mettre à jour les statistiques avec les résultats filtrés
+        mettreAJourStatistiquesFiltrees();
+    }
+
+    private void mettreAJourStatistiquesFiltrees() {
+        int total = filteredData.size();
+
+        int quantiteTotale = filteredData.stream()
+                .mapToInt(ressource::getQuatite)
+                .sum();
+
+        long typesUniques = filteredData.stream()
+                .map(ressource::getType_ressource)
+                .distinct()
+                .count();
+
+        // Indiquer si on est en mode recherche
+        if (searchField.getText() != null && !searchField.getText().isEmpty()) {
+            statsTotal.setText("Résultats: " + total + " (sur " + observableList.size() + ")");
+        } else {
+            statsTotal.setText("Total ressources: " + total);
+        }
+
+        statsQuantiteTotale.setText("Quantité totale: " + quantiteTotale);
+        statsTypes.setText("Types: " + typesUniques);
     }
 
     private void chargerDonnees() {
         List<ressource> ressources = serviceRessource.getAll();
         observableList.setAll(ressources);
-        listViewRessources.setItems(observableList);
+        // Réappliquer le filtre après rechargement
+        if (filteredData != null) {
+            filtrerRessources(searchField != null ? searchField.getText() : "");
+        } else {
+            listViewRessources.setItems(observableList);
+        }
         mettreAJourStatistiques();
     }
 
     private void mettreAJourStatistiques() {
         int total = observableList.size();
-        statsTotal.setText("Total ressources: " + total);
-
         int quantiteTotale = observableList.stream()
                 .mapToInt(ressource::getQuatite)
                 .sum();
-        statsQuantiteTotale.setText("Quantité totale: " + quantiteTotale);
-
         long typesUniques = observableList.stream()
                 .map(ressource::getType_ressource)
                 .distinct()
                 .count();
+
+        statsTotal.setText("Total ressources: " + total);
+        statsQuantiteTotale.setText("Quantité totale: " + quantiteTotale);
         statsTypes.setText("Types: " + typesUniques);
     }
 
@@ -97,7 +190,7 @@ public class RessourceController implements Initializable {
 
     @FXML
     private void ouvrirModifierRessource() {
-        ressource selected = listViewRessources.getSelectionModel().getSelectedItem();  // ← Changé ici
+        ressource selected = listViewRessources.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert(Alert.AlertType.WARNING, "Attention",
                     "Veuillez sélectionner une ressource à modifier");
@@ -126,7 +219,7 @@ public class RessourceController implements Initializable {
 
     @FXML
     private void supprimerRessource() {
-        ressource selected = listViewRessources.getSelectionModel().getSelectedItem();  // ← Changé ici
+        ressource selected = listViewRessources.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert(Alert.AlertType.WARNING, "Attention",
                     "Veuillez sélectionner une ressource à supprimer");
@@ -157,7 +250,7 @@ public class RessourceController implements Initializable {
     private void retourMenuPrincipal() {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/produit.fxml"));
-            Stage stage = (Stage) listViewRessources.getScene().getWindow();  // ← Changé ici
+            Stage stage = (Stage) listViewRessources.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Gestion des Produits");
         } catch (IOException e) {
