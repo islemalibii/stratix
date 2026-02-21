@@ -11,7 +11,6 @@ import models.enums.EventType;
 import services.ServiceEvenemnet;
 
 import java.io.IOException;
-import java.time.LocalDate;
 
 public class ModifyEventController {
     @FXML private TextField titreField;
@@ -126,7 +125,7 @@ public class ModifyEventController {
         try {
             Stage stage = (Stage) titreField.getScene().getWindow();
             javafx.fxml.FXMLLoader loader =
-                    new javafx.fxml.FXMLLoader(getClass().getResource("/EventDashboard.fxml"));
+                    new javafx.fxml.FXMLLoader(getClass().getResource("/EventDetailsAdmin.fxml"));
             stage.setScene(new javafx.scene.Scene(loader.load()));
         } catch (IOException e) {
             System.err.println(e.getMessage());

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+
+<HBox prefHeight="700.0" prefWidth="1200.0" styleClass="main-bg"
+      stylesheets="@/style/global.css" xmlns="http://javafx.com/javafx/20"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.EventDetailsAdminController">
+
+    <fx:include source="TableauBord.fxml" />
+
+    <VBox HBox.hgrow="ALWAYS" spacing="20" style="-fx-padding: 40;">
+        <Button text="Retour au Dashboard" onAction="#goBack" styleClass="btn-secondary" />
+
+        <HBox spacing="40" styleClass="card" style="-fx-padding: 30; -fx-background-radius: 20; -fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+
+            <VBox alignment="TOP_CENTER" spacing="15">
+                <ImageView fx:id="eventImageView" fitHeight="350.0" fitWidth="450.0" pickOnBounds="true" />
+                <Label fx:id="statusBadge" styleClass="status-badge" />
+            </VBox>
+
+            <VBox spacing="15" HBox.hgrow="ALWAYS">
+                <Label fx:id="titleLabel" styleClass="heading-large" wrapText="true" />
+                <Separator />
+
+                <GridPane vgap="12" hgap="25">
+                    <Label text="Statut :" GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="input-label" />
+                    <Label fx:id="statusTextLabel"  GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                    <Label text="Date :" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="input-label" />
+                    <Label fx:id="dateLabel"  GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <Label text="Lieu :" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="input-label" />
+                    <Label fx:id="locationLabel"  GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                    <Label text="Type :" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="input-label" />
+                    <Label fx:id="typeLabel"  GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                </GridPane>
+
+                <VBox spacing="8" VBox.vgrow="ALWAYS">
+                    <Label text="Description :" styleClass="input-label" />
+                    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+                        <Label fx:id="descriptionLabel" styleClass="card-description" wrapText="true" />
+                    </ScrollPane>
+                </VBox>
+
+                <HBox spacing="15" alignment="BOTTOM_RIGHT" style="-fx-padding: 10 0 0 0;">
+                    <Button text="Modifier" onAction="#handleEdit" styleClass="btn-modify-card" prefWidth="180" prefHeight="40" />
+                    <Button text="Archiver" onAction="#handleArchive" styleClass="btn-archive-card" prefWidth="150" prefHeight="40" />
+                </HBox>
+            </VBox>
+        </HBox>
+    </VBox>
+</HBox>

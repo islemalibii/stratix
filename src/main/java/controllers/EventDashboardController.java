@@ -115,34 +115,26 @@ public class EventDashboardController {
         Label status = new Label(e.getStatut().name().toUpperCase());
         status.getStyleClass().addAll("status-badge", "status-" + e.getStatut().name().toLowerCase());
 
-        HBox actions = new HBox(10);
-        actions.setAlignment(Pos.CENTER);
 
-        Button modifyBtn = new Button("Modifier");
-        Button archiveBtn = new Button("Archiver");
-        modifyBtn.getStyleClass().add("btn-modify-card");
-        archiveBtn.getStyleClass().add("btn-archive-card");
 
-        modifyBtn.setOnAction(ev -> {
+        Button detailBtn = new Button("Details");
+        detailBtn.getStyleClass().add("btn-archive-card");
+        detailBtn.setMaxWidth(Double.MAX_VALUE);
+
+        detailBtn.setOnAction(ev -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/ModifyEvent.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventDetailsAdmin.fxml"));
                 Parent root = loader.load();
-                ModifyEventController controller = loader.getController();
-                controller.setEvent(e);
+                EventDetailsAdminController controller = loader.getController();
+                controller.setEventData(e);
 
                 eventContainer.getScene().setRoot(root);
-            } catch (Exception ex) { ex.getMessage(); }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         });
 
-        archiveBtn.setOnAction(ev -> {
-            service.archiver(e.getId());
-            events = service.getAll();
-            updateCounters();
-            displayEvents(events);
-        });
-
-        actions.getChildren().addAll(modifyBtn, archiveBtn);
-        infoBox.getChildren().addAll(title, typeLabel, dateLieu, status, actions);
+        infoBox.getChildren().addAll(title, typeLabel, dateLieu, status, detailBtn);
         card.getChildren().addAll(imageView, infoBox);
 
         return card;

@@ -90,7 +90,7 @@ public class ArchivedEventsController {
         });
 
         Button deleteBtn = new Button("Supprimer");
-        deleteBtn.getStyleClass().add("btn-delete-permanent");
+        deleteBtn.getStyleClass().add("btn-archive-permanent");
         deleteBtn.setOnAction(event -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Supprimer définitivement ?", ButtonType.YES, ButtonType.NO);
             if (alert.showAndWait().get() == ButtonType.YES) {
