@@ -1,4 +1,4 @@
-/*  VARIABLES DE COULEURS */
+
 .root {
     -fx-primary: #1a2639;
     -fx-secondary: #3a4a6b;
@@ -216,7 +216,7 @@
 .modern-title {
     -fx-font-size: 28px;
     -fx-font-weight: bold;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #1a2639;
 }
 
 .modern-search {
@@ -237,7 +237,7 @@
 }
 
 .modern-button-primary {
-    -fx-background-color: #3b82f6;
+    -fx-background-color: #3a4a6b;
     -fx-text-fill: white;
     -fx-padding: 10 20;
     -fx-background-radius: 30;
@@ -246,7 +246,7 @@
 }
 
 .modern-button-pdf {
-    -fx-background-color: #ef4444;
+    -fx-background-color: #e74c3c;
     -fx-text-fill: white;
     -fx-padding: 8 16;
     -fx-background-radius: 30;
@@ -255,7 +255,7 @@
 }
 
 .modern-button-archive {
-    -fx-background-color: #64748b;
+    -fx-background-color: #95a5a6;
     -fx-text-fill: white;
     -fx-padding: 8 16;
     -fx-background-radius: 30;
@@ -264,7 +264,7 @@
 }
 
 .modern-button-retour {
-    -fx-background-color: #3b82f6;
+    -fx-background-color: #3a4a6b;
     -fx-text-fill: white;
     -fx-padding: 8 16;
     -fx-background-radius: 30;
@@ -273,7 +273,7 @@
 }
 
 .modern-button-add {
-    -fx-background-color: #10b981;
+    -fx-background-color: #2ecc71;
     -fx-text-fill: white;
     -fx-padding: 8 16;
     -fx-background-radius: 30;
@@ -303,8 +303,8 @@
 }
 
 .service-card:hover {
-    -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.2), 15, 0, 0, 5);
-    -fx-border-color: #3b82f6;
+    -fx-effect: dropshadow(gaussian, rgba(26,38,57,0.2), 15, 0, 0, 5);  /* -fx-primary with opacity */
+    -fx-border-color: #1a2639;
 }
 
 .card-header {
@@ -316,12 +316,12 @@
 .card-title {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #1a2639;
 }
 
 .card-category {
-    -fx-background-color: #dbeafe;
-    -fx-text-fill: #1e40af;
+    -fx-background-color: #eef2ff;
+    -fx-text-fill: #3a4a6b;
     -fx-padding: 4 10;
     -fx-background-radius: 20;
     -fx-font-size: 12px;
@@ -340,25 +340,25 @@
 
 .card-label {
     -fx-font-size: 13px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: #7f8c8d;
     -fx-min-width: 70;
 }
 
 .card-value {
     -fx-font-size: 14px;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #2c3e50;
     -fx-font-weight: 500;
 }
 
 .card-budget {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-text-fill: #10b981;
+    -fx-text-fill: #2ecc71;
 }
 
 .card-responsable {
     -fx-background-color: #f1f5f9;
-    -fx-text-fill: #334155;
+    -fx-text-fill: #2c3e50;
     -fx-padding: 4 8;
     -fx-background-radius: 20;
     -fx-font-size: 12px;
@@ -374,7 +374,7 @@
 
 .card-button-archive {
     -fx-background-color: #f1f5f9;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: #95a5a6;
     -fx-padding: 6 12;
     -fx-background-radius: 20;
     -fx-font-weight: bold;
@@ -382,12 +382,12 @@
 }
 
 .card-button-archive:hover {
-    -fx-background-color: #64748b;
+    -fx-background-color: #95a5a6;
     -fx-text-fill: white;
 }
 
 .card-button-modify {
-    -fx-background-color: #3b82f6;
+    -fx-background-color: #f39c12;
     -fx-text-fill: white;
     -fx-padding: 6 12;
     -fx-background-radius: 20;
@@ -412,8 +412,8 @@
 }
 
 .categorie-card:hover {
-    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.2), 15, 0, 0, 5);
-    -fx-border-color: #6366f1;
+    -fx-effect: dropshadow(gaussian, rgba(26,38,57,0.2), 15, 0, 0, 5);  /* -fx-primary with opacity */
+    -fx-border-color: #1a2639;
 }
 
 .categorie-header {
@@ -425,7 +425,7 @@
 .categorie-nom {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #1a2639;
 }
 
 .categorie-content {
@@ -435,7 +435,7 @@
 
 .categorie-description {
     -fx-font-size: 14px;
-    -fx-text-fill: #475569;
+    -fx-text-fill: #2c3e50;
 }
 
 .categorie-row {
@@ -445,13 +445,13 @@
 
 .categorie-label {
     -fx-font-size: 13px;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: #7f8c8d;
     -fx-min-width: 80;
 }
 
 .categorie-value {
     -fx-font-size: 14px;
-    -fx-text-fill: #0f172a;
+    -fx-text-fill: #2c3e50;
     -fx-font-weight: 500;
 }
 
@@ -465,7 +465,7 @@
 
 .categorie-button-archive {
     -fx-background-color: #f1f5f9;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: #95a5a6;
     -fx-padding: 6 12;
     -fx-background-radius: 20;
     -fx-font-weight: bold;
@@ -473,12 +473,12 @@
 }
 
 .categorie-button-archive:hover {
-    -fx-background-color: #64748b;
+    -fx-background-color: #95a5a6;
     -fx-text-fill: white;
 }
 
 .categorie-button-modify {
-    -fx-background-color: #6366f1;
+    -fx-background-color: #f39c12;
     -fx-text-fill: white;
     -fx-padding: 6 12;
     -fx-background-radius: 20;
@@ -491,7 +491,7 @@
 }
 
 .categorie-button-restore {
-    -fx-background-color: #10b981;
+    -fx-background-color: #2ecc71;  /* -fx-success */
     -fx-text-fill: white;
     -fx-padding: 6 12;
     -fx-background-radius: 20;
@@ -501,4 +501,214 @@
 
 .categorie-button-restore:hover {
     -fx-opacity: 0.9;
+}
+
+/* Main Window with Sidebar */
+.main-window {
+    -fx-background-color: #f8fafc;
+}
+
+.header {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+.app-title {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.user-label {
+    -fx-text-fill: #2c3e50;
+    -fx-font-size: 14px;
+}
+
+.user-icon {
+    -fx-text-fill: #7f8c8d;  /* -fx-text-light */
+    -fx-font-size: 18px;
+}
+
+/* Sidebar styles */
+.sidebar {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 1 0 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 2, 0);
+}
+
+
+.sidebar-title {
+    -fx-text-fill: #000000;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.sidebar-menu {
+    -fx-background-color: white;
+}
+
+/* Sidebar buttons - with your chosen colors */
+.sidebar-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1a2639;  /* -fx-primary */
+    -fx-font-size: 14px;
+    -fx-padding: 10 15;
+    -fx-background-radius: 8;
+    -fx-alignment: CENTER_LEFT;
+    -fx-cursor: hand;
+    -fx-graphic-text-gap: 12;
+    -fx-border-color: transparent;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: #eef2ff;
+    -fx-text-fill: #3a4a6b;
+}
+
+.sidebar-button:pressed {
+    -fx-background-color: #dbeafe;
+}
+
+/* User section at bottom */
+.user-section {
+    -fx-padding: 10 0 15 0;
+}
+
+.user-separator {
+    -fx-background-color: #e2e8f0;
+    -fx-padding: 0 10 0 10;
+}
+
+.user-info-container {
+    -fx-padding: 5 5 0 5;
+    -fx-background-radius: 10;
+}
+
+.user-info-container:hover {
+    -fx-background-color: #f8fafc;
+}
+
+.user-avatar-large {
+    -fx-font-size: 28px;
+    -fx-text-fill: #1a2639;
+    -fx-min-width: 40;
+    -fx-alignment: center;
+}
+
+.user-name-large {
+    -fx-text-fill: #1a2639;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.user-role-label {
+    -fx-text-fill: #7f8c8d;
+    -fx-font-size: 12px;
+}
+
+.user-settings-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #95a5a6;
+    -fx-font-size: 16px;
+    -fx-padding: 5;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+    -fx-min-width: 30;
+    -fx-min-height: 30;
+}
+
+.user-settings-button:hover {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #1a2639;
+}
+
+/* Content area */
+.content-area {
+    -fx-background-color: #f8fafc;
+    -fx-padding: 20;
+}
+
+/* Sub-navigation styles */
+.sub-nav-bar {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-padding: 5;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+}
+
+.sub-nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #7f8c8d;
+    -fx-font-size: 14px;
+    -fx-padding: 8 20;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.sub-nav-button:hover {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #1a2639;
+}
+
+.sub-nav-button-active {
+    -fx-background-color: #1a2639;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.sub-nav-button-active:hover {
+    -fx-background-color: #2c3e50;
+}
+
+/* Keep all your existing card styles */
+.service-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);
+    -fx-padding: 18;
+    -fx-border-color: #eef2f6;
+    -fx-border-radius: 12;
+}
+
+.card-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a2639;
+}
+
+.card-category {
+    -fx-background-color: #eef2ff;
+    -fx-text-fill: #3a4a6b;
+    -fx-font-size: 12px;
+    -fx-padding: 4 10;
+    -fx-background-radius: 20;
+}
+
+.card-budget {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2ecc71;
+}
+
+.card-button-archive {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #95a5a6;
+    -fx-font-size: 12px;
+    -fx-padding: 6 12;
+    -fx-background-radius: 6;
+}
+
+.card-button-modify {
+    -fx-background-color: #f39c12;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 6 12;
+    -fx-background-radius: 6;
 }
