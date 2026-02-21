@@ -16,6 +16,15 @@ import javafx.stage.Stage;
 import model.Projet;
 import service.ProjetService;
 
+// Bibliothèques PDF (OpenPDF / iText)
+import com.lowagie.text.Document;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.Element;
+
+import java.io.FileOutputStream;
+import java.io.File;
+import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -97,16 +106,10 @@ public class ListeProjetsController {
         nom.getStyleClass().add("project-title");
         nom.setWrapText(true);
 
-        // --- 3. QR CODE (SANS IDs) ---
-        // On construit le texte proprement pour le scanneur
+        // 3. QR CODE
         String qrContent = String.format(
-                "PROJET : %s\n" +
-                        "DESCRIPTION : %s\n" +
-                        "CHEF : %s\n" +
-                        "ÉQUIPE : %s\n" +
-                        "PROGRESSION : %d%%",
-                p.getNom(),
-                p.getDescription(),
+                "PROJET : %s\nDESCRIPTION : %s\nCHEF : %s\nÉQUIPE : %s\nPROGRESSION : %d%%",
+                p.getNom(), p.getDescription(),
                 (p.getResponsableId() > 0 ? "Responsable Assigné" : "Non défini"),
                 (p.getEquipeMembres() != null ? p.getEquipeMembres() : "Aucun membre"),
                 p.getProgression()
@@ -123,9 +126,7 @@ public class ListeProjetsController {
         qrContainer.setAlignment(Pos.CENTER);
         qrContainer.setStyle("-fx-background-color: white; -fx-padding: 8; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);");
 
-        Tooltip.install(qrCodeView, new Tooltip("Scannez pour les détails du projet"));
-
-        // 4. Description courte sous le QR
+        // 4. Description
         Label desc = new Label(p.getDescription());
         desc.getStyleClass().add("project-desc");
         desc.setWrapText(true);
@@ -139,12 +140,17 @@ public class ListeProjetsController {
         pb.setPrefWidth(Double.MAX_VALUE);
         progBox.getChildren().addAll(lblProg, pb);
 
-        // 6. Actions
+        // 6. Actions (AJOUT DU BOUTON PDF ICI)
         HBox actions = new HBox(10);
         actions.setAlignment(Pos.CENTER);
+
         Button btnMod = new Button("Modifier");
         btnMod.getStyleClass().add("btn-secondary");
         btnMod.setOnAction(e -> ouvrirFenetreModification(p));
+
+        Button btnPdf = new Button("PDF");
+        btnPdf.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-font-weight: bold;");
+        btnPdf.setOnAction(e -> exporterEnPDF(p, qrUrl)); // On passe l'URL du QR Code
 
         Button btnArch = new Button("Archiver");
         btnArch.getStyleClass().add("btn-primary");
@@ -154,7 +160,7 @@ public class ListeProjetsController {
             rafraichirDonnees();
         });
 
-        actions.getChildren().addAll(btnMod, btnArch);
+        actions.getChildren().addAll(btnMod, btnPdf, btnArch);
 
         card.getChildren().addAll(statutBadge, nom, qrContainer, desc, progBox, new Separator(), actions);
         return card;
@@ -169,6 +175,59 @@ public class ListeProjetsController {
         };
     }
 
+    // --- LOGIQUE D'EXPORT PDF ---
+    private void exporterEnPDF(Projet p, String qrCodeUrl) {
+        Document document = new Document();
+        try {
+            String fileName = "Rapport_" + p.getNom().replaceAll("\\s+", "_") + ".pdf";
+            PdfWriter.getInstance(document, new FileOutputStream(fileName));
+
+            document.open();
+
+            // En-tête
+            Paragraph header = new Paragraph("STRATIX - FICHE TECHNIQUE DU PROJET");
+            header.setAlignment(Element.ALIGN_CENTER);
+            document.add(header);
+            document.add(new Paragraph(" ")); // Espace
+            document.add(new Paragraph("============================================"));
+
+            // Détails
+            document.add(new Paragraph("NOM DU PROJET : " + p.getNom()));
+            document.add(new Paragraph("STATUT : " + p.getStatut()));
+            document.add(new Paragraph("PROGRESSION : " + p.getProgression() + "%"));
+            document.add(new Paragraph("CHEF DE PROJET (ID) : " + p.getResponsableId()));
+            document.add(new Paragraph("ÉQUIPE : " + (p.getEquipeMembres() != null ? p.getEquipeMembres() : "Non définie")));
+            document.add(new Paragraph("DESCRIPTION : " + p.getDescription()));
+            document.add(new Paragraph(" "));
+
+            // Insertion du QR Code dans le PDF
+            try {
+                com.lowagie.text.Image qrImage = com.lowagie.text.Image.getInstance(new java.net.URL(qrCodeUrl));
+                qrImage.scaleAbsolute(120, 120);
+                qrImage.setAlignment(Element.ALIGN_CENTER);
+                document.add(qrImage);
+                Paragraph qrLabel = new Paragraph("(Scannez pour suivre l'évolution en direct)");
+                qrLabel.setAlignment(Element.ALIGN_CENTER);
+                document.add(qrLabel);
+            } catch (Exception ex) {
+                document.add(new Paragraph("[Image QR Code indisponible sans connexion internet]"));
+            }
+
+            document.close();
+
+            // Ouverture automatique du PDF
+            File file = new File(fileName);
+            if (file.exists()) {
+                Desktop.getDesktop().open(file);
+            }
+
+        } catch (Exception e) {
+            afficherErreur("Erreur PDF", "Impossible de générer le fichier.");
+            e.printStackTrace();
+        }
+    }
+
+    // --- NAVIGATION ET FENÊTRES ---
     @FXML private void allerAjouterProjet() { chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet"); }
     @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Archives"); }
 
