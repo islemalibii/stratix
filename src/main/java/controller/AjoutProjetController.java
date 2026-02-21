@@ -25,19 +25,14 @@ public class AjoutProjetController {
     @FXML
     public void initialize() {
 
-        // ✅ Statut par défaut (désactivé)
         cbStatut.getItems().add("Planifié");
         cbStatut.setValue("Planifié");
         cbStatut.setDisable(true);
 
-        // sélection multiple membres
         lvMembres.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-        // ❌ bloquer dates passées
         bloquerDatesPassees(dpDateDebut);
         bloquerDatesPassees(dpDateFin);
 
-        // empêcher date fin < date début dynamiquement
         dpDateDebut.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && dpDateFin.getValue() != null &&
                     dpDateFin.getValue().isBefore(newVal)) {
@@ -83,7 +78,6 @@ public class AjoutProjetController {
     private void ajouterProjet() {
 
         try {
-            // ✅ Vérifier champs obligatoires
             if (tfNom.getText().isEmpty()
                     || taDescription.getText().isEmpty()
                     || tfBudget.getText().isEmpty()
@@ -96,7 +90,6 @@ public class AjoutProjetController {
                 return;
             }
 
-            // ✅ Vérifier budget valide
             double budget;
             try {
                 budget = Double.parseDouble(tfBudget.getText());
@@ -107,18 +100,15 @@ public class AjoutProjetController {
                 return;
             }
 
-            // ✅ Vérifier ordre des dates
             if (dpDateDebut.getValue().isAfter(dpDateFin.getValue())) {
                 showAlert(Alert.AlertType.WARNING,
                         "La date de début doit être avant la date de fin.");
                 return;
             }
 
-            // Extraction ID chef
             String selectedChef = cbResponsable.getValue();
             int idChef = Integer.parseInt(selectedChef.split(" - ")[0]);
 
-            // Membres sélectionnés
             String membres = lvMembres.getSelectionModel()
                     .getSelectedItems()
                     .stream()
