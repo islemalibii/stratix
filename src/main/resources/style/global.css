@@ -360,51 +360,49 @@
 
 .sidebar-brand {
     -fx-font-family: "Segoe UI Bold", "System";
-    -fx-font-size: 28px;            /* Taille augmentée */
-    -fx-text-fill: #113A71;         /* Le bleu "Strati X" */
-    -fx-font-weight: bold;          /* Mise en gras prononcée */
-    -fx-padding: 10 0 20 0;         /* Plus d'espace sous le nom */
-    -fx-letter-spacing: -0.5px;     /* Pour un look plus moderne/compact */
+    -fx-font-size: 28px;
+    -fx-text-fill: #113A71;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 20 0;
+    -fx-letter-spacing: -0.5px;
 }
 
 .sidebar-btn {
     -fx-background-color: transparent;
-    -fx-text-fill: #718096;         /* Gris moyen pour les éléments inactifs */
+    -fx-text-fill: #718096;
     -fx-font-family: "Segoe UI", "System";
     -fx-font-size: 14px;
     -fx-font-weight: 500;
-    -fx-padding: 12 18;             /* Confort de clic */
-    -fx-background-radius: 12;      /* Bords bien arrondis */
-    -fx-cursor: hand;               /* Curseur main au survol */
-    -fx-alignment: BASELINE_LEFT;   /* Texte aligné à gauche */
+    -fx-padding: 12 18;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-alignment: BASELINE_LEFT;
 }
 
 .sidebar-btn:hover {
-    -fx-background-color: #f8fafc;  /* Gris extrêmement clair au survol */
-    -fx-text-fill: #3182ce;         /* Le texte passe au bleu */
+    -fx-background-color: #f8fafc;
+    -fx-text-fill: #3182ce;
 }
 
 .sidebar-btn-active {
-    -fx-background-color: #ebf8ff;  /* Fond bleu très pâle */
-    -fx-text-fill: #3182ce;         /* Bleu Strati X */
-    -fx-font-weight: bold;          /* Mise en gras */
+    -fx-background-color: #ebf8ff;
+    -fx-text-fill: #3182ce;
+    -fx-font-weight: bold;
 }
 
 .stat-card {
     -fx-background-color: white;
     -fx-background-radius: 15;
-    /* Ombre portée douce pour l'effet de profondeur */
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);
     -fx-padding: 20;
     -fx-pref-height: 100;
     -fx-pref-width: 180;
-    /* Optionnel : une bordure très fine pour définir la carte */
     -fx-border-color: #F1F5F9;
     -fx-border-radius: 15;
     -fx-border-width: 1;
 }
 
-/* On s'assure que le contenu est bien espacé */
+
 .stat-card .label {
     -fx-text-alignment: center;
 }
