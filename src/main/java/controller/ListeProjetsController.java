@@ -17,6 +17,8 @@ import model.Projet;
 import service.ProjetService;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class ListeProjetsController {
@@ -25,7 +27,7 @@ public class ListeProjetsController {
     @FXML private Label lblTotal, lblEnCours, lblTermine, lblAnnule;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> comboFiltre;
-    @FXML private ImageView logoImageView; // Pour gérer le logo dynamiquement si besoin
+    @FXML private ImageView logoImageView;
 
     private ProjetService projetService;
     private List<Projet> listeCompleteProjets;
@@ -34,7 +36,7 @@ public class ListeProjetsController {
     public void initialize() {
         projetService = new ProjetService();
 
-        // Chargement du logo stratix.png
+        // 1. Chargement du logo
         if (logoImageView != null) {
             try {
                 Image logo = new Image(getClass().getResourceAsStream("/stratix.png"));
@@ -44,6 +46,7 @@ public class ListeProjetsController {
             }
         }
 
+        // 2. Initialisation ComboBox
         if (comboFiltre != null) {
             comboFiltre.setItems(FXCollections.observableArrayList(
                     "Tous les projets", "Planifié", "En cours", "Terminé", "Annulé"
@@ -52,6 +55,7 @@ public class ListeProjetsController {
             comboFiltre.setOnAction(e -> filtrerEtAfficher());
         }
 
+        // 3. Listener Recherche
         if (searchField != null) {
             searchField.textProperty().addListener((obs, oldVal, newVal) -> filtrerEtAfficher());
         }
@@ -92,24 +96,45 @@ public class ListeProjetsController {
         }
     }
 
+    /**
+     * Crée une carte projet avec intégration de l'API QR Code
+     */
     private VBox creerCardProjet(Projet p) {
         VBox card = new VBox(15);
-        card.setPrefWidth(320); // Légèrement plus large pour Stratix
+        card.setPrefWidth(320);
         card.setPadding(new Insets(20));
         card.getStyleClass().add("project-card");
 
+        // Statut Badge
         Label statutBadge = new Label(p.getStatut());
         statutBadge.getStyleClass().addAll("statut-badge", getStatutClass(p.getStatut()));
 
+        // Titre
         Label nom = new Label(p.getNom());
-        nom.getStyleClass().add("project-title"); // Utilise la classe CSS
+        nom.getStyleClass().add("project-title");
         nom.setWrapText(true);
 
+        // --- SECTION API QR CODE ---
+        // On génère une URL pour le QR Code contenant les infos clés
+        String qrData = "Projet: " + p.getNom() + " | Statut: " + p.getStatut();
+        String encodedData = URLEncoder.encode(qrData, StandardCharsets.UTF_8);
+        String qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" + encodedData;
+
+        ImageView qrCodeView = new ImageView(new Image(qrUrl, true)); // true = chargement asynchrone
+        qrCodeView.setFitWidth(80);
+        qrCodeView.setPreserveRatio(true);
+
+        VBox qrContainer = new VBox(qrCodeView);
+        qrContainer.setAlignment(Pos.CENTER);
+        // ---------------------------
+
+        // Description
         Label desc = new Label(p.getDescription());
-        desc.getStyleClass().add("project-desc"); // Utilise la classe CSS
+        desc.getStyleClass().add("project-desc");
         desc.setWrapText(true);
         desc.setMinHeight(50);
 
+        // Progression
         VBox progBox = new VBox(8);
         Label lblProg = new Label("Progression: " + p.getProgression() + "%");
         lblProg.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #4a5568;");
@@ -117,6 +142,7 @@ public class ListeProjetsController {
         pb.setPrefWidth(Double.MAX_VALUE);
         progBox.getChildren().addAll(lblProg, pb);
 
+        // Boutons Actions
         HBox actions = new HBox(10);
         actions.setAlignment(Pos.CENTER);
 
@@ -126,14 +152,16 @@ public class ListeProjetsController {
 
         Button btnArch = new Button("Archiver");
         btnArch.getStyleClass().add("btn-primary");
-        btnArch.setStyle("-fx-background-color: #f59e0b;"); // Orange pour l'archive
+        btnArch.setStyle("-fx-background-color: #f59e0b;");
         btnArch.setOnAction(e -> {
             projetService.archiverUnProjet(p.getId());
             rafraichirDonnees();
         });
 
         actions.getChildren().addAll(btnMod, btnArch);
-        card.getChildren().addAll(statutBadge, nom, desc, progBox, new Separator(), actions);
+
+        // Assemblage final de la carte
+        card.getChildren().addAll(statutBadge, nom, qrContainer, desc, progBox, new Separator(), actions);
         return card;
     }
 
@@ -188,16 +216,36 @@ public class ListeProjetsController {
         alert.showAndWait();
     }
 
+    // --- GESTION DE LA NAVIGATION (Conservation de la taille) ---
+
     @FXML
     private void allerAuFront() {
+        changerEspace("/EmployeListeProjets.fxml", "Stratix - Espace Employé");
+    }
+
+    private void changerEspace(String fxmlPath, String titre) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EmployeListeProjets.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
+
+            // Récupérer le stage actuel via un élément injecté
             Stage stage = (Stage) containerProjets.getScene().getWindow();
-            Scene scene = new Scene(root, 1100, 800);
-            scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+
+            // Capturer les dimensions actuelles de l'utilisateur
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+
+            // Appliquer la nouvelle scène avec les mêmes dimensions
+            Scene scene = new Scene(root, width, height);
+
+            // Re-lier le fichier CSS
+            String css = getClass().getResource("/styles.css").toExternalForm();
+            scene.getStylesheets().add(css);
+
+            stage.setTitle(titre);
             stage.setScene(scene);
         } catch (IOException e) {
+            System.err.println("Erreur de transition : " + e.getMessage());
             e.printStackTrace();
         }
     }

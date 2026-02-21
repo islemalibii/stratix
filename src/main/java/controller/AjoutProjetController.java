@@ -5,15 +5,17 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import model.Projet;
 import service.ProjetService;
-import java.time.LocalDate;
-import java.util.Date;
+import util.DBConnection;
+import java.sql.*;
+import java.util.stream.Collectors;
 
 public class AjoutProjetController {
-
     @FXML private TextField tfNom, tfBudget;
     @FXML private TextArea taDescription;
     @FXML private DatePicker dpDateDebut, dpDateFin;
     @FXML private ChoiceBox<String> cbStatut;
+    @FXML private ComboBox<String> cbResponsable;
+    @FXML private ListView<String> lvMembres;
 
     private ProjetService projetService = new ProjetService();
 
@@ -21,56 +23,47 @@ public class AjoutProjetController {
     public void initialize() {
         cbStatut.getItems().addAll("Planifié", "En cours", "Terminé", "Annulé");
         cbStatut.setValue("Planifié");
+        lvMembres.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        chargerUtilisateurs();
+    }
+
+    private void chargerUtilisateurs() {
+        String sql = "SELECT id, nom, prenom FROM utilisateur";
+        try (Connection conn = DBConnection.getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                String label = rs.getInt("id") + " - " + rs.getString("nom") + " " + rs.getString("prenom");
+                cbResponsable.getItems().add(label);
+                lvMembres.getItems().add(label);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 
     @FXML
     private void ajouterProjet() {
         try {
-            if (validationsEchouent()) return;
+            // Extraction de l'ID du chef
+            String selectedChef = cbResponsable.getValue();
+            int idChef = Integer.parseInt(selectedChef.split(" - ")[0]);
 
-            Date dateDebut = java.sql.Date.valueOf(dpDateDebut.getValue());
-            Date dateFin = java.sql.Date.valueOf(dpDateFin.getValue());
-            double budget = Double.parseDouble(tfBudget.getText());
+            // Extraction des noms des membres
+            String membres = lvMembres.getSelectionModel().getSelectedItems()
+                    .stream().collect(Collectors.joining(", "));
 
             Projet p = new Projet(0, tfNom.getText(), taDescription.getText(),
-                    dateDebut, dateFin, budget, "Planifié", 0, false);
+                    java.sql.Date.valueOf(dpDateDebut.getValue()),
+                    java.sql.Date.valueOf(dpDateFin.getValue()),
+                    Double.parseDouble(tfBudget.getText()),
+                    cbStatut.getValue(), 0, false, idChef, membres);
 
             projetService.ajouterProjet(p);
-            showAlert(Alert.AlertType.INFORMATION, "Succès", "Projet ajouté !");
-            fermerFenetre();
-
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Erreur", "Budget invalide.");
+            ((Stage) tfNom.getScene().getWindow()).close();
+        } catch (Exception e) {
+            new Alert(Alert.AlertType.ERROR, "Vérifiez vos saisies (Chef requis)").show();
         }
     }
 
-    private boolean validationsEchouent() {
-        LocalDate aujourdhui = LocalDate.now();
-        LocalDate debut = dpDateDebut.getValue();
-        LocalDate fin = dpDateFin.getValue();
-
-        if (tfNom.getText().isEmpty() || debut == null || fin == null) {
-            showAlert(Alert.AlertType.ERROR, "Erreur", "Veuillez remplir les champs obligatoires.");
-            return true;
-        }
-
-        if (debut.isBefore(aujourdhui)) {
-            showAlert(Alert.AlertType.ERROR, "Erreur", "La date de début ne peut pas être antérieure à aujourd'hui.");
-            return true;
-        }
-
-        if (fin.isBefore(debut)) {
-            showAlert(Alert.AlertType.ERROR, "Erreur", "La date de fin ne peut pas être avant la date de début.");
-            return true;
-        }
-        return false;
-    }
-
-    @FXML private void annuler() { fermerFenetre(); }
-    private void fermerFenetre() { ((Stage) tfNom.getScene().getWindow()).close(); }
-    private void showAlert(Alert.AlertType type, String t, String m) {
-        Alert a = new Alert(type); a.setTitle(t); a.setContentText(m); a.show();
-    }
-
-
+    @FXML private void annuler() { ((Stage) tfNom.getScene().getWindow()).close(); }
 }

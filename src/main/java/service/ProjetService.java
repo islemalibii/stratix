@@ -17,7 +17,7 @@ public class ProjetService implements Services {
 
     @Override
     public void ajouterProjet(Projet p) {
-        String sql = "INSERT INTO projet (nom, description, date_debut, date_fin, budget, statut, progression, is_archived) VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
+        String sql = "INSERT INTO projet (nom, description, date_debut, date_fin, budget, statut, responsable_id, equipe_membres, progression, is_archived) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, p.getNom());
             ps.setString(2, p.getDescription());
@@ -25,7 +25,9 @@ public class ProjetService implements Services {
             ps.setDate(4, new java.sql.Date(p.getDateFin().getTime()));
             ps.setDouble(5, p.getBudget());
             ps.setString(6, p.getStatut());
-            ps.setInt(7, p.getProgression());
+            ps.setInt(7, p.getResponsableId());      // L'ID extrait du String
+            ps.setString(8, p.getEquipeMembres());   // La liste des noms
+            ps.setInt(9, p.getProgression());
             ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
     }
@@ -48,10 +50,17 @@ public class ProjetService implements Services {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 projets.add(new Projet(
-                        rs.getInt("id"), rs.getString("nom"), rs.getString("description"),
-                        rs.getDate("date_debut"), rs.getDate("date_fin"),
-                        rs.getDouble("budget"), rs.getString("statut"),
-                        rs.getInt("progression"), rs.getBoolean("is_archived")
+                        rs.getInt("id"),
+                        rs.getString("nom"),
+                        rs.getString("description"),
+                        rs.getDate("date_debut"),
+                        rs.getDate("date_fin"),
+                        rs.getDouble("budget"),
+                        rs.getString("statut"),
+                        rs.getInt("progression"),
+                        rs.getBoolean("is_archived"),
+                        rs.getInt("responsable_id"),    // Nouveau champ
+                        rs.getString("equipe_membres")  // Nouveau champ
                 ));
             }
         } catch (SQLException e) { e.printStackTrace(); }
@@ -60,7 +69,6 @@ public class ProjetService implements Services {
 
     @Override
     public void archiverUnProjet(int id) {
-        // Cette méthode sert aussi à DÉSARCHIVER si on change le paramètre
         String sql = "UPDATE projet SET is_archived = 1 WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -68,7 +76,6 @@ public class ProjetService implements Services {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    // Ajout d'une méthode pour restaurer (désarchiver)
     public void desarchiverUnProjet(int id) {
         String sql = "UPDATE projet SET is_archived = 0 WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -79,7 +86,8 @@ public class ProjetService implements Services {
 
     @Override
     public void mettreAJourProjet(Projet p) {
-        String sql = "UPDATE projet SET nom=?, description=?, date_debut=?, date_fin=?, budget=?, statut=?, progression=? WHERE id=?";
+        // Mise à jour incluant le chef et l'équipe
+        String sql = "UPDATE projet SET nom=?, description=?, date_debut=?, date_fin=?, budget=?, statut=?, responsable_id=?, equipe_membres=?, progression=? WHERE id=?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, p.getNom());
             ps.setString(2, p.getDescription());
@@ -87,8 +95,10 @@ public class ProjetService implements Services {
             ps.setDate(4, new java.sql.Date(p.getDateFin().getTime()));
             ps.setDouble(5, p.getBudget());
             ps.setString(6, p.getStatut());
-            ps.setInt(7, p.getProgression());
-            ps.setInt(8, p.getId());
+            ps.setInt(7, p.getResponsableId());      // Nouvelle colonne
+            ps.setString(8, p.getEquipeMembres());   // Nouvelle colonne
+            ps.setInt(9, p.getProgression());
+            ps.setInt(10, p.getId());
             ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
     }
@@ -109,7 +119,6 @@ public class ProjetService implements Services {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // On utilise le même mapping que pour tes listes
                     return new Projet(
                             rs.getInt("id"),
                             rs.getString("nom"),
@@ -119,20 +128,20 @@ public class ProjetService implements Services {
                             rs.getDouble("budget"),
                             rs.getString("statut"),
                             rs.getInt("progression"),
-                            rs.getBoolean("is_archived")
+                            rs.getBoolean("is_archived"),
+                            rs.getInt("responsable_id"),
+                            rs.getString("equipe_membres")
                     );
                 }
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la recherche du projet (ID: " + idProjet + ") : " + e.getMessage());
         }
-        return null; // Retourne null si le projet n'existe pas
+        return null;
     }
 
     public List<Projet> rechercherProjets(String query, String statut) {
-        // On récupère d'abord tous les projets non archivés
         List<Projet> tous = listerTousLesProjets();
-
         return tous.stream()
                 .filter(p -> (statut.equals("Tous les projets") || p.getStatut().equals(statut)))
                 .filter(p -> p.getNom().toLowerCase().contains(query.toLowerCase()))

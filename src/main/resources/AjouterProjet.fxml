@@ -5,39 +5,30 @@
 
 <VBox spacing="15" alignment="CENTER" xmlns:fx="http://javafx.com/fxml"
       fx:controller="controller.AjoutProjetController" style="-fx-background-color: #f8f9fa;">
+    <padding><Insets top="20" right="30" bottom="20" left="30"/></padding>
 
-    <padding>
-        <Insets top="25" right="30" bottom="25" left="30"/>
-    </padding>
+    <Label text="🚀 Nouveau Projet" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
 
-    <Label text="Nouveau Projet" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
-
-    <TextField fx:id="tfNom" promptText="Nom du projet" prefHeight="35"/>
-
-    <TextArea fx:id="taDescription" promptText="Description..." prefRowCount="3" wrapText="true"/>
+    <TextField fx:id="tfNom" promptText="Nom du projet" />
+    <TextArea fx:id="taDescription" promptText="Description..." prefRowCount="3" />
 
     <HBox spacing="10">
-        <VBox HBox.hgrow="ALWAYS">
-            <Label text="Début :"/>
-            <DatePicker fx:id="dpDateDebut" maxWidth="Infinity"/>
-        </VBox>
-        <VBox HBox.hgrow="ALWAYS">
-            <Label text="Fin :"/>
-            <DatePicker fx:id="dpDateFin" maxWidth="Infinity"/>
-        </VBox>
+        <DatePicker fx:id="dpDateDebut" promptText="Début" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        <DatePicker fx:id="dpDateFin" promptText="Fin" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
     </HBox>
 
     <TextField fx:id="tfBudget" promptText="Budget (dt)"/>
 
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Statut : " style="-fx-font-weight: bold;"/>
-        <ChoiceBox fx:id="cbStatut" prefWidth="150" />
-    </HBox>
+    <Label text="Chef de Projet :" style="-fx-font-weight: bold;"/>
+    <ComboBox fx:id="cbResponsable" promptText="Choisir le chef" maxWidth="Infinity" />
 
-    <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10 0 0 0;">
-        <Button text="Annuler" onAction="#annuler"
-                style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-cursor: hand;"/>
-        <Button text="Confirmer l'Ajout" onAction="#ajouterProjet"
-                style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+    <Label text="Membres de l'équipe (Ctrl+Clic) :" style="-fx-font-weight: bold;"/>
+    <ListView fx:id="lvMembres" prefHeight="80" />
+
+    <ChoiceBox fx:id="cbStatut" prefWidth="150" />
+
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button text="Annuler" onAction="#annuler" style="-fx-background-color: #95a5a6; -fx-text-fill: white;"/>
+        <Button text="Créer" onAction="#ajouterProjet" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;"/>
     </HBox>
 </VBox>
