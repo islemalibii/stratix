@@ -760,3 +760,106 @@
 .card-button-modify:hover {
     -fx-opacity: 0.9;
 }
+.categorie-card {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 16;
+    -fx-min-width: 300;
+    -fx-max-width: 350;
+}
+
+.categorie-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(99,102,241,0.2), 15, 0, 0, 5);
+    -fx-border-color: #6366f1;
+}
+
+.categorie-header {
+    -fx-padding: 0 0 15 0;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 0 1 0;
+}
+
+.categorie-nom {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0f172a;
+}
+
+.categorie-content {
+    -fx-padding: 15 0;
+    -fx-spacing: 12;
+}
+
+.categorie-description {
+    -fx-font-size: 14px;
+    -fx-text-fill: #475569;
+    -fx-line-spacing: 2;
+}
+
+.categorie-row {
+    -fx-alignment: center-left;
+    -fx-spacing: 10;
+}
+
+.categorie-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+    -fx-min-width: 80;
+}
+
+.categorie-value {
+    -fx-font-size: 14px;
+    -fx-text-fill: #0f172a;
+    -fx-font-weight: 500;
+}
+
+.categorie-actions {
+    -fx-padding: 15 0 0 0;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1 0 0 0;
+    -fx-alignment: center-right;
+    -fx-spacing: 10;
+}
+
+.categorie-button-archive {
+    -fx-background-color: #f1f5f9;
+    -fx-text-fill: #64748b;
+    -fx-padding: 6 12;
+    -fx-background-radius: 20;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.categorie-button-archive:hover {
+    -fx-background-color: #64748b;
+    -fx-text-fill: white;
+}
+
+.categorie-button-modify {
+    -fx-background-color: #6366f1;
+    -fx-text-fill: white;
+    -fx-padding: 6 12;
+    -fx-background-radius: 20;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.categorie-button-modify:hover {
+    -fx-opacity: 0.9;
+}
+
+.categorie-button-restore {
+    -fx-background-color: #10b981;
+    -fx-text-fill: white;
+    -fx-padding: 6 12;
+    -fx-background-radius: 20;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.categorie-button-restore:hover {
+    -fx-opacity: 0.9;
+}
