@@ -1,12 +1,26 @@
 package controllers;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
+
 import services.StatsService;
+import services.SERVICETache;
+import services.EmployeeService;
 import models.DashboardStats;
+import models.Tache;
+import models.Employe;
 
-public class DashboardController {
+import java.net.URL;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
+public class DashboardController implements Initializable {
+
+    // Labels principaux
     @FXML private Label lblTotalTaches;
     @FXML private Label lblEnCours;
     @FXML private Label lblTerminees;
@@ -16,47 +30,57 @@ public class DashboardController {
     @FXML private Label lblAbsents;
     @FXML private Label lblAFaire;
 
+    // Mini indicateurs
+    @FXML private Label lblTotalEmployesMini;
+    @FXML private Label lblEnRetardMini;
+
+    // Labels du graphique
+    @FXML private Label lblAFaireGraph;
+    @FXML private Label lblEnCoursGraph;
+    @FXML private Label lblTermineesGraph;
+
+    // Barres du graphique
+    @FXML private Rectangle barAFaire;
+    @FXML private Rectangle barEnCours;
+    @FXML private Rectangle barTerminees;
+
+    // Recherche
+    @FXML private TextField searchField;
+    @FXML private VBox searchResultsContainer;
+    @FXML private ListView<String> searchResultsList;
+
     private StatsService statsService;
+    private SERVICETache tacheService;
+    private EmployeeService employeService;
 
-    @FXML
-    public void initialize() {
-        System.out.println("=== INITIALISATION DASHBOARD ===");
-
-        // Vérifier que les labels ne sont pas null
-        verifierLabels();
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        System.out.println("=== INITIALISATION DASHBOARD AVEC RECHERCHE ===");
 
         statsService = new StatsService();
-        chargerStatistiques();
-    }
+        tacheService = new SERVICETache();
+        employeService = new EmployeeService();
 
-    private void verifierLabels() {
-        System.out.println("Vérification des labels:");
-        System.out.println("  lblTotalTaches: " + (lblTotalTaches != null ? "✅" : "❌"));
-        System.out.println("  lblEnCours: " + (lblEnCours != null ? "✅" : "❌"));
-        System.out.println("  lblTerminees: " + (lblTerminees != null ? "✅" : "❌"));
-        System.out.println("  lblEnRetard: " + (lblEnRetard != null ? "✅" : "❌"));
-        System.out.println("  lblTotalEmployes: " + (lblTotalEmployes != null ? "✅" : "❌"));
-        System.out.println("  lblEnPoste: " + (lblEnPoste != null ? "✅" : "❌"));
-        System.out.println("  lblAbsents: " + (lblAbsents != null ? "✅" : "❌"));
-        System.out.println("  lblAFaire: " + (lblAFaire != null ? "✅" : "❌"));
+        chargerStatistiques();
+
+        // Listener pour la recherche
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal == null || newVal.trim().isEmpty()) {
+                    searchResultsContainer.setVisible(false);
+                    searchResultsContainer.setManaged(false);
+                } else {
+                    effectuerRecherche(newVal.trim().toLowerCase());
+                }
+            });
+        }
     }
 
     private void chargerStatistiques() {
         try {
-            System.out.println("\nChargement des statistiques...");
             DashboardStats stats = statsService.getDashboardStats();
 
-            System.out.println("Statistiques reçues:");
-            System.out.println("  Total Tâches: " + stats.getTotalTaches());
-            System.out.println("  En cours: " + stats.getTachesEnCours());
-            System.out.println("  Terminées: " + stats.getTachesTerminees());
-            System.out.println("  En retard: " + stats.getTachesEnRetard());
-            System.out.println("  Total Employés: " + stats.getTotalEmployes());
-            System.out.println("  En poste: " + stats.getEmployesEnPoste());
-            System.out.println("  Absents: " + stats.getEmployesAbsents());
-            System.out.println("  À faire: " + stats.getTachesAFaire());
-
-            // Mettre à jour les labels
+            // Labels principaux
             lblTotalTaches.setText(String.valueOf(stats.getTotalTaches()));
             lblEnCours.setText(String.valueOf(stats.getTachesEnCours()));
             lblTerminees.setText(String.valueOf(stats.getTachesTerminees()));
@@ -66,39 +90,59 @@ public class DashboardController {
             lblAbsents.setText(String.valueOf(stats.getEmployesAbsents()));
             lblAFaire.setText(String.valueOf(stats.getTachesAFaire()));
 
-            System.out.println("✅ Dashboard mis à jour avec succès!");
+            // Mini indicateurs
+            lblTotalEmployesMini.setText(String.valueOf(stats.getTotalEmployes()));
+            lblEnRetardMini.setText(String.valueOf(stats.getTachesEnRetard()));
+
+            // Graphique
+            lblAFaireGraph.setText(String.valueOf(stats.getTachesAFaire()));
+            lblEnCoursGraph.setText(String.valueOf(stats.getTachesEnCours()));
+            lblTermineesGraph.setText(String.valueOf(stats.getTachesTerminees()));
+
+            int max = Math.max(stats.getTachesAFaire(),
+                    Math.max(stats.getTachesEnCours(), stats.getTachesTerminees()));
+            if (max > 0) {
+                barAFaire.setHeight((stats.getTachesAFaire() * 100.0) / max);
+                barEnCours.setHeight((stats.getTachesEnCours() * 100.0) / max);
+                barTerminees.setHeight((stats.getTachesTerminees() * 100.0) / max);
+            }
+
+            System.out.println("✅ Dashboard mis à jour!");
 
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors du chargement des statistiques:");
-            e.printStackTrace();
-
-            // Afficher des valeurs par défaut en cas d'erreur
-            lblTotalTaches.setText("0");
-            lblEnCours.setText("0");
-            lblTerminees.setText("0");
-            lblEnRetard.setText("0");
-            lblTotalEmployes.setText("0");
-            lblEnPoste.setText("0");
-            lblAbsents.setText("0");
-            lblAFaire.setText("0");
+            System.err.println("❌ Erreur: " + e.getMessage());
         }
     }
 
-    @FXML
-    private void openTaches() {
-        System.out.println("Navigation vers Tâches");
-        MainController.showTaches();
+    private void effectuerRecherche(String recherche) {
+        searchResultsList.getItems().clear();
+
+        // Recherche dans les tâches
+        List<Tache> taches = tacheService.getAllTaches();
+        List<String> resultats = taches.stream()
+                .filter(t -> t.getTitre().toLowerCase().contains(recherche))
+                .map(t -> "📋 Tâche: " + t.getTitre())
+                .collect(Collectors.toList());
+
+        // Recherche dans les employés
+        List<Employe> employes = employeService.getAllEmployes();
+        resultats.addAll(employes.stream()
+                .filter(e -> e.getUsername().toLowerCase().contains(recherche))
+                .map(e -> "👤 Employé: " + e.getUsername())
+                .collect(Collectors.toList()));
+
+        if (!resultats.isEmpty()) {
+            searchResultsList.getItems().addAll(resultats);
+            searchResultsContainer.setVisible(true);
+            searchResultsContainer.setManaged(true);
+        } else {
+            searchResultsList.getItems().add("🔍 Aucun résultat");
+            searchResultsContainer.setVisible(true);
+            searchResultsContainer.setManaged(true);
+        }
     }
 
-    @FXML
-    private void openPlanning() {
-        System.out.println("Navigation vers Planning");
-        MainController.showPlanning();
-    }
-
-    @FXML
-    private void openCalendar() {
-        System.out.println("Navigation vers Calendrier");
-        MainController.showCalendar();
-    }
-}//
+    @FXML private void openTaches() { MainController.showTaches(); }
+    @FXML private void openPlanning() { MainController.showPlanning(); }
+    @FXML private void openCalendar() { MainController.showCalendar(); }
+}

@@ -4,6 +4,8 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Circle?>
@@ -15,12 +17,12 @@
             fx:controller="controllers.DashboardController"
             style="-fx-background-color: linear-gradient(to bottom, #f0f9ff, #e6f0fa);">
 
-    <!-- Header avec design moderne -->
+    <!-- Header avec barre de recherche -->
     <top>
         <VBox>
-            <!-- Bandeau supérieur avec dégradé -->
+            <!-- Bandeau supérieur avec dégradé et RECHERCHE -->
             <HBox alignment="CENTER_LEFT" style="-fx-background-color: linear-gradient(to right, #1e293b, #0f172a); -fx-padding: 25 35;">
-                <VBox spacing="8">
+                <VBox spacing="8" HBox.hgrow="ALWAYS">
                     <Label text="📊 TABLEAU DE BORD"
                            style="-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold; -fx-letter-spacing: 1px;">
                         <font>
@@ -31,8 +33,16 @@
                            style="-fx-text-fill: #94a3b8; -fx-font-size: 16px;"/>
                 </VBox>
 
+                <!-- BARRE DE RECHERCHE AJOUTÉE ICI -->
+                <HBox style="-fx-background-color: rgba(255,255,255,0.15); -fx-background-radius: 30; -fx-padding: 5 20; -fx-spacing: 10;" alignment="CENTER">
+                    <Label text="🔍" style="-fx-text-fill: #94a3b8; -fx-font-size: 18px;"/>
+                    <TextField fx:id="searchField" promptText="Rechercher une tâche, un employé..."
+                               style="-fx-background-color: transparent; -fx-text-fill: white; -fx-prompt-text-fill: #94a3b8; -fx-border-color: transparent; -fx-font-size: 14px;"
+                               prefWidth="250"/>
+                </HBox>
+
                 <!-- Badge de statut -->
-                <HBox style="-fx-background-color: rgba(255,255,255,0.15); -fx-background-radius: 50; -fx-padding: 12 25; -fx-spacing: 10;" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                <HBox style="-fx-background-color: rgba(255,255,255,0.15); -fx-background-radius: 50; -fx-padding: 12 25; -fx-spacing: 10;" alignment="CENTER">
                     <Circle radius="6" fill="#4ade80"/>
                     <Label text="Système opérationnel" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
                 </HBox>
@@ -77,10 +87,16 @@
 
     <center>
         <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;">
-            <VBox spacing="30" style="-fx-background-color: transparent;">
+            <VBox spacing="25" style="-fx-background-color: transparent;">
                 <padding>
                     <Insets top="30" right="35" bottom="30" left="35"/>
                 </padding>
+
+                <!-- RÉSULTATS DE RECHERCHE (caché par défaut) -->
+                <VBox fx:id="searchResultsContainer" spacing="10" managed="false" visible="false" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+                    <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="🔍 Résultats de recherche"/>
+                    <ListView fx:id="searchResultsList" prefHeight="150" style="-fx-background-radius: 10; -fx-border-radius: 10;"/>
+                </VBox>
 
                 <!-- Section 1: Statistiques principales -->
                 <VBox spacing="20">
@@ -97,10 +113,6 @@
                             </HBox>
                             <Label text="Total Tâches" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                             <Label fx:id="lblTotalTaches" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
-                            <HBox spacing="5">
-                                <Circle radius="5" fill="#10b981"/>
-                                <Label text="+12% ce mois" style="-fx-text-fill: #10b981; -fx-font-size: 12px; -fx-font-weight: bold;"/>
-                            </HBox>
                         </VBox>
 
                         <!-- Carte En cours -->
@@ -111,7 +123,6 @@
                             </HBox>
                             <Label text="En cours" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                             <Label fx:id="lblEnCours" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
-                            <Label text="En progression" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
                         </VBox>
 
                         <!-- Carte Terminées -->
@@ -122,18 +133,16 @@
                             </HBox>
                             <Label text="Terminées" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                             <Label fx:id="lblTerminees" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
-                            <Label text="Ce mois" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
                         </VBox>
 
-                        <!-- Carte En retard -->
+                        <!-- Carte À faire -->
                         <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5); -fx-min-width: 200; -fx-min-height: 180;" HBox.hgrow="ALWAYS">
                             <HBox alignment="CENTER_LEFT" spacing="15">
-                                <Circle radius="30" fill="#ef4444" opacity="0.15"/>
-                                <Label text="⚠️" style="-fx-font-size: 36px;"/>
+                                <Circle radius="30" fill="#f59e0b" opacity="0.15"/>
+                                <Label text="📊" style="-fx-font-size: 36px;"/>
                             </HBox>
-                            <Label text="En retard" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
-                            <Label fx:id="lblEnRetard" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #ef4444;"/>
-                            <Label text="Urgent" style="-fx-text-fill: #ef4444; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                            <Label text="À faire" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
+                            <Label fx:id="lblAFaire" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
                         </VBox>
                     </HBox>
                 </VBox>
@@ -153,7 +162,6 @@
                             </HBox>
                             <Label text="Total Employés" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                             <Label fx:id="lblTotalEmployes" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #8b5cf6;"/>
-                            <Label text="Dans l'équipe" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
                         </VBox>
 
                         <!-- Carte En poste -->
@@ -164,7 +172,6 @@
                             </HBox>
                             <Label text="En poste" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                             <Label fx:id="lblEnPoste" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
-                            <Label text="Aujourd'hui" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
                         </VBox>
 
                         <!-- Carte Absents -->
@@ -175,76 +182,70 @@
                             </HBox>
                             <Label text="Absents" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
                             <Label fx:id="lblAbsents" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #ef4444;"/>
-                            <Label text="Aujourd'hui" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
                         </VBox>
 
-                        <!-- Carte À faire -->
+                        <!-- Carte En retard -->
                         <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5); -fx-min-width: 200; -fx-min-height: 180;" HBox.hgrow="ALWAYS">
                             <HBox alignment="CENTER_LEFT" spacing="15">
-                                <Circle radius="30" fill="#f59e0b" opacity="0.15"/>
-                                <Label text="📊" style="-fx-font-size: 36px;"/>
+                                <Circle radius="30" fill="#ef4444" opacity="0.15"/>
+                                <Label text="⚠️" style="-fx-font-size: 36px;"/>
                             </HBox>
-                            <Label text="À faire" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
-                            <Label fx:id="lblAFaire" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
-                            <Label text="En attente" style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                            <Label text="En retard" style="-fx-font-size: 15px; -fx-text-fill: #64748b; -fx-font-weight: bold;"/>
+                            <Label fx:id="lblEnRetard" text="0" style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #ef4444;"/>
                         </VBox>
                     </HBox>
                 </VBox>
 
-                <!-- Section 3: Graphique et navigation -->
-                <HBox spacing="20">
+                <!-- Section 3: Graphique -->
+                <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);">
+                    <Label text="📊 RÉPARTITION DES TÂCHES" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
 
-                    <!-- Graphique en barres -->
-                    <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);" HBox.hgrow="ALWAYS">
-                        <Label text="📊 RÉPARTITION DES TÂCHES" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
-
-                        <HBox spacing="30" alignment="CENTER">
-                            <!-- Légende -->
-                            <VBox spacing="15">
-                                <HBox spacing="15" alignment="CENTER_LEFT">
-                                    <Rectangle width="20" height="20" fill="#f59e0b" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
-                                    <Label text="À faire" style="-fx-font-size: 14px; -fx-text-fill: #475569;"/>
-                                    <Label fx:id="lblAFaireGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
-                                </HBox>
-                                <HBox spacing="15" alignment="CENTER_LEFT">
-                                    <Rectangle width="20" height="20" fill="#3b82f6" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
-                                    <Label text="En cours" style="-fx-font-size: 14px; -fx-text-fill: #475569;"/>
-                                    <Label fx:id="lblEnCoursGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
-                                </HBox>
-                                <HBox spacing="15" alignment="CENTER_LEFT">
-                                    <Rectangle width="20" height="20" fill="#10b981" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
-                                    <Label text="Terminées" style="-fx-font-size: 14px; -fx-text-fill: #475569;"/>
-                                    <Label fx:id="lblTermineesGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
-                                </HBox>
-                            </VBox>
-
-                            <!-- Barres de progression - LIGNE 226 CORRIGÉE -->
-                            <HBox spacing="20" alignment="BOTTOM_CENTER" prefHeight="120">
-                                <VBox alignment="BOTTOM_CENTER" spacing="5">
-                                    <Rectangle fx:id="barAFaire" width="40" height="0" style="-fx-fill: #f59e0b; -fx-arc-width: 10; -fx-arc-height: 10;"/>
-                                    <Label text="À faire" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
-                                </VBox>
-                                <VBox alignment="BOTTOM_CENTER" spacing="5">
-                                    <Rectangle fx:id="barEnCours" width="40" height="0" style="-fx-fill: #3b82f6; -fx-arc-width: 10; -fx-arc-height: 10;"/>
-                                    <Label text="En cours" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
-                                </VBox>
-                                <VBox alignment="BOTTOM_CENTER" spacing="5">
-                                    <Rectangle fx:id="barTerminees" width="40" height="0" style="-fx-fill: #10b981; -fx-arc-width: 10; -fx-arc-height: 10;"/>
-                                    <Label text="Terminées" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
-                                </VBox>
+                    <HBox spacing="30" alignment="CENTER">
+                        <!-- Légende -->
+                        <VBox spacing="15">
+                            <HBox spacing="15" alignment="CENTER_LEFT">
+                                <Rectangle width="20" height="20" fill="#f59e0b" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
+                                <Label text="À faire" style="-fx-font-size: 14px; -fx-text-fill: #475569;"/>
+                                <Label fx:id="lblAFaireGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;"/>
                             </HBox>
+                            <HBox spacing="15" alignment="CENTER_LEFT">
+                                <Rectangle width="20" height="20" fill="#3b82f6" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
+                                <Label text="En cours" style="-fx-font-size: 14px; -fx-text-fill: #475569;"/>
+                                <Label fx:id="lblEnCoursGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #3b82f6;"/>
+                            </HBox>
+                            <HBox spacing="15" alignment="CENTER_LEFT">
+                                <Rectangle width="20" height="20" fill="#10b981" style="-fx-arc-width: 5; -fx-arc-height: 5;"/>
+                                <Label text="Terminées" style="-fx-font-size: 14px; -fx-text-fill: #475569;"/>
+                                <Label fx:id="lblTermineesGraph" text="0" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #10b981;"/>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Barres de progression -->
+                        <HBox spacing="20" alignment="BOTTOM_CENTER" prefHeight="120">
+                            <VBox alignment="BOTTOM_CENTER" spacing="5">
+                                <Rectangle fx:id="barAFaire" width="40" height="0" style="-fx-fill: #f59e0b; -fx-arc-width: 10; -fx-arc-height: 10;"/>
+                                <Label text="À faire" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                            </VBox>
+                            <VBox alignment="BOTTOM_CENTER" spacing="5">
+                                <Rectangle fx:id="barEnCours" width="40" height="0" style="-fx-fill: #3b82f6; -fx-arc-width: 10; -fx-arc-height: 10;"/>
+                                <Label text="En cours" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                            </VBox>
+                            <VBox alignment="BOTTOM_CENTER" spacing="5">
+                                <Rectangle fx:id="barTerminees" width="40" height="0" style="-fx-fill: #10b981; -fx-arc-width: 10; -fx-arc-height: 10;"/>
+                                <Label text="Terminées" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                            </VBox>
                         </HBox>
-                    </VBox>
-                </HBox>
+                    </HBox>
+                </VBox>
 
                 <!-- Boutons de navigation -->
                 <HBox spacing="20" alignment="CENTER" style="-fx-padding: 20 0 20 0;">
                     <Button text="📋 GESTION DES TÂCHES" onAction="#openTaches"
-                            style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 15 35; -fx-background-radius: 50; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.4), 15, 0, 0, 5);"/>
+                            style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 15 35; -fx-background-radius: 50; -fx-cursor: hand;"/>
                     <Button text="📅 GESTION DES PLANNINGS" onAction="#openPlanning"
-                            style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 15 35; -fx-background-radius: 50; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(245,158,11,0.4), 15, 0, 0, 5);"/>
+                            style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 15 35; -fx-background-radius: 50; -fx-cursor: hand;"/>
                     <Button text="🗓️ CALENDRIER" onAction="#openCalendar"
-                            style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 15 35; -fx-background-radius: 50; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(139,92,246,0.4), 15, 0, 0, 5);"/>
+                            style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 15 35; -fx-background-radius: 50; -fx-cursor: hand;"/>
                 </HBox>
             </VBox>
         </ScrollPane>
