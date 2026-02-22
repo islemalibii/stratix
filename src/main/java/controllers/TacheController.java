@@ -40,11 +40,10 @@ public class TacheController {
     public void initialize() {
         System.out.println("=== Initialisation TacheController ===");
 
-        // Charger les employés dans la ComboBox
+        // Charger les employés
         List<Employe> employes = employeService.getAllEmployes();
         cmbEmploye.setItems(FXCollections.observableArrayList(employes));
 
-        // Afficher le nom dans la ComboBox
         cmbEmploye.setCellFactory(param -> new ListCell<Employe>() {
             @Override
             protected void updateItem(Employe emp, boolean empty) {
@@ -69,15 +68,8 @@ public class TacheController {
             }
         });
 
-        // Initialiser les ComboBox
         cbPriorite.getItems().addAll("HAUTE", "MOYENNE", "BASSE");
         cbStatut.getItems().addAll("A_FAIRE", "EN_COURS", "TERMINEE");
-
-        // Vérification des composants
-        System.out.println("   cmbEmploye: " + (cmbEmploye != null ? "✅" : "❌"));
-        System.out.println("   cbPriorite: " + (cbPriorite != null ? "✅" : "❌"));
-        System.out.println("   cbStatut: " + (cbStatut != null ? "✅" : "❌"));
-        System.out.println("   txtTitre: " + (txtTitre != null ? "✅" : "❌"));
 
         mettreAJourStatistiques();
     }
@@ -99,9 +91,9 @@ public class TacheController {
             t.setProjetId(Integer.parseInt(txtProjetId.getText()));
 
             service.addTache(t);
-            showAlert("Succès", "✅ Tâche ajoutée avec succès !");
-            mettreAJourStatistiques();
+            showAlert("Succès", "✅ Tâche ajoutée !");
             viderFormulaire();
+            mettreAJourStatistiques();
 
         } catch (NumberFormatException e) {
             showAlert("Erreur", "L'ID Projet doit être un nombre !");
@@ -110,11 +102,11 @@ public class TacheController {
             e.printStackTrace();
         }
     }
-//
+
     @FXML
     void modifierTache() {
         if (selectedTacheId == -1) {
-            showAlert("Erreur", "Sélectionnez d'abord une tâche dans la liste !");
+            showAlert("Erreur", "❌ Aucune tâche sélectionnée");
             return;
         }
 
@@ -134,12 +126,13 @@ public class TacheController {
             t.setProjetId(Integer.parseInt(txtProjetId.getText()));
 
             service.updateTache(t);
-            showAlert("Succès", "✅ Tâche modifiée avec succès !");
-            mettreAJourStatistiques();
+            showAlert("Succès", "✅ Tâche modifiée !");
             viderFormulaire();
+            mettreAJourStatistiques();
+            selectedTacheId = -1;
 
         } catch (Exception e) {
-            showAlert("Erreur", "Erreur lors de la modification : " + e.getMessage());
+            showAlert("Erreur", "Erreur : " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -147,7 +140,7 @@ public class TacheController {
     @FXML
     void supprimerTache() {
         if (selectedTacheId == -1) {
-            showAlert("Erreur", "Sélectionnez d'abord une tâche dans la liste !");
+            showAlert("Erreur", "❌ Aucune tâche sélectionnée");
             return;
         }
 
@@ -156,38 +149,55 @@ public class TacheController {
         confirm.setHeaderText(null);
         confirm.setContentText("Voulez-vous vraiment supprimer cette tâche ?");
 
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        if (confirm.showAndWait().get() == ButtonType.OK) {
             service.deleteTache(selectedTacheId);
-            showAlert("Succès", "✅ Tâche supprimée avec succès !");
-            mettreAJourStatistiques();
+            showAlert("Succès", "✅ Tâche supprimée !");
             viderFormulaire();
+            mettreAJourStatistiques();
+            selectedTacheId = -1;
+        }
+    }
+
+    public void setTacheToEdit(Tache tache) {
+        if (tache != null) {
+            this.selectedTacheId = tache.getId();
+
+            txtTitre.setText(tache.getTitre());
+            txtDescription.setText(tache.getDescription());
+            dpDeadline.setValue(tache.getDeadline().toLocalDate());
+            cbStatut.setValue(tache.getStatut());
+            cbPriorite.setValue(tache.getPriorite());
+            txtProjetId.setText(String.valueOf(tache.getProjetId()));
+
+            Employe emp = employeService.getEmployeById(tache.getEmployeId());
+            if (emp != null) {
+                cmbEmploye.setValue(emp);
+            }
+
+            System.out.println("🔄 Formulaire pré-rempli pour tâche ID: " + selectedTacheId);
         }
     }
 
     @FXML
     private void openTacheListe() {
         try {
-            System.out.println("Ouverture de la liste des tâches...");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/TacheListeView.fxml"));
             Parent root = loader.load();
-            Stage stage = new Stage();
-            stage.setTitle("📋 Liste des Tâches");
+
+            Stage stage = (Stage) txtTitre.getScene().getWindow();
             stage.setScene(new Scene(root));
+            stage.setMaximized(true);
             stage.show();
+
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Erreur", "Impossible d'ouvrir la liste des tâches");
+            showAlert("Erreur", "Impossible d'ouvrir la liste");
         }
     }
 
     private boolean validerChamps() {
         if (txtTitre.getText().trim().isEmpty()) {
             showAlert("Erreur", "❌ Le titre est requis !");
-            return false;
-        }
-        if (txtDescription.getText().trim().isEmpty()) {
-            showAlert("Erreur", "❌ La description est requise !");
             return false;
         }
         if (dpDeadline.getValue() == null) {
@@ -216,9 +226,7 @@ public class TacheController {
     private void mettreAJourStatistiques() {
         List<Tache> taches = service.getAllTaches();
         int total = taches.size();
-        int aFaire = 0;
-        int enCours = 0;
-        int terminees = 0;
+        int aFaire = 0, enCours = 0, terminees = 0;
 
         for (Tache t : taches) {
             switch(t.getStatut()) {

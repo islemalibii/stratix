@@ -1,29 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane prefHeight="700" prefWidth="1000" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.TacheListeController">
 
-    <!-- Header avec boutons -->
+    <!-- Header -->
     <VBox layoutX="0" layoutY="0" prefWidth="1000" style="-fx-background-color: #2c3e50;">
         <HBox alignment="CENTER_LEFT" prefHeight="70" spacing="20" style="-fx-padding: 0 30;">
             <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" text="📋 LISTE DES TÂCHES" />
-
-            <!-- Boutons d'export à droite -->
-            <HBox spacing="10" alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-                <Button text="📄 PDF" onAction="#exportToPDF"
-                        style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 20; -fx-cursor: hand;"/>
-                <Button text="📊 Excel" onAction="#exportToExcel"
-                        style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 20; -fx-cursor: hand;"/>
-                <Button text="📊 Stats" onAction="#showStatistics"
-                        style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 8 20; -fx-background-radius: 20; -fx-cursor: hand;"/>
-            </HBox>
         </HBox>
     </VBox>
 
@@ -33,24 +24,21 @@
             <Label style="-fx-font-size: 14px; -fx-text-fill: #1e40af;" text="Total tâches" />
             <Label fx:id="lblTotalTaches" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1e40af;" text="0" />
         </VBox>
-
         <VBox spacing="5" style="-fx-background-color: #fef9c3; -fx-padding: 15; -fx-background-radius: 10;" HBox.hgrow="ALWAYS">
             <Label style="-fx-font-size: 14px; -fx-text-fill: #854d0e;" text="À faire" />
             <Label fx:id="lblAFaire" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #854d0e;" text="0" />
         </VBox>
-
         <VBox spacing="5" style="-fx-background-color: #fed7aa; -fx-padding: 15; -fx-background-radius: 10;" HBox.hgrow="ALWAYS">
             <Label style="-fx-font-size: 14px; -fx-text-fill: #9a3412;" text="En cours" />
             <Label fx:id="lblEnCours" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #9a3412;" text="0" />
         </VBox>
-
         <VBox spacing="5" style="-fx-background-color: #dcfce7; -fx-padding: 15; -fx-background-radius: 10;" HBox.hgrow="ALWAYS">
             <Label style="-fx-font-size: 14px; -fx-text-fill: #166534;" text="Terminées" />
             <Label fx:id="lblTerminees" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #166534;" text="0" />
         </VBox>
     </HBox>
 
-    <!-- Tableau des tâches -->
+    <!-- Tableau -->
     <VBox layoutX="30" layoutY="220" prefHeight="400" prefWidth="940" spacing="10">
         <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="📋 Tâches enregistrées" />
 
@@ -63,6 +51,7 @@
                 <TableColumn fx:id="colDeadline" prefWidth="100" text="Deadline" />
                 <TableColumn fx:id="colStatut" prefWidth="100" text="Statut" />
                 <TableColumn fx:id="colProjet" prefWidth="80" text="Projet" />
+                <TableColumn fx:id="colActions" prefWidth="100" text="Actions" />
             </columns>
         </TableView>
     </VBox>
