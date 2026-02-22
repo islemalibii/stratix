@@ -9,10 +9,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.ressource;
 import service.service_ressource;
 
+import service.export.ExportPDFService;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -30,7 +34,7 @@ public class RessourceController implements Initializable {
     @FXML
     private Label statsTypes;
 
-    // Nouveaux champs pour la recherche
+    // Champs pour la recherche
     @FXML
     private TextField searchField;
     @FXML
@@ -254,6 +258,56 @@ public class RessourceController implements Initializable {
             stage.setScene(new Scene(root));
             stage.setTitle("Gestion des Produits");
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ==================== FONCTIONS D'EXPORT ====================
+
+    @FXML
+    private void exporterRessourcesExcel() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Enregistrer le fichier Excel");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Fichiers Excel", "*.xlsx")
+            );
+            fileChooser.setInitialFileName("ressources.xlsx");
+
+            File file = fileChooser.showSaveDialog(listViewRessources.getScene().getWindow());
+
+            if (file != null) {
+                ExportExcelService.exporterRessourcesVersExcel(observableList, file.getAbsolutePath());
+                showAlert(Alert.AlertType.INFORMATION, "Succès",
+                        "Export Excel réussi !\nFichier : " + file.getName());
+            }
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Erreur lors de l'export Excel : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void exporterRessourcesPDF() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Enregistrer le fichier PDF");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf")
+            );
+            fileChooser.setInitialFileName("ressources.pdf");
+
+            File file = fileChooser.showSaveDialog(listViewRessources.getScene().getWindow());
+
+            if (file != null) {
+                ExportPDFService.exporterRessourcesVersPDF(observableList, file.getAbsolutePath());
+                showAlert(Alert.AlertType.INFORMATION, "Succès",
+                        "Export PDF réussi !\nFichier : " + file.getName());
+            }
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Erreur lors de l'export PDF : " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -13,10 +13,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.produit;
 import service.service_produit;
+
+import service.export.ExportPDFService;
 
 import javafx.geometry.Insets;
 import java.io.File;
@@ -522,5 +525,55 @@ public class ProduitController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // ==================== FONCTIONS D'EXPORT ====================
+
+    @FXML
+    private void exporterProduitsExcel() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Enregistrer le fichier Excel");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Fichiers Excel", "*.xlsx")
+            );
+            fileChooser.setInitialFileName("produits.xlsx");
+
+            File file = fileChooser.showSaveDialog(listViewProduits.getScene().getWindow());
+
+            if (file != null) {
+                ExportExcelService.exporterProduitsVersExcel(produitsList, file.getAbsolutePath());
+                showAlert(Alert.AlertType.INFORMATION, "Succès",
+                        "Export Excel réussi !\nFichier : " + file.getName());
+            }
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Erreur lors de l'export Excel : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void exporterProduitsPDF() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Enregistrer le fichier PDF");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf")
+            );
+            fileChooser.setInitialFileName("produits.pdf");
+
+            File file = fileChooser.showSaveDialog(listViewProduits.getScene().getWindow());
+
+            if (file != null) {
+                ExportPDFService.exporterProduitsVersPDF(produitsList, file.getAbsolutePath());
+                showAlert(Alert.AlertType.INFORMATION, "Succès",
+                        "Export PDF réussi !\nFichier : " + file.getName());
+            }
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Erreur lors de l'export PDF : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

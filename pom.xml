@@ -15,23 +15,20 @@
         <javafx.version>17.0.6</javafx.version>
     </properties>
 
-    <!-- SECTION DÉPENDANCES (UNE SEULE FOIS) -->
+    <!-- DÉPENDANCES -->
     <dependencies>
-        <!-- JavaFX Controls (dépendance principale) -->
+        <!-- JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-
-        <!-- JavaFX FXML (pour les fichiers .fxml) -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- JavaFX Graphics (souvent inclus via controls, mais pas obligatoire ici) -->
         <!-- MySQL Connector -->
         <dependency>
             <groupId>com.mysql</groupId>
@@ -46,9 +43,51 @@
             <version>5.10.1</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Apache POI pour Excel -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.3</version>
+        </dependency>
+
+        <!-- iText 7 pour PDF (version simplifiée) -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>7.2.5</version>
+            <type>pom</type>
+        </dependency>
+
+        <!-- Alternative: iText 7 avec dépendances individuelles (si la précédente ne fonctionne pas) -->
+        <!--
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>kernel</artifactId>
+            <version>7.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>layout</artifactId>
+            <version>7.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>io</artifactId>
+            <version>7.2.5</version>
+        </dependency>
+        -->
+
+        <!-- JasperReports (optionnel - commenté si non utilisé)
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.20.0</version>
+        </dependency>
+        -->
     </dependencies>
 
-    <!-- SECTION BUILD (UNE SEULE FOIS) -->
+    <!-- BUILD -->
     <build>
         <plugins>
             <plugin>
