@@ -2,7 +2,7 @@ package service;
 
 import Interface.service;
 import models.produit;
-import utils.database;
+import utils.Mydatabase;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class service_produit implements service<produit> {
         String req = "INSERT INTO produit(nom, description, categorie, prix, stock_actuel, stock_min, date_creation, ressources_necessaires, image_path, date_fabrication, date_peremption, date_garantie) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try {
-            Connection cnx = database.getInstance().getCnx();
+            Connection cnx = Mydatabase.getInstance().getCnx();
             PreparedStatement ps = cnx.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
 
             ps.setString(1, p.getNom());
@@ -77,7 +77,7 @@ public class service_produit implements service<produit> {
         String req = "SELECT id, nom, description, categorie, prix, stock_actuel, stock_min, date_creation, ressources_necessaires, image_path, date_fabrication, date_peremption, date_garantie FROM produit";
 
         try {
-            Connection cnx = database.getInstance().getCnx();
+            Connection cnx = Mydatabase.getInstance().getCnx();
             Statement st = cnx.createStatement();
             ResultSet rs = st.executeQuery(req);
 
@@ -139,7 +139,7 @@ public class service_produit implements service<produit> {
         String req = "UPDATE produit SET nom=?, description=?, categorie=?, prix=?, stock_actuel=?, stock_min=?, date_creation=?, ressources_necessaires=?, image_path=?, date_fabrication=?, date_peremption=?, date_garantie=? WHERE id=?";
 
         try {
-            Connection cnx = database.getInstance().getCnx();
+            Connection cnx = Mydatabase.getInstance().getCnx();
             PreparedStatement ps = cnx.prepareStatement(req);
 
             ps.setString(1, p.getNom());
@@ -197,7 +197,7 @@ public class service_produit implements service<produit> {
         String req = "DELETE FROM produit WHERE id=?";
 
         try {
-            Connection cnx = database.getInstance().getCnx();
+            Connection cnx = Mydatabase.getInstance().getCnx();
             PreparedStatement ps = cnx.prepareStatement(req);
 
             ps.setInt(1, p.getId());
@@ -218,7 +218,7 @@ public class service_produit implements service<produit> {
     public void deleteAll() {
         String sql = "DELETE FROM produit";
 
-        try (Connection cnx = database.getInstance().getCnx();
+        try (Connection cnx = Mydatabase.getInstance().getCnx();
              PreparedStatement ps = cnx.prepareStatement(sql)) {
 
             ps.executeUpdate();
