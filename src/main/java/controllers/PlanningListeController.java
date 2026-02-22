@@ -25,14 +25,15 @@ import java.util.ResourceBundle;
 
 public class PlanningListeController implements Initializable {
 
+    // @FXML private TableColumn<Planning, Integer> colId;  ← SUPPRIMÉ
+
     @FXML private TableView<Planning> tablePlannings;
-    @FXML private TableColumn<Planning, Integer> colId;
     @FXML private TableColumn<Planning, String> colEmploye;
     @FXML private TableColumn<Planning, String> colDate;
     @FXML private TableColumn<Planning, String> colHeureDebut;
     @FXML private TableColumn<Planning, String> colHeureFin;
     @FXML private TableColumn<Planning, String> colTypeShift;
-    @FXML private TableColumn<Planning, Void> colActions;  // Colonne pour les boutons
+    @FXML private TableColumn<Planning, Void> colActions;
 
     @FXML private Label lblTotalPlannings;
     @FXML private Label lblTotalJour;
@@ -41,6 +42,7 @@ public class PlanningListeController implements Initializable {
     @FXML private Label lblConges;
     @FXML private Label lblMaladie;
     @FXML private Label lblFormation;
+    @FXML private Label lblAutre;
     @FXML private Label lblMeteo;
 
     private SERVICEPlanning planningService;
@@ -56,7 +58,7 @@ public class PlanningListeController implements Initializable {
         planningList = FXCollections.observableArrayList();
 
         configurerColonnes();
-        ajouterBoutonsAction();  // Ajouter les boutons
+        ajouterBoutonsAction();
         configurerCouleursLignes();
         chargerPlannings();
 
@@ -70,7 +72,7 @@ public class PlanningListeController implements Initializable {
     }
 
     private void configurerColonnes() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        // SUPPRIMÉ : colId.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         // Colonne Employé
         colEmploye.setCellValueFactory(cellData -> {
@@ -109,7 +111,6 @@ public class PlanningListeController implements Initializable {
         colTypeShift.setCellValueFactory(new PropertyValueFactory<>("typeShift"));
     }
 
-    // Ajouter les boutons Modifier et Supprimer
     private void ajouterBoutonsAction() {
         colActions.setCellFactory(param -> new TableCell<Planning, Void>() {
             private final Button btnEdit = new Button("✏️");
@@ -143,20 +144,16 @@ public class PlanningListeController implements Initializable {
         });
     }
 
-    // Méthode pour modifier un planning
     private void modifierPlanning(Planning planning) {
         try {
             System.out.println("✏️ Modification planning ID: " + planning.getId());
 
-            // Charger le formulaire
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/PlanningView.fxml"));
             Parent root = loader.load();
 
-            // Passer le planning au formulaire
             PlanningController controller = loader.getController();
             controller.setPlanningToEdit(planning);
 
-            // Changer de scène
             Stage stage = (Stage) tablePlannings.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setMaximized(true);
@@ -164,11 +161,9 @@ public class PlanningListeController implements Initializable {
 
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert("Erreur", "Impossible d'ouvrir le formulaire de modification");
         }
     }
 
-    // Méthode pour supprimer un planning
     private void supprimerPlanning(Planning planning) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation");
@@ -178,11 +173,10 @@ public class PlanningListeController implements Initializable {
         if (confirm.showAndWait().get() == ButtonType.OK) {
             planningService.deletePlanning(planning.getId());
             chargerPlannings();
-            showAlert("Succès", "✅ Planning supprimé avec succès");
+            showAlert("Succès", "✅ Planning supprimé");
         }
     }
 
-    // Colorer les lignes selon le type
     private void configurerCouleursLignes() {
         tablePlannings.setRowFactory(tv -> new TableRow<Planning>() {
             @Override
@@ -194,16 +188,16 @@ public class PlanningListeController implements Initializable {
                     String type = planning.getTypeShift();
                     switch(type) {
                         case "CONGE":
-                            setStyle("-fx-background-color: #fef3c7;"); // Jaune clair
+                            setStyle("-fx-background-color: #fef3c7;");
                             break;
                         case "MALADIE":
-                            setStyle("-fx-background-color: #fee2e2;"); // Rouge clair
+                            setStyle("-fx-background-color: #fee2e2;");
                             break;
                         case "FORMATION":
-                            setStyle("-fx-background-color: #dbeafe;"); // Bleu clair
+                            setStyle("-fx-background-color: #dbeafe;");
                             break;
                         case "AUTRE":
-                            setStyle("-fx-background-color: #f3f4f6;"); // Gris clair
+                            setStyle("-fx-background-color: #f3f4f6;");
                             break;
                         default:
                             setStyle("");
@@ -219,10 +213,9 @@ public class PlanningListeController implements Initializable {
         planningList.addAll(plannings);
         tablePlannings.setItems(planningList);
 
-        // Mettre à jour les statistiques
         int total = plannings.size();
         int jour = 0, soir = 0, nuit = 0;
-        int conge = 0, maladie = 0, formation = 0;
+        int conge = 0, maladie = 0, formation = 0, autre = 0;
 
         for (Planning p : plannings) {
             switch(p.getTypeShift()) {
@@ -232,6 +225,7 @@ public class PlanningListeController implements Initializable {
                 case "CONGE": conge++; break;
                 case "MALADIE": maladie++; break;
                 case "FORMATION": formation++; break;
+                case "AUTRE": autre++; break;
             }
         }
 
@@ -242,6 +236,7 @@ public class PlanningListeController implements Initializable {
         lblConges.setText(String.valueOf(conge));
         lblMaladie.setText(String.valueOf(maladie));
         lblFormation.setText(String.valueOf(formation));
+        lblAutre.setText(String.valueOf(autre));
 
         System.out.println("📊 " + total + " plannings chargés");
     }

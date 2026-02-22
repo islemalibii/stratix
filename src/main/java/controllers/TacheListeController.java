@@ -24,15 +24,16 @@ import java.util.ResourceBundle;
 
 public class TacheListeController implements Initializable {
 
+    // @FXML private TableColumn<Tache, Integer> colId;  ← SUPPRIMÉ
+
     @FXML private TableView<Tache> tableTaches;
-    @FXML private TableColumn<Tache, Integer> colId;
     @FXML private TableColumn<Tache, String> colPriorite;
     @FXML private TableColumn<Tache, String> colTitre;
     @FXML private TableColumn<Tache, String> colEmploye;
     @FXML private TableColumn<Tache, String> colDeadline;
     @FXML private TableColumn<Tache, String> colStatut;
     @FXML private TableColumn<Tache, Integer> colProjet;
-    @FXML private TableColumn<Tache, Void> colActions;  // Nouvelle colonne pour les boutons
+    @FXML private TableColumn<Tache, Void> colActions;
 
     @FXML private Label lblTotalTaches;
     @FXML private Label lblAFaire;
@@ -52,12 +53,12 @@ public class TacheListeController implements Initializable {
         tacheList = FXCollections.observableArrayList();
 
         configurerColonnes();
-        ajouterBoutonsAction();  // Ajouter les boutons
+        ajouterBoutonsAction();
         chargerTaches();
     }
 
     private void configurerColonnes() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        // SUPPRIMÉ : colId.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         // Priorité avec emoji
         colPriorite.setCellValueFactory(cellData -> {
@@ -110,7 +111,6 @@ public class TacheListeController implements Initializable {
         colProjet.setCellValueFactory(new PropertyValueFactory<>("projetId"));
     }
 
-    // Ajouter les boutons Modifier et Supprimer
     private void ajouterBoutonsAction() {
         colActions.setCellFactory(param -> new TableCell<Tache, Void>() {
             private final Button btnEdit = new Button("✏️");
@@ -144,20 +144,16 @@ public class TacheListeController implements Initializable {
         });
     }
 
-    // Méthode pour modifier une tâche
     private void modifierTache(Tache tache) {
         try {
             System.out.println("✏️ Modification tâche ID: " + tache.getId());
 
-            // Charger le formulaire
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/TacheView.fxml"));
             Parent root = loader.load();
 
-            // Passer la tâche au formulaire
             TacheController controller = loader.getController();
             controller.setTacheToEdit(tache);
 
-            // Changer de scène
             Stage stage = (Stage) tableTaches.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setMaximized(true);
@@ -168,7 +164,6 @@ public class TacheListeController implements Initializable {
         }
     }
 
-    // Méthode pour supprimer une tâche
     private void supprimerTache(Tache tache) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation");
