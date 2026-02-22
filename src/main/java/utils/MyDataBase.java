@@ -1,10 +1,10 @@
-package utiles;
+package utils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DBConnection {
+public class MyDataBase {
 
     private static final String URL = "jdbc:mysql://localhost:3306/stratix";
     private static final String USER = "root";

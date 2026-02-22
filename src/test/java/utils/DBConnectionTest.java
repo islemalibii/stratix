@@ -1,4 +1,4 @@
-package utiles;
+package utils;
 
 import org.junit.jupiter.api.Test;
 import java.sql.Connection;
@@ -8,7 +8,7 @@ public class DBConnectionTest {
 
     @Test
     public void testGetConnection() {
-        Connection conn = DBConnection.getConnection();
+        Connection conn = MyDataBase.getConnection();
         assertNotNull(conn, "La connexion à la base de données ne doit pas être nulle !");
         try {
             assertFalse(conn.isClosed(), "La connexion ne doit pas être fermée !");

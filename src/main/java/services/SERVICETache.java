@@ -1,7 +1,7 @@
 package services;
 
 import models.Tache;
-import utiles.DBConnection;
+import utils.MyDataBase;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class SERVICETache {
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """;
 
-        try (Connection c = DBConnection.getConnection();
+        try (Connection c = MyDataBase.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, t.getTitre());
@@ -39,7 +39,7 @@ public class SERVICETache {
         List<Tache> list = new ArrayList<>();
         String sql = "SELECT * FROM tache";
 
-        try (Connection c = DBConnection.getConnection();
+        try (Connection c = MyDataBase.getConnection();
              Statement st = c.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
@@ -71,7 +71,7 @@ public class SERVICETache {
             WHERE id=?
         """;
 
-        try (Connection c = DBConnection.getConnection();
+        try (Connection c = MyDataBase.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, t.getTitre());
@@ -94,7 +94,7 @@ public class SERVICETache {
     public void deleteTache(int id) {
         String sql = "DELETE FROM tache WHERE id=?";
 
-        try (Connection c = DBConnection.getConnection();
+        try (Connection c = MyDataBase.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -109,7 +109,7 @@ public class SERVICETache {
     public Tache getTacheById(int id) {
         String sql = "SELECT * FROM tache WHERE id = ?";
 
-        try (Connection c = DBConnection.getConnection();
+        try (Connection c = MyDataBase.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, id);

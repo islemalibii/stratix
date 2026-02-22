@@ -1,4 +1,4 @@
-package utiles;
+package utils;
 
 import models.Employe;
 

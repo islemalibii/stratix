@@ -1,4 +1,4 @@
-package utiles;
+package utils;
 
 import models.Planning;
 import models.Tache;
@@ -14,7 +14,7 @@ public class Main {
     public static void main(String[] args) {
 
         System.out.println("=== Test de connexion à la base de données ===");
-        Connection conn = DBConnection.getConnection();
+        Connection conn = MyDataBase.getConnection();
 
         if (conn == null) {
             System.err.println("Connexion échouée. Arrêt du programme.");

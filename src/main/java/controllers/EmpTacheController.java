@@ -1,10 +1,8 @@
 package controllers;
 
 import models.Tache;
-import models.Employe;
 import services.SERVICETache;
 import services.EmployeeService;
-import utiles.SessionManager;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;

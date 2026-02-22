@@ -1,12 +1,9 @@
 package services;
 
 import models.DashboardStats;
-import models.Tache;
-import models.Planning;
-import utiles.DBConnection;
+import utils.MyDataBase;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +14,7 @@ public class StatsService {
     public DashboardStats getDashboardStats() {
         DashboardStats stats = new DashboardStats();
 
-        try (Connection conn = DBConnection.getConnection()) {
+        try (Connection conn = MyDataBase.getConnection()) {
 
             // 1. Total des employés (utilisateurs avec rôle employe)
             String sqlEmployes = "SELECT COUNT(*) FROM utilisateur WHERE role = 'employe' OR role = 'EMPLOYE' OR role LIKE 'responsable%'";
