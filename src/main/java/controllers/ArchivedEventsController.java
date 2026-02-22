@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -116,41 +117,15 @@ public class ArchivedEventsController {
     @FXML
     private void goBack() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/EventDashboard.fxml"));
-            archiveContainer.getScene().setRoot(root);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    @FXML
-    private void handleEvenements(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventDashboard.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) btnEvenements.getScene().getWindow();
-            stage.getScene().setRoot(root);
-
-            stage.centerOnScreen();
-
+            Node dashboardView = FXMLLoader.load(getClass().getResource("/EventDashboard.fxml"));
+            StackPane contentArea = (StackPane) archiveContainer.getScene().lookup("#contentArea");
+            if (contentArea != null) {
+                contentArea.getChildren().setAll(dashboardView);
+            }
         } catch (IOException e) {
-            System.err.println("Erreur de chargement du Dashboard Événements : " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Erreur retour dashboard: " + e.getMessage());
         }
     }
 
-    @FXML
-    void handleLogout(ActionEvent event) {
-        SessionManager.getInstance().logout();
 
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
-            Stage stage = (Stage) logoutButton.getScene().getWindow();
-            stage.setScene(new Scene(root, 1000, 700));
-            stage.setMaximized(false);
-            stage.centerOnScreen();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

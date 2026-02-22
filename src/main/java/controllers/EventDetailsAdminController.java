@@ -1,13 +1,15 @@
 package controllers;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -25,7 +27,6 @@ public class EventDetailsAdminController {
     @FXML private ImageView eventImageView;
     @FXML private Label titleLabel, dateLabel, locationLabel, typeLabel, descriptionLabel, statusTextLabel, statusBadge;
     @FXML private VBox feedbackContainer;
-    @FXML private Button btnEvenements;
 
     private Evenement currentEvent;
     private ServiceEvenemnet service = new ServiceEvenemnet();
@@ -93,19 +94,40 @@ public class EventDetailsAdminController {
         }
     }
 
+    private void navigateTo(String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Node view = loader.load();
+            StackPane contentArea = (StackPane) titleLabel.getScene().lookup("#contentArea");
+
+            if (contentArea != null) {
+                contentArea.getChildren().setAll(view);
+            }
+        } catch (IOException ex) {
+            System.err.println("Erreur de navigation : " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
     @FXML
     private void handleEdit() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ModifyEvent.fxml"));
             Parent root = loader.load();
+
             ModifyEventController controller = loader.getController();
             controller.setEvent(currentEvent);
-            titleLabel.getScene().setRoot(root);
+
+            Stage stage = (Stage) titleLabel.getScene().getWindow();
+            Scene scene = stage.getScene();
+
+
+            scene.setRoot(root);
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
-
     @FXML
     private void handleArchive() {
         service.archiver(currentEvent.getId());
@@ -114,27 +136,12 @@ public class EventDetailsAdminController {
 
     @FXML
     private void goBack() {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/EventDashboard.fxml"));
-            titleLabel.getScene().setRoot(root);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        navigateTo("/EventDashboard.fxml");
     }
+
     @FXML
     private void handleEvenements() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventDashboard.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) btnEvenements.getScene().getWindow();
-            stage.getScene().setRoot(root);
-
-            stage.centerOnScreen();
-
-        } catch (IOException e) {
-            System.err.println("Erreur de chargement du Dashboard Événements : " + e.getMessage());
-            e.printStackTrace();
-        }
+        navigateTo("/EventDashboard.fxml");
     }
 
 }

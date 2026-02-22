@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20" styleClass="main-container" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.StatistiquesController">
+
+    <Label text="STATISTIQUES DES SERVICES" styleClass="page-title"/>
+
+    <HBox spacing="20" alignment="CENTER">
+        <VBox styleClass="stat-card blue" alignment="CENTER" spacing="5" prefWidth="180">
+            <Label text="Budget Moyen" styleClass="stat-label"/>
+            <Label fx:id="lblBudgetMoyen" text="0 DT" styleClass="stat-number"/>
+        </VBox>
+        <VBox styleClass="stat-card orange" alignment="CENTER" spacing="5" prefWidth="180">
+            <Label text="Total Services" styleClass="stat-label"/>
+            <Label fx:id="lblTotalServices" text="0" styleClass="stat-number"/>
+        </VBox>
+        <VBox styleClass="stat-card green" alignment="CENTER" spacing="5" prefWidth="180">
+            <Label text="Budget Total" styleClass="stat-label"/>
+            <Label fx:id="lblTotalBudget" text="0 DT" styleClass="stat-number"/>
+        </VBox>
+    </HBox>
+
+    <TitledPane text="Budget par Catégorie" expanded="true">
+        <BarChart fx:id="budgetChart" title="Budget par Catégorie (DT)" animated="false" prefHeight="300">
+            <xAxis>
+                <CategoryAxis label="Catégorie"/>
+            </xAxis>
+            <yAxis>
+                <NumberAxis label="Budget (DT)"/>
+            </yAxis>
+        </BarChart>
+    </TitledPane>
+
+    <HBox spacing="20" HBox.hgrow="ALWAYS">
+        <TitledPane text="Répartition des Services" HBox.hgrow="ALWAYS">
+            <PieChart fx:id="repartitionChart" title="Répartition par Catégorie" animated="false"
+                      labelsVisible="true" prefHeight="250"/>
+        </TitledPane>
+        <TitledPane text="Évolution Mensuelle" HBox.hgrow="ALWAYS">
+            <LineChart fx:id="evolutionChart" title="Créations par Mois" animated="false" prefHeight="250">
+                <xAxis>
+                    <CategoryAxis label="Mois"/>
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="Nombre"/>
+                </yAxis>
+            </LineChart>
+        </TitledPane>
+    </HBox>
+
+</VBox>

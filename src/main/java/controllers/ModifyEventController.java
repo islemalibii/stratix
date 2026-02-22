@@ -4,7 +4,6 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
 import models.Evenement;
 import models.enums.EventStatus;
 import models.enums.EventType;
@@ -123,12 +122,23 @@ public class ModifyEventController {
     @FXML
     private void goBack() {
         try {
-            Stage stage = (Stage) titreField.getScene().getWindow();
-            javafx.fxml.FXMLLoader loader =
-                    new javafx.fxml.FXMLLoader(getClass().getResource("/EventDashboard.fxml"));
-            stage.setScene(new javafx.scene.Scene(loader.load()));
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/service-view.fxml"));
+            javafx.scene.Parent root = loader.load();
+
+            javafx.scene.Scene scene = titreField.getScene();
+            scene.getStylesheets().clear();
+            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+
+            javafx.scene.layout.StackPane contentArea = (javafx.scene.layout.StackPane) root.lookup("#contentArea");
+            if (contentArea != null) {
+                javafx.scene.Node eventView = javafx.fxml.FXMLLoader.load(getClass().getResource("/EventDashboard.fxml"));
+                contentArea.getChildren().setAll(eventView);
+            }
+            scene.setRoot(root);
+
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            System.err.println("Erreur retour dashboard : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

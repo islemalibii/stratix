@@ -13,15 +13,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import models.Evenement;
 import models.enums.EventStatus;
 import models.enums.EventType;
 import services.ServiceEvenemnet;
-import utils.SessionManager;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,8 +33,6 @@ public class EventEmployeeController {
     @FXML private FlowPane eventContainer;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> typeFilterCombo;
-    @FXML private Button btnEvenements;
-    @FXML private Button logoutButton;
 
 
     private ServiceEvenemnet service = new ServiceEvenemnet();
@@ -113,7 +111,12 @@ public class EventEmployeeController {
 
                 EventDetailsEmployeeController controller = loader.getController();
                 controller.setEventData(e);
-                eventContainer.getScene().setRoot(root);
+                StackPane contentArea = (StackPane) eventContainer.getScene().lookup("#contentArea");
+                if (contentArea != null) {
+                    contentArea.getChildren().setAll(root);
+                } else {
+                    eventContainer.getScene().setRoot(root);
+                }
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -179,31 +182,16 @@ public class EventEmployeeController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventEmployeeDashboard.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) btnEvenements.getScene().getWindow();
-            stage.getScene().setRoot(root);
 
-            stage.centerOnScreen();
-
-        } catch (IOException e) {
-            System.err.println("Erreur de chargement du Dashboard Événements : " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    void handleLogout(ActionEvent event) {
-        // Supprimer la session
-        SessionManager.getInstance().logout();
-
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
-            Stage stage = (Stage) logoutButton.getScene().getWindow();
-            stage.setScene(new Scene(root, 1000, 700));
-            stage.setMaximized(false);
-            stage.centerOnScreen();
+            StackPane contentArea = (StackPane) eventContainer.getScene().lookup("#contentArea");
+            if (contentArea != null) {
+                contentArea.getChildren().setAll(root);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
     }
 
 }

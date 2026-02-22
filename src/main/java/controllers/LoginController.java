@@ -1,5 +1,7 @@
 package controllers;
 
+import models.Role;
+import models.UserRole;
 import services.AuthenticationService;
 import services.EmailService;
 import services.UtilisateurService;
@@ -196,25 +198,13 @@ public class LoginController {
      * Rediriger vers le dashboard selon le rôle
      */
     private void redirectToRoleDashboard(Utilisateur user) {
-        switch (user.getRole()) {
-            case ADMIN:
-                openDashboard(user);
-                break;
-            case CEO:
-                openCEODashboard(user);
-                break;
-            case RESPONSABLE_RH:
-            case RESPONSABLE_PROJET:
-            case RESPONSABLE_PRODUCTION:
-                openResponsableDashboard(user);
-                break;
-            case EMPLOYE:
-                openEmployeDashboard(user);
-                break;
-            default:
-                showError("Rôle non reconnu");
+        UserRole.getInstance().setUser(user);
+        if (user.getRole() == Role.ADMIN) {
+            openDashboard(user);
+        } else {
+            openStandardUserDashboard(user);
         }
-    }
+        }
     
     @FXML
     void handleForgotPassword(ActionEvent event) {
@@ -406,41 +396,45 @@ public class LoginController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/dashboard_admin.fxml"));
             Parent root = loader.load();
-            
+
             DashboardAdminController controller = loader.getController();
             controller.setCurrentUser(user);
-            
+
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(new Scene(root, 1200, 700));
-            stage.setMaximized(false);
             stage.centerOnScreen();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
-    private void openCEODashboard(Utilisateur user) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Dashboard CEO");
-        alert.setHeaderText("Bienvenue " + user.getNom());
-        loadEventPage("/EventDashboard.fxml", user);
-        alert.showAndWait();
-    }
-    
-    private void openResponsableDashboard(Utilisateur user) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Dashboard Responsable");
-        alert.setHeaderText("Bienvenue " + user.getNom());
-        loadEventPage("/EventDashboard.fxml", user);
-        alert.showAndWait();
-    }
-    
-    private void openEmployeDashboard(Utilisateur user) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Dashboard Employé");
-        alert.setHeaderText("Bienvenue " + user.getNom());
-        loadEventPage("/EventEmployeeDashboard.fxml", user);
-        alert.showAndWait();
+
+    private void openStandardUserDashboard(Utilisateur user) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/service-view.fxml"));
+            Parent root = loader.load();
+
+            MainController mainController = loader.getController();
+
+            mainController.initData(user);
+
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+            Scene scene = new Scene(root, 1300, 750);
+
+            String path = "/css/style.css";
+            if (getClass().getResource(path) != null) {
+                scene.getStylesheets().add(getClass().getResource(path).toExternalForm());
+            } else {
+                System.err.println("ERREUR : Fichier CSS introuvable à : " + path);
+            }
+
+            stage.setScene(scene);
+            stage.setTitle("stratiX - " + user.getNom() + " " + user.getPrenom() + " [" + user.getRole() + "]");
+            stage.centerOnScreen();
+
+        } catch (IOException e) {
+            System.err.println("Erreur lors de l'ouverture du dashboard standard : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void loadEventPage(String fxmlPath, Utilisateur user) {

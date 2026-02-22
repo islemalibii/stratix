@@ -6,9 +6,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
 import models.Evenement;
 import models.enums.EventStatus;
 import javafx.scene.control.Button;
@@ -22,7 +22,7 @@ public class EventDetailsEmployeeController {
     @FXML private ImageView qrCodeImageView;
     @FXML private VBox qrCodeContainer;
     @FXML private Button participateBtn;
-    @FXML private Button btnEvenements;
+
 
 
     public void setEventData(Evenement e) {
@@ -87,26 +87,31 @@ public class EventDetailsEmployeeController {
 
     @FXML
     private void goBack() {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/EventEmployeeDashboard.fxml"));
-            titleLabel.getScene().setRoot(root);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        navigateBack();
     }
+
     @FXML
     private void handleEvenements() {
+        navigateBack();
+    }
+
+    private void navigateBack() {
         try {
+            // On charge le Dashboard simplifié de l'employé
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventEmployeeDashboard.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) btnEvenements.getScene().getWindow();
-            stage.getScene().setRoot(root);
 
-            stage.centerOnScreen();
+            // On injecte dans le contentArea du MainController
+            StackPane contentArea = (StackPane) titleLabel.getScene().lookup("#contentArea");
 
-        } catch (IOException e) {
-            System.err.println("Erreur de chargement du Dashboard Événements : " + e.getMessage());
-            e.printStackTrace();
+            if (contentArea != null) {
+                contentArea.getChildren().setAll(root);
+            } else {
+                // Fallback si lancé hors du MainController
+                titleLabel.getScene().setRoot(root);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 }

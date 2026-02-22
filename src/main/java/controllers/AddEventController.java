@@ -1,10 +1,14 @@
 package controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import models.Evenement;
 import models.Ressource;
 import models.enums.EventStatus;
@@ -165,14 +169,22 @@ public class AddEventController {
     @FXML
     private void goBack() {
         try {
-            Stage stage = (Stage) titreField.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/service-view.fxml"));
+            Parent root = loader.load();
+            Scene scene = titreField.getScene();
+            scene.getStylesheets().clear();
+            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
 
-            javafx.fxml.FXMLLoader loader =
-                    new javafx.fxml.FXMLLoader(getClass().getResource("/EventDashboard.fxml"));
 
-            stage.setScene(new javafx.scene.Scene(loader.load()));
+            StackPane contentArea = (StackPane) root.lookup("#contentArea");
+            if (contentArea != null) {
+                Node eventView = FXMLLoader.load(getClass().getResource("/EventDashboard.fxml"));
+                contentArea.getChildren().setAll(eventView);
+            }
+            scene.setRoot(root);
+
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

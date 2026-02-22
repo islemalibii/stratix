@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -20,7 +21,6 @@ import services.ServiceEvenemnet;
 
 import javafx.scene.image.ImageView;
 import services.ServiceEventFeedback;
-import utils.SessionManager;
 
 import java.io.IOException;
 import java.net.URL;
@@ -38,8 +38,7 @@ public class EventDashboardController {
     @FXML private FlowPane eventContainer;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filterStatusCombo;
-    @FXML private Button btnEvenements;
-    @FXML private Button logoutButton;
+
 
 
     private ServiceEvenemnet service = new ServiceEvenemnet();
@@ -135,11 +134,13 @@ public class EventDashboardController {
         detailBtn.setOnAction(ev -> {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventDetailsAdmin.fxml"));
-                Parent root = loader.load();
+                Node view = loader.load();
+
                 EventDetailsAdminController controller = loader.getController();
                 controller.setEventData(e);
 
-                eventContainer.getScene().setRoot(root);
+                StackPane contentArea = (StackPane) eventContainer.getScene().lookup("#contentArea");
+                contentArea.getChildren().setAll(view);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -155,21 +156,30 @@ public class EventDashboardController {
     private void goToAddEvent() {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/addEvent.fxml"));
-            eventContainer.getScene().setRoot(root);
+
+            Stage stage = (Stage) eventContainer.getScene().getWindow();
+
+            Scene scene = new Scene(root, stage.getScene().getWidth(), stage.getScene().getHeight());
+            stage.setScene(scene);
 
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            System.err.println("Erreur de chargement de la page d'ajout : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     @FXML
     private void goToArchived() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/ArchivedEvents.fxml"));
-            eventContainer.getScene().setRoot(root);
-
+            Node archiveView = FXMLLoader.load(getClass().getResource("/ArchivedEvents.fxml"));
+            StackPane contentArea = (StackPane) eventContainer.getScene().lookup("#contentArea");
+            if (contentArea != null) {
+                contentArea.getChildren().setAll(archiveView);
+            } else {
+                System.err.println("Erreur : contentArea non trouvé !");
+            }
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -216,37 +226,6 @@ public class EventDashboardController {
     }
 
 
-
-    @FXML
-    private void handleEvenements() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventDashboard.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) btnEvenements.getScene().getWindow();
-            stage.getScene().setRoot(root);
-
-            stage.centerOnScreen();
-
-        } catch (IOException e) {
-            System.err.println("Erreur de chargement du Dashboard Événements : " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    void handleLogout(ActionEvent event) {
-        SessionManager.getInstance().logout();
-
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
-            Stage stage = (Stage) logoutButton.getScene().getWindow();
-            stage.setScene(new Scene(root, 1000, 700));
-            stage.setMaximized(false);
-            stage.centerOnScreen();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 
     // teb3a api qr code bch l sheet tt3aba f database

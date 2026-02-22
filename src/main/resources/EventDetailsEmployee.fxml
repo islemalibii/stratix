@@ -1,119 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.image.*?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.shape.*?>
 
-<BorderPane prefHeight="750.0" prefWidth="1300.0" styleClass="main-bg"
-            stylesheets="@/style/global.css" xmlns="http://javafx.com/javafx/20"
+<ScrollPane fitToWidth="true" styleClass="scroll-pane"
+            xmlns="http://javafx.com/javafx/20"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="controllers.EventDetailsEmployeeController">
+    <content>
+        <VBox spacing="20" style="-fx-padding: 30;">
+            <Button text="← Retour" onAction="#goBack" styleClass="btn-secondary" />
 
-    <top>
-        <HBox alignment="CENTER_LEFT" prefHeight="90.0" spacing="20.0" styleClass="dashboard-top-bar-light">
-            <padding>
-                <Insets bottom="10.0" left="25.0" right="25.0" top="10.0" />
-            </padding>
-            <children>
-                <HBox alignment="CENTER_LEFT" spacing="12.0">
-                    <ImageView fitHeight="70.0" fitWidth="220.0" preserveRatio="true">
-                        <image>
-                            <Image url="@/images/logo.png" />
-                        </image>
-                    </ImageView>
-                    <Label text="Strati X" styleClass="sidebar-brand" />
-                </HBox>
+            <HBox spacing="40" styleClass="card" style="-fx-padding: 30; -fx-background-radius: 20; -fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
 
-                <Region HBox.hgrow="ALWAYS" />
+                <VBox alignment="TOP_CENTER">
+                    <ImageView fx:id="eventImageView" fitHeight="350.0" fitWidth="450.0" pickOnBounds="true" preserveRatio="true" />
+                </VBox>
 
-                <HBox alignment="CENTER_RIGHT" spacing="15.0">
-                    <Label fx:id="welcomeLabel" text="Bienvenue" textFill="#2D3748" style="-fx-font-weight: bold; -fx-font-size: 15.0;" />
-                    <StackPane>
-                        <Circle radius="22.0" fill="#EDF2F7" />
-                        <Label fx:id="avatarLabel" text="E" textFill="#3182CE" style="-fx-font-weight: bold; -fx-font-size: 16.0;" />
-                    </StackPane>
-                </HBox>
-            </children>
-        </HBox>
-    </top>
+                <VBox spacing="20" HBox.hgrow="ALWAYS">
+                    <Label fx:id="titleLabel" styleClass="heading-large" wrapText="true" />
+                    <Separator />
 
-    <left>
-        <VBox prefWidth="260.0" spacing="8.0" styleClass="sidebar">
-            <padding>
-                <Insets bottom="20.0" left="15.0" right="15.0" top="30.0" />
-            </padding>
-            <children>
-                <Label text="ESPACE EMPLOYÉ" textFill="#A0AEC0" style="-fx-font-weight: bold; -fx-font-size: 11.0;">
-                    <VBox.margin>
-                        <Insets bottom="10.0" left="10.0" />
-                    </VBox.margin>
-                </Label>
+                    <GridPane vgap="12" hgap="25">
+                        <Label text="Date:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="input-label" />
+                        <Label fx:id="dateLabel" styleClass="event-details" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                <Button text="Tableau de bord" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
-                <Button text="Employés" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
-                <Button text="Projets" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
-                <Button text="Tâches et planning" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+                        <Label text="Lieu:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="input-label" />
+                        <Label fx:id="locationLabel" styleClass="event-details" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-                <Button fx:id="btnEvenements" text="Événements" onAction="#handleEvenements"
-                        styleClass="sidebar-btn, sidebar-btn-active" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+                        <Label text="Type:" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="input-label" />
+                        <Label fx:id="typeLabel" styleClass="event-details" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    </GridPane>
 
-                <Button text="Produits et ressources" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
-                <Button text="Services" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+                    <VBox spacing="8">
+                        <Label text="Description:" styleClass="input-label" />
+                        <Label fx:id="descriptionLabel" styleClass="card-description" wrapText="true" />
+                    </VBox>
 
-                <Region VBox.vgrow="ALWAYS" />
+                    <Separator />
 
-            </children>
-        </VBox>
-    </left>
+                    <VBox fx:id="qrCodeContainer" spacing="10" alignment="CENTER" style="-fx-background-color: #F8FAFC; -fx-padding: 15; -fx-background-radius: 15;">
+                        <Label text="Scannez pour donner votre avis :" styleClass="input-label" />
+                        <ImageView fx:id="qrCodeImageView" fitHeight="160.0" fitWidth="160.0" pickOnBounds="true" preserveRatio="true" />
+                    </VBox>
 
-    <center>
-        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
-            <content>
-                <VBox spacing="20" style="-fx-padding: 30;">
-                    <Button text="← Retour" onAction="#goBack" styleClass="btn-secondary" />
-
-                    <HBox spacing="40" styleClass="card" style="-fx-padding: 30; -fx-background-radius: 20; -fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
-
-                        <VBox alignment="TOP_CENTER">
-                            <ImageView fx:id="eventImageView" fitHeight="350.0" fitWidth="450.0" pickOnBounds="true" preserveRatio="true" />
-                        </VBox>
-
-                        <VBox spacing="20" HBox.hgrow="ALWAYS">
-                            <Label fx:id="titleLabel" styleClass="heading-large" wrapText="true" />
-                            <Separator />
-
-                            <GridPane vgap="12" hgap="25">
-                                <Label text="Date:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="input-label" />
-                                <Label fx:id="dateLabel" styleClass="event-details" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-
-                                <Label text="Lieu:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="input-label" />
-                                <Label fx:id="locationLabel" styleClass="event-details" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                                <Label text="Type:" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="input-label" />
-                                <Label fx:id="typeLabel" styleClass="event-details" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                            </GridPane>
-
-                            <VBox spacing="8">
-                                <Label text="Description:" styleClass="input-label" />
-                                <Label fx:id="descriptionLabel" styleClass="card-description" wrapText="true" />
-                            </VBox>
-
-                            <Separator />
-
-                            <VBox fx:id="qrCodeContainer" spacing="10" alignment="CENTER" style="-fx-background-color: #F8FAFC; -fx-padding: 15; -fx-background-radius: 15;">
-                                <Label text="Scannez pour donner votre avis :" styleClass="input-label" />
-                                <ImageView fx:id="qrCodeImageView" fitHeight="160.0" fitWidth="160.0" pickOnBounds="true" preserveRatio="true" />
-                            </VBox>
-
-                            <HBox spacing="15" alignment="BOTTOM_RIGHT" style="-fx-padding: 10 0 0 0;">
-                                <Button fx:id="participateBtn" text="Participer à l'événement" styleClass="btn-primary1" prefHeight="45" prefWidth="250" />
-                            </HBox>
-                        </VBox>
+                    <HBox spacing="15" alignment="BOTTOM_RIGHT" style="-fx-padding: 10 0 0 0;">
+                        <Button fx:id="participateBtn" text="Participer à l'événement" styleClass="btn-primary1" prefHeight="45" prefWidth="250" />
                     </HBox>
                 </VBox>
-            </content>
-        </ScrollPane>
-    </center>
-</BorderPane>
+            </HBox>
+        </VBox>
+    </content>
+</ScrollPane>
