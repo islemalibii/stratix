@@ -59,10 +59,18 @@
                 <Region HBox.hgrow="ALWAYS"/>
             </HBox>
 
-            <!-- Boutons d'action -->
+            <!-- Boutons d'action avec exports -->
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Gestion des Produits" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
                 <Region HBox.hgrow="ALWAYS"/>
+
+                <!-- Boutons d'export (NOUVEAUX) -->
+                <Button text="📊 Excel" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;"
+                        onAction="#exporterProduitsExcel"/>
+                <Button text="📄 PDF" style="-fx-background-color: #e67e22; -fx-text-fill: white; -fx-cursor: hand;"
+                        onAction="#exporterProduitsPDF"/>
+
+                <!-- Boutons existants -->
                 <Button text=" Ajouter" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;"
                         onAction="#ouvrirAjoutProduit"/>
                 <Button text="✏ Modifier" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-cursor: hand;"
@@ -87,17 +95,4 @@
             <Label fx:id="statsValeurStock" text="Valeur stock: 0.00 DT" style="-fx-font-weight: bold; -fx-text-fill: #27ae60;"/>
         </HBox>
     </bottom>
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Gestion des Produits" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button text=" Ajouter" style="-fx-background-color: #27ae60; -fx-text-fill: white;" onAction="#ouvrirAjoutProduit"/>
-        <Button text="✏ Modifier" style="-fx-background-color: #f39c12; -fx-text-fill: white;" onAction="#ouvrirModifierProduit"/>
-        <Button text="🗑 Supprimer" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" onAction="#supprimerProduit"/>
-
-        <!-- NOUVEAUX BOUTONS D'EXPORT -->
-        <Button text="📊 Excel" style="-fx-background-color: #27ae60; -fx-text-fill: white;" onAction="#exporterProduitsExcel"/>
-        <Button text="📄 PDF" style="-fx-background-color: #e67e22; -fx-text-fill: white;" onAction="#exporterProduitsPDF"/>
-
-        <Button text=" Rafraîchir" style="-fx-background-color: #3498db; -fx-text-fill: white;" onAction="#rafraichirListe"/>
-    </HBox>
 </BorderPane>

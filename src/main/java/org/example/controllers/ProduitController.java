@@ -17,6 +17,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.produit;
+import service.export.ExportExcelService;
 import service.service_produit;
 
 import service.export.ExportPDFService;
