@@ -20,7 +20,7 @@ public class EmpTacheController {
     @FXML private TableColumn<Tache, String> colDeadline;
     @FXML private TableColumn<Tache, String> colStatut;
     @FXML private TableColumn<Tache, String> colPriorite;
-    @FXML private TableColumn<Tache, Integer> colEmployeId;  // ← Nouvelle colonne
+
 
     private SERVICETache tacheService = new SERVICETache();
     private EmployeeService employeService = new EmployeeService();
@@ -46,8 +46,7 @@ public class EmpTacheController {
         colStatut.setCellValueFactory(new PropertyValueFactory<>("statut"));
         colPriorite.setCellValueFactory(new PropertyValueFactory<>("priorite"));
 
-        // Nouvelle colonne pour afficher l'employé
-        colEmployeId.setCellValueFactory(new PropertyValueFactory<>("employeId"));
+
 
         chargerToutesTaches();
     }

@@ -49,7 +49,7 @@ public class EmpPlanningController {
         });
 
         colTypeShift.setCellValueFactory(new PropertyValueFactory<>("typeShift"));
-        colEmployeId.setCellValueFactory(new PropertyValueFactory<>("employeId"));
+
 
         chargerTousPlannings();
     }

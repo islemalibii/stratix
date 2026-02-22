@@ -21,7 +21,7 @@
             <TableColumn fx:id="colHeureDebut" prefWidth="80" text="Début" />
             <TableColumn fx:id="colHeureFin" prefWidth="80" text="Fin" />
             <TableColumn fx:id="colTypeShift" prefWidth="100" text="Type" />
-            <TableColumn fx:id="colEmployeId" prefWidth="80" text="Employé ID" />
+
         </columns>
     </TableView>
 

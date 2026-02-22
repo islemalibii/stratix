@@ -22,7 +22,7 @@
             <TableColumn fx:id="colDeadline" prefWidth="100" text="Deadline" />
             <TableColumn fx:id="colStatut" prefWidth="100" text="Statut" />
             <TableColumn fx:id="colPriorite" prefWidth="80" text="Priorité" />
-            <TableColumn fx:id="colEmployeId" prefWidth="80" text="Employé ID" />
+
         </columns>
     </TableView>
 
