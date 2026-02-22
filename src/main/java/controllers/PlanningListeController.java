@@ -1,11 +1,16 @@
 package controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.stage.Stage;
+import javafx.scene.layout.HBox;
 
 import models.Planning;
 import models.Employe;
@@ -27,6 +32,7 @@ public class PlanningListeController implements Initializable {
     @FXML private TableColumn<Planning, String> colHeureDebut;
     @FXML private TableColumn<Planning, String> colHeureFin;
     @FXML private TableColumn<Planning, String> colTypeShift;
+    @FXML private TableColumn<Planning, Void> colActions;  // Colonne pour les boutons
 
     @FXML private Label lblTotalPlannings;
     @FXML private Label lblTotalJour;
@@ -35,7 +41,6 @@ public class PlanningListeController implements Initializable {
     @FXML private Label lblConges;
     @FXML private Label lblMaladie;
     @FXML private Label lblFormation;
-    @FXML private Label lblAutre;
     @FXML private Label lblMeteo;
 
     private SERVICEPlanning planningService;
@@ -44,17 +49,22 @@ public class PlanningListeController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        System.out.println("=== Initialisation PlanningListeController ===");
+
         planningService = new SERVICEPlanning();
         employeService = new EmployeeService();
         planningList = FXCollections.observableArrayList();
 
         configurerColonnes();
-        colorerLignes();
+        ajouterBoutonsAction();  // Ajouter les boutons
+        configurerCouleursLignes();
         chargerPlannings();
 
         tablePlannings.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldVal, newVal) -> {
-                    if (newVal != null) afficherMeteo(newVal);
+                    if (newVal != null) {
+                        afficherMeteo(newVal);
+                    }
                 }
         );
     }
@@ -62,6 +72,7 @@ public class PlanningListeController implements Initializable {
     private void configurerColonnes() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
 
+        // Colonne Employé
         colEmploye.setCellValueFactory(cellData -> {
             Planning p = cellData.getValue();
             Employe emp = employeService.getEmployeById(p.getEmployeId());
@@ -69,6 +80,7 @@ public class PlanningListeController implements Initializable {
             return new javafx.beans.property.SimpleStringProperty(nom);
         });
 
+        // Formatage de la date
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         colDate.setCellValueFactory(cellData -> {
             Planning p = cellData.getValue();
@@ -77,37 +89,125 @@ public class PlanningListeController implements Initializable {
             );
         });
 
+        // Formatage de l'heure (HH:MM)
         colHeureDebut.setCellValueFactory(cellData -> {
             Planning p = cellData.getValue();
+            String heure = p.getHeureDebut().toString();
             return new javafx.beans.property.SimpleStringProperty(
-                    p.getHeureDebut().toString().substring(0, 5)
+                    heure.length() >= 5 ? heure.substring(0, 5) : heure
             );
         });
 
         colHeureFin.setCellValueFactory(cellData -> {
             Planning p = cellData.getValue();
+            String heure = p.getHeureFin().toString();
             return new javafx.beans.property.SimpleStringProperty(
-                    p.getHeureFin().toString().substring(0, 5)
+                    heure.length() >= 5 ? heure.substring(0, 5) : heure
             );
         });
 
         colTypeShift.setCellValueFactory(new PropertyValueFactory<>("typeShift"));
     }
 
-    private void colorerLignes() {
-        tablePlannings.setRowFactory(tv -> new TableRow<Planning>() {
-            protected void updateItem(Planning p, boolean empty) {
-                super.updateItem(p, empty);
-                if (p == null || empty) {
-                    setStyle("");
-                } else if ("CONGE".equals(p.getTypeShift())) {
-                    setStyle("-fx-background-color: #fef3c7;");
-                } else if ("MALADIE".equals(p.getTypeShift())) {
-                    setStyle("-fx-background-color: #fee2e2;");
-                } else if ("FORMATION".equals(p.getTypeShift())) {
-                    setStyle("-fx-background-color: #dbeafe;");
+    // Ajouter les boutons Modifier et Supprimer
+    private void ajouterBoutonsAction() {
+        colActions.setCellFactory(param -> new TableCell<Planning, Void>() {
+            private final Button btnEdit = new Button("✏️");
+            private final Button btnDelete = new Button("🗑️");
+
+            {
+                btnEdit.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
+                btnDelete.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-background-radius: 5; -fx-cursor: hand;");
+
+                btnEdit.setOnAction(event -> {
+                    Planning planning = getTableView().getItems().get(getIndex());
+                    modifierPlanning(planning);
+                });
+
+                btnDelete.setOnAction(event -> {
+                    Planning planning = getTableView().getItems().get(getIndex());
+                    supprimerPlanning(planning);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
                 } else {
+                    HBox buttons = new HBox(5, btnEdit, btnDelete);
+                    setGraphic(buttons);
+                }
+            }
+        });
+    }
+
+    // Méthode pour modifier un planning
+    private void modifierPlanning(Planning planning) {
+        try {
+            System.out.println("✏️ Modification planning ID: " + planning.getId());
+
+            // Charger le formulaire
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/PlanningView.fxml"));
+            Parent root = loader.load();
+
+            // Passer le planning au formulaire
+            PlanningController controller = loader.getController();
+            controller.setPlanningToEdit(planning);
+
+            // Changer de scène
+            Stage stage = (Stage) tablePlannings.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setMaximized(true);
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible d'ouvrir le formulaire de modification");
+        }
+    }
+
+    // Méthode pour supprimer un planning
+    private void supprimerPlanning(Planning planning) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmation");
+        confirm.setHeaderText("Supprimer le planning");
+        confirm.setContentText("Voulez-vous vraiment supprimer ce planning ?");
+
+        if (confirm.showAndWait().get() == ButtonType.OK) {
+            planningService.deletePlanning(planning.getId());
+            chargerPlannings();
+            showAlert("Succès", "✅ Planning supprimé avec succès");
+        }
+    }
+
+    // Colorer les lignes selon le type
+    private void configurerCouleursLignes() {
+        tablePlannings.setRowFactory(tv -> new TableRow<Planning>() {
+            @Override
+            protected void updateItem(Planning planning, boolean empty) {
+                super.updateItem(planning, empty);
+                if (planning == null || empty) {
                     setStyle("");
+                } else {
+                    String type = planning.getTypeShift();
+                    switch(type) {
+                        case "CONGE":
+                            setStyle("-fx-background-color: #fef3c7;"); // Jaune clair
+                            break;
+                        case "MALADIE":
+                            setStyle("-fx-background-color: #fee2e2;"); // Rouge clair
+                            break;
+                        case "FORMATION":
+                            setStyle("-fx-background-color: #dbeafe;"); // Bleu clair
+                            break;
+                        case "AUTRE":
+                            setStyle("-fx-background-color: #f3f4f6;"); // Gris clair
+                            break;
+                        default:
+                            setStyle("");
+                    }
                 }
             }
         });
@@ -119,7 +219,10 @@ public class PlanningListeController implements Initializable {
         planningList.addAll(plannings);
         tablePlannings.setItems(planningList);
 
-        int jour = 0, soir = 0, nuit = 0, conge = 0, maladie = 0, formation = 0, autre = 0;
+        // Mettre à jour les statistiques
+        int total = plannings.size();
+        int jour = 0, soir = 0, nuit = 0;
+        int conge = 0, maladie = 0, formation = 0;
 
         for (Planning p : plannings) {
             switch(p.getTypeShift()) {
@@ -129,35 +232,55 @@ public class PlanningListeController implements Initializable {
                 case "CONGE": conge++; break;
                 case "MALADIE": maladie++; break;
                 case "FORMATION": formation++; break;
-                default: autre++;
             }
         }
 
-        lblTotalPlannings.setText(String.valueOf(plannings.size()));
+        lblTotalPlannings.setText(String.valueOf(total));
         lblTotalJour.setText(String.valueOf(jour));
         lblTotalSoir.setText(String.valueOf(soir));
         lblTotalNuit.setText(String.valueOf(nuit));
         lblConges.setText(String.valueOf(conge));
         lblMaladie.setText(String.valueOf(maladie));
         lblFormation.setText(String.valueOf(formation));
-        lblAutre.setText(String.valueOf(autre));
+
+        System.out.println("📊 " + total + " plannings chargés");
     }
 
     private void afficherMeteo(Planning planning) {
         try {
             String date = planning.getDate().toString();
             Employe emp = employeService.getEmployeById(planning.getEmployeId());
-            String nom = (emp != null) ? emp.getUsername() : "Employé " + planning.getEmployeId();
-            String dateF = planning.getDate().toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            String employeName = (emp != null) ? emp.getUsername() : "Employé " + planning.getEmployeId();
+
             String meteo = WeatherAPI.getWeatherForDate(date);
-            lblMeteo.setText("🌤️ " + nom + " le " + dateF + " : " + meteo);
+            String dateFormatted = planning.getDate().toLocalDate()
+                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+            lblMeteo.setText("🌤️ " + employeName + " le " + dateFormatted + " : " + meteo);
+
         } catch (Exception e) {
-            lblMeteo.setText("🌤️ Sélectionnez un planning");
+            lblMeteo.setText("🌤️ Sélectionnez un planning pour voir la météo");
         }
     }
 
     @FXML
     private void retourFormulaire() {
-        MainController.showPlanning();
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/PlanningView.fxml"));
+            Stage stage = (Stage) tablePlannings.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setMaximized(true);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
