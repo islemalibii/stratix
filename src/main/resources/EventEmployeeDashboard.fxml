@@ -3,41 +3,97 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.shape.*?>
 
-<HBox prefHeight="750.0" prefWidth="1300.0" styleClass="main-bg"
-      stylesheets="@/style/global.css" xmlns="http://javafx.com/javafx/20"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="controllers.EventEmployeeController">
+<BorderPane prefHeight="750.0" prefWidth="1300.0" styleClass="main-bg"
+            stylesheets="@/style/global.css" xmlns="http://javafx.com/javafx/20"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.EventEmployeeController">
 
-    <fx:include source="TableauBord.fxml" />
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="90.0" spacing="20.0" styleClass="dashboard-top-bar-light">
+            <padding>
+                <Insets bottom="10.0" left="25.0" right="25.0" top="10.0" />
+            </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                    <ImageView fitHeight="70.0" fitWidth="220.0" preserveRatio="true">
+                        <image>
+                            <Image url="@/images/logo.png" />
+                        </image>
+                    </ImageView>
+                    <Label text="Strati X" styleClass="sidebar-brand" />
+                </HBox>
 
-    <VBox HBox.hgrow="ALWAYS" spacing="25">
-        <padding>
-            <Insets top="25" right="30" bottom="25" left="30"/>
-        </padding>
+                <Region HBox.hgrow="ALWAYS" />
 
-        <Label text="Catalogue des Événements" styleClass="heading-medium"/>
-
-        <HBox alignment="CENTER_LEFT" spacing="15" >
-            <TextField fx:id="searchField" onKeyReleased="#search"
-                       promptText="Rechercher un événement..."
-                       HBox.hgrow="ALWAYS" />
-
-            <ComboBox fx:id="typeFilterCombo" onAction="#handleFilter"
-                      promptText="Filtrer par Type" prefWidth="200" />
-
-            <Button onAction="#switchToAdminView" text="Vue Admin" styleClass="btn-ghost" />
+                <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                    <Label fx:id="welcomeLabel" text="Bienvenue" textFill="#2D3748" style="-fx-font-weight: bold; -fx-font-size: 15.0;" />
+                    <StackPane>
+                        <Circle radius="22.0" fill="#EDF2F7" />
+                        <Label fx:id="avatarLabel" text="E" textFill="#3182CE" style="-fx-font-weight: bold; -fx-font-size: 16.0;" />
+                    </StackPane>
+                    <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#handleLogout" styleClass="logout-button-modern" text="Déconnexion" />
+                </HBox>
+            </children>
         </HBox>
+    </top>
 
+    <left>
+        <VBox prefWidth="260.0" spacing="8.0" styleClass="sidebar">
+            <padding>
+                <Insets bottom="20.0" left="15.0" right="15.0" top="30.0" />
+            </padding>
+            <children>
+                <Label text="ESPACE EMPLOYÉ" textFill="#A0AEC0" style="-fx-font-weight: bold; -fx-font-size: 11.0;">
+                    <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" />
+                    </VBox.margin>
+                </Label>
 
-        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
-            <content>
-                <FlowPane fx:id="eventContainer" hgap="25.0" vgap="25.0">
-                    <padding>
-                        <Insets bottom="30.0" left="10.0" right="10.0" top="10.0" />
-                    </padding>
-                </FlowPane>
-            </content>
-        </ScrollPane>
-    </VBox>
-</HBox>
+                <Button text="Tableau de bord" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+                <Button text="Employés" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+                <Button text="Projets" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+                <Button text="Tâches et planning" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+
+                <Button fx:id="btnEvenements" text="Événements" onAction="#handleEvenements"
+                        styleClass="sidebar-btn, sidebar-btn-active" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+
+                <Button text="Produits et ressources" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+                <Button text="Services" styleClass="sidebar-btn" maxWidth="Infinity" alignment="BASELINE_LEFT" />
+
+                <Region VBox.vgrow="ALWAYS" />
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="25">
+            <padding>
+                <Insets top="25" right="30" bottom="25" left="30"/>
+            </padding>
+
+            <Label text="Catalogue des Événements" styleClass="heading-medium"/>
+
+            <HBox alignment="CENTER_LEFT" spacing="15" >
+                <TextField fx:id="searchField" onKeyReleased="#search"
+                           promptText="Rechercher un événement..."
+                           HBox.hgrow="ALWAYS" styleClass="text-field" />
+
+                <ComboBox fx:id="typeFilterCombo" onAction="#handleFilter"
+                          promptText="Filtrer par Type" prefWidth="200" styleClass="combo-box" />
+            </HBox>
+
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane">
+                <content>
+                    <FlowPane fx:id="eventContainer" hgap="25.0" vgap="25.0">
+                        <padding>
+                            <Insets bottom="30.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                    </FlowPane>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>

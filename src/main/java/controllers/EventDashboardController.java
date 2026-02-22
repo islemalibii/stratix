@@ -1,22 +1,26 @@
 package controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import models.Evenement;
 import models.enums.EventStatus;
 import services.ServiceEvenemnet;
 
 import javafx.scene.image.ImageView;
 import services.ServiceEventFeedback;
+import utils.SessionManager;
 
 import java.io.IOException;
 import java.net.URL;
@@ -34,6 +38,9 @@ public class EventDashboardController {
     @FXML private FlowPane eventContainer;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> filterStatusCombo;
+    @FXML private Button btnEvenements;
+    @FXML private Button logoutButton;
+
 
     private ServiceEvenemnet service = new ServiceEvenemnet();
     private List<Evenement> events = new ArrayList<>();
@@ -208,20 +215,38 @@ public class EventDashboardController {
         applyFilters();
     }
 
-    //temporaryyyy
-    @FXML
-    private void switchToEmployeeView() {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/EventEmployeeDashboard.fxml"));
 
-            eventContainer.getScene().setRoot(root);
+
+    @FXML
+    private void handleEvenements() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventDashboard.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) btnEvenements.getScene().getWindow();
+            stage.getScene().setRoot(root);
+
+            stage.centerOnScreen();
 
         } catch (IOException e) {
+            System.err.println("Erreur de chargement du Dashboard Événements : " + e.getMessage());
             e.printStackTrace();
         }
     }
 
+    @FXML
+    void handleLogout(ActionEvent event) {
+        SessionManager.getInstance().logout();
 
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            stage.setScene(new Scene(root, 1000, 700));
+            stage.setMaximized(false);
+            stage.centerOnScreen();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     // teb3a api qr code bch l sheet tt3aba f database
@@ -259,4 +284,5 @@ public class EventDashboardController {
             e.printStackTrace();
         }
     }
+
 }

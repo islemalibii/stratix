@@ -1,24 +1,31 @@
 package controllers;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import models.Evenement;
 import services.ServiceEvenemnet;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
 import javafx.scene.shape.Rectangle;
+import utils.SessionManager;
 
+import java.io.IOException;
 import java.util.List;
 public class ArchivedEventsController {
-    @FXML
-    private FlowPane archiveContainer;
+    @FXML private FlowPane archiveContainer;
+
+    @FXML private Button btnEvenements;
+    @FXML private Button logoutButton;
 
     private ServiceEvenemnet service = new ServiceEvenemnet();
 
@@ -113,6 +120,37 @@ public class ArchivedEventsController {
             archiveContainer.getScene().setRoot(root);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleEvenements(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventDashboard.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) btnEvenements.getScene().getWindow();
+            stage.getScene().setRoot(root);
+
+            stage.centerOnScreen();
+
+        } catch (IOException e) {
+            System.err.println("Erreur de chargement du Dashboard Événements : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void handleLogout(ActionEvent event) {
+        SessionManager.getInstance().logout();
+
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            stage.setScene(new Scene(root, 1000, 700));
+            stage.setMaximized(false);
+            stage.centerOnScreen();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

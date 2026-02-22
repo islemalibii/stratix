@@ -17,6 +17,10 @@ public class MyDataBase {
             System.out.println("Connected to database");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            System.err.println("Erreur de connexion à la base de données: " + e.getMessage());
+            System.err.println("Vérifiez que MySQL est démarré et que la base 'stratix' existe.");
+            // Ne pas lancer d'exception, juste logger l'erreur
+            this.cnx = null;
         }
 
     }

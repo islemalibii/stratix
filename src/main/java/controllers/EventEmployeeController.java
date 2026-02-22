@@ -1,10 +1,12 @@
 package controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -14,10 +16,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import models.Evenement;
 import models.enums.EventStatus;
 import models.enums.EventType;
 import services.ServiceEvenemnet;
+import utils.SessionManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +33,9 @@ public class EventEmployeeController {
     @FXML private FlowPane eventContainer;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> typeFilterCombo;
+    @FXML private Button btnEvenements;
+    @FXML private Button logoutButton;
+
 
     private ServiceEvenemnet service = new ServiceEvenemnet();
     private List<Evenement> events = new ArrayList<>();
@@ -167,16 +174,36 @@ public class EventEmployeeController {
         applyFilters();
     }
 
-
-
-    //temporaryyy
     @FXML
-    private void switchToAdminView() {
+    private void handleEvenements(ActionEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/EventDashboard.fxml"));
-            eventContainer.getScene().setRoot(root);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventEmployeeDashboard.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) btnEvenements.getScene().getWindow();
+            stage.getScene().setRoot(root);
+
+            stage.centerOnScreen();
+
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.err.println("Erreur de chargement du Dashboard Événements : " + e.getMessage());
+            e.printStackTrace();
         }
     }
+
+    @FXML
+    void handleLogout(ActionEvent event) {
+        // Supprimer la session
+        SessionManager.getInstance().logout();
+
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            stage.setScene(new Scene(root, 1000, 700));
+            stage.setMaximized(false);
+            stage.centerOnScreen();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

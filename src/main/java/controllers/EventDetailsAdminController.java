@@ -1,13 +1,16 @@
 package controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 import models.Evenement;
 import models.EventFeedback;
 import models.enums.EventStatus;
@@ -22,6 +25,7 @@ public class EventDetailsAdminController {
     @FXML private ImageView eventImageView;
     @FXML private Label titleLabel, dateLabel, locationLabel, typeLabel, descriptionLabel, statusTextLabel, statusBadge;
     @FXML private VBox feedbackContainer;
+    @FXML private Button btnEvenements;
 
     private Evenement currentEvent;
     private ServiceEvenemnet service = new ServiceEvenemnet();
@@ -117,4 +121,20 @@ public class EventDetailsAdminController {
             ex.printStackTrace();
         }
     }
+    @FXML
+    private void handleEvenements(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventDashboard.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) btnEvenements.getScene().getWindow();
+            stage.getScene().setRoot(root);
+
+            stage.centerOnScreen();
+
+        } catch (IOException e) {
+            System.err.println("Erreur de chargement du Dashboard Événements : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 }

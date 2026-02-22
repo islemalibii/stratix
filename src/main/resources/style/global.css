@@ -415,3 +415,99 @@
      -fx-font-style: italic;
      -fx-font-weight: bold;
  }
+
+
+/* Sidebar Blanche Épurée */
+.sidebar {
+    -fx-background-color: #ffffff;
+    -fx-padding: 25 15 25 15;
+    -fx-border-color: #edf2f7;
+    -fx-border-width: 0 1 0 0;
+    -fx-pref-width: 260px;
+}
+
+/* Boutons de la sidebar en mode clair */
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #718096; /* Gris doux */
+    -fx-font-family: "Segoe UI", "System";
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-padding: 12 18;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-alignment: BASELINE_LEFT;
+    -fx-transition: 0.2s;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: #f8fafc; /* Gris très clair au survol */
+    -fx-text-fill: #3182ce;       /* Bleu au survol */
+}
+
+/* Élément actif (Événements) */
+.sidebar-btn-active {
+    -fx-background-color: #ebf8ff; /* Fond bleu très pâle */
+    -fx-text-fill: #3182ce;       /* Texte bleu */
+    -fx-font-weight: bold;
+}
+
+/* Style pour la zone d'astuce en bas (Light) */
+.tip-box-light {
+    -fx-background-color: #f7fafc;
+    -fx-background-radius: 15;
+    -fx-padding: 15;
+    -fx-border-color: #edf2f7;
+    -fx-border-width: 1;
+    -fx-border-radius: 15;
+}
+
+/* Conteneur principal de la Top Bar */
+.dashboard-top-bar-light {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #edf2f7;
+    -fx-border-width: 0 0 1 0; /* Bordure uniquement en bas */
+    -fx-padding: 10 25 10 25;
+}
+
+/* Style du label "Bienvenue" */
+#welcomeLabel {
+    -fx-text-fill: #2D3748;
+    -fx-font-family: "Segoe UI Semibold", "System";
+    -fx-font-size: 15px;
+}
+
+/* Style de l'avatar circulaire */
+.avatar-circle {
+    -fx-fill: #EDF2F7;
+    -fx-stroke: #E2E8F0;
+    -fx-stroke-width: 1;
+}
+
+/* Label à l'intérieur de l'avatar */
+#avatarLabel {
+    -fx-text-fill: #3182CE;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+/* Bouton Déconnexion Moderne */
+.logout-button-modern {
+    -fx-background-color: #FFF5F5; /* Rouge très pâle */
+    -fx-text-fill: #C53030;       /* Rouge sombre pour le texte */
+    -fx-font-family: "Segoe UI", "System";
+    -fx-font-weight: bold;
+    -fx-padding: 8 18;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-border-color: #FED7D7;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-transition: 0.2s;
+}
+
+.logout-button-modern:hover {
+    -fx-background-color: #C53030;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #C53030;
+}
