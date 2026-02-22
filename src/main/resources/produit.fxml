@@ -28,6 +28,10 @@
             <Button text=" Ressources" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
                     onAction="#naviguerRessources" prefWidth="180"/>
 
+            <!-- NOUVEAU BOUTON FRONT OFFICE -->
+            <Button text="👥 Front Office" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
+                    onAction="#ouvrirFrontOffice" prefWidth="180"/>
+
             <Button text=" Prévoyance" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
                     onAction="#naviguerPrevoyance" prefWidth="180"/>
 
@@ -64,13 +68,13 @@
                 <Label text="Gestion des Produits" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <!-- Boutons d'export (NOUVEAUX) -->
+                <!-- Boutons d'export -->
                 <Button text="📊 Excel" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;"
                         onAction="#exporterProduitsExcel"/>
                 <Button text="📄 PDF" style="-fx-background-color: #e67e22; -fx-text-fill: white; -fx-cursor: hand;"
                         onAction="#exporterProduitsPDF"/>
 
-                <!-- Boutons existants -->
+                <!-- Boutons de gestion -->
                 <Button text=" Ajouter" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;"
                         onAction="#ouvrirAjoutProduit"/>
                 <Button text="✏ Modifier" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-cursor: hand;"

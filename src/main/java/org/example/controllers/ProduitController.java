@@ -577,4 +577,42 @@ public class ProduitController {
             e.printStackTrace();
         }
     }
+    @FXML
+    private void ouvrirFrontOffice() {
+        try {
+            // Charger la vue Front Office des produits
+            URL fxmlUrl = getClass().getResource("/fxml/front/frontProduits.fxml");
+            if (fxmlUrl == null) {
+                // Essayer d'autres chemins possibles
+                fxmlUrl = getClass().getResource("/front/frontProduits.fxml");
+            }
+
+            if (fxmlUrl == null) {
+                showAlert(Alert.AlertType.ERROR, "Erreur",
+                        "Fichier frontProduits.fxml introuvable!\n" +
+                                "Vérifiez qu'il est dans src/main/resources/fxml/front/");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent root = loader.load();
+
+            // Créer une nouvelle fenêtre pour le Front Office
+            Stage frontStage = new Stage();
+            frontStage.setTitle("Front Office - Consultation");
+            frontStage.setScene(new Scene(root));
+            frontStage.setMaximized(true); // Ouvrir en plein écran
+
+            // Optionnel : rendre la fenêtre modale (bloque la fenêtre principale)
+            // frontStage.initModality(Modality.WINDOW_MODAL);
+            // frontStage.initOwner(listViewProduits.getScene().getWindow());
+
+            frontStage.show();
+
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Impossible d'ouvrir le Front Office: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
