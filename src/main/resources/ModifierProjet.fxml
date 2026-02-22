@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<VBox prefWidth="550.0" spacing="15.0" styleClass="form-container" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ModifierProjetController">
+<VBox prefWidth="550.0" spacing="15.0" styleClass="form-container" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ModifierProjetController">
     <padding>
         <Insets top="20" right="30" bottom="20" left="30"/>
     </padding>

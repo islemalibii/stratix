@@ -4,7 +4,7 @@
 <?import javafx.geometry.Insets?>
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="controller.ListeArchivesController"
+      fx:controller="controllers.ListeArchivesController"
       spacing="15" styleClass="root-container" prefWidth="550" prefHeight="600">
 
     <padding>

@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 
 <VBox spacing="15" alignment="CENTER" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="controller.AjoutProjetController" style="-fx-background-color: #f8f9fa;">
+      fx:controller="controllers.AjoutProjetController" style="-fx-background-color: #f8f9fa;">
     <padding><Insets top="20" right="30" bottom="20" left="30"/></padding>
 
     <Label text="🚀 Nouveau Projet" style="-fx-font-size: 20px; -fx-font-weight: bold;" />

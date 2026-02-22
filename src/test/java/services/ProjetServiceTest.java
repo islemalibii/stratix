@@ -1,6 +1,6 @@
-package service;
+package services;
 
-import model.Projet;
+import models.Projet;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 import java.sql.SQLException;

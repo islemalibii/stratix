@@ -6,7 +6,7 @@
 <?import java.net.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="controller.ListeProjetsController" styleClass="root-container">
+            fx:controller="controllers.ListeProjetsController" styleClass="root-container">
 
     <stylesheets>
         <URL value="@styles.css" />

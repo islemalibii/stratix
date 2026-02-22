@@ -1,8 +1,8 @@
-package service;
+package services;
 
 import interfaces.Services;
-import model.Projet;
-import util.DBConnection;
+import models.Projet;
+import utils.MyDataBase;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ public class ProjetService implements Services {
     private Connection connection;
 
     public ProjetService() {
-        this.connection = DBConnection.getConnection();
+        this.connection = MyDataBase.getConnection();
     }
 
     @Override
@@ -25,8 +25,8 @@ public class ProjetService implements Services {
             ps.setDate(4, new java.sql.Date(p.getDateFin().getTime()));
             ps.setDouble(5, p.getBudget());
             ps.setString(6, p.getStatut());
-            ps.setInt(7, p.getResponsableId());      // L'ID extrait du String
-            ps.setString(8, p.getEquipeMembres());   // La liste des noms
+            ps.setInt(7, p.getResponsableId());
+            ps.setString(8, p.getEquipeMembres());
             ps.setInt(9, p.getProgression());
             ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
@@ -34,12 +34,12 @@ public class ProjetService implements Services {
 
     @Override
     public List<Projet> listerTousLesProjets() {
-        return recupererParEtat(0); // 0 = Non archivés
+        return recupererParEtat(0);
     }
 
     @Override
     public List<Projet> listerArchives() {
-        return recupererParEtat(1); // 1 = Archivés
+        return recupererParEtat(1);
     }
 
     private List<Projet> recupererParEtat(int etat) {
@@ -59,8 +59,8 @@ public class ProjetService implements Services {
                         rs.getString("statut"),
                         rs.getInt("progression"),
                         rs.getBoolean("is_archived"),
-                        rs.getInt("responsable_id"),    // Nouveau champ
-                        rs.getString("equipe_membres")  // Nouveau champ
+                        rs.getInt("responsable_id"),
+                        rs.getString("equipe_membres")
                 ));
             }
         } catch (SQLException e) { e.printStackTrace(); }
@@ -95,8 +95,8 @@ public class ProjetService implements Services {
             ps.setDate(4, new java.sql.Date(p.getDateFin().getTime()));
             ps.setDouble(5, p.getBudget());
             ps.setString(6, p.getStatut());
-            ps.setInt(7, p.getResponsableId());      // Nouvelle colonne
-            ps.setString(8, p.getEquipeMembres());   // Nouvelle colonne
+            ps.setInt(7, p.getResponsableId());
+            ps.setString(8, p.getEquipeMembres());
             ps.setInt(9, p.getProgression());
             ps.setInt(10, p.getId());
             ps.executeUpdate();

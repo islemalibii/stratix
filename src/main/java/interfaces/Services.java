@@ -1,7 +1,7 @@
 package interfaces;
 
 import java.util.List;
-import model.Projet;
+import models.Projet;
 
 public interface Services {
 

@@ -1,4 +1,4 @@
-package controller;
+package controllers;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -13,10 +13,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import model.Projet;
-import service.ProjetService;
+import models.Projet;
+import services.ProjetService;
 
-// Bibliothèques PDF (OpenPDF / iText)
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
@@ -97,16 +96,13 @@ public class ListeProjetsController {
         card.setPadding(new Insets(20));
         card.getStyleClass().add("project-card");
 
-        // 1. Badge Statut
         Label statutBadge = new Label(p.getStatut());
         statutBadge.getStyleClass().addAll("statut-badge", getStatutClass(p.getStatut()));
 
-        // 2. Titre
         Label nom = new Label(p.getNom());
         nom.getStyleClass().add("project-title");
         nom.setWrapText(true);
 
-        // 3. QR CODE
         String qrContent = String.format(
                 "PROJET : %s\nDESCRIPTION : %s\nCHEF : %s\nÉQUIPE : %s\nPROGRESSION : %d%%",
                 p.getNom(), p.getDescription(),
@@ -126,13 +122,11 @@ public class ListeProjetsController {
         qrContainer.setAlignment(Pos.CENTER);
         qrContainer.setStyle("-fx-background-color: white; -fx-padding: 8; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);");
 
-        // 4. Description
         Label desc = new Label(p.getDescription());
         desc.getStyleClass().add("project-desc");
         desc.setWrapText(true);
         desc.setMaxHeight(60);
 
-        // 5. Progression
         VBox progBox = new VBox(8);
         Label lblProg = new Label("Progression: " + p.getProgression() + "%");
         lblProg.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
@@ -140,7 +134,6 @@ public class ListeProjetsController {
         pb.setPrefWidth(Double.MAX_VALUE);
         progBox.getChildren().addAll(lblProg, pb);
 
-        // 6. Actions (AJOUT DU BOUTON PDF ICI)
         HBox actions = new HBox(10);
         actions.setAlignment(Pos.CENTER);
 
@@ -175,7 +168,6 @@ public class ListeProjetsController {
         };
     }
 
-    // --- LOGIQUE D'EXPORT PDF ---
     private void exporterEnPDF(Projet p, String qrCodeUrl) {
         Document document = new Document();
         try {
@@ -184,14 +176,12 @@ public class ListeProjetsController {
 
             document.open();
 
-            // En-tête
             Paragraph header = new Paragraph("STRATIX - FICHE TECHNIQUE DU PROJET");
             header.setAlignment(Element.ALIGN_CENTER);
             document.add(header);
             document.add(new Paragraph(" ")); // Espace
             document.add(new Paragraph("============================================"));
 
-            // Détails
             document.add(new Paragraph("NOM DU PROJET : " + p.getNom()));
             document.add(new Paragraph("STATUT : " + p.getStatut()));
             document.add(new Paragraph("PROGRESSION : " + p.getProgression() + "%"));
@@ -200,7 +190,6 @@ public class ListeProjetsController {
             document.add(new Paragraph("DESCRIPTION : " + p.getDescription()));
             document.add(new Paragraph(" "));
 
-            // Insertion du QR Code dans le PDF
             try {
                 com.lowagie.text.Image qrImage = com.lowagie.text.Image.getInstance(new java.net.URL(qrCodeUrl));
                 qrImage.scaleAbsolute(120, 120);
@@ -215,7 +204,6 @@ public class ListeProjetsController {
 
             document.close();
 
-            // Ouverture automatique du PDF
             File file = new File(fileName);
             if (file.exists()) {
                 Desktop.getDesktop().open(file);
@@ -227,7 +215,6 @@ public class ListeProjetsController {
         }
     }
 
-    // --- NAVIGATION ET FENÊTRES ---
     @FXML private void allerAjouterProjet() { chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet"); }
     @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Archives"); }
 

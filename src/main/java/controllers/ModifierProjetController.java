@@ -1,14 +1,12 @@
-package controller;
+package controllers;
 
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import model.Projet;
-import service.ProjetService;
-import util.DBConnection;
+import models.Projet;
+import services.ProjetService;
+import utils.MyDataBase;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +18,6 @@ public class ModifierProjetController {
     @FXML private DatePicker dateDebut, dateFin;
     @FXML private ChoiceBox<String> comboStatut;
 
-    // Nouveaux composants pour le chef et l'équipe
     @FXML private ComboBox<String> cbResponsable;
     @FXML private ListView<String> lvMembres;
 
@@ -29,19 +26,16 @@ public class ModifierProjetController {
 
     @FXML
     public void initialize() {
-        // Initialiser les choix de statut
         comboStatut.getItems().addAll("Planifié", "En cours", "Terminé", "Annulé");
 
-        // Activer la sélection multiple pour l'équipe
         lvMembres.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        // Charger tous les utilisateurs de la base dans les listes
         chargerUtilisateurs();
     }
 
     private void chargerUtilisateurs() {
         String sql = "SELECT id, nom, prenom FROM utilisateur";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = MyDataBase.getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
@@ -65,15 +59,12 @@ public class ModifierProjetController {
             txtProgression.setText(String.valueOf(projetEnModification.getProgression()));
             comboStatut.setValue(projetEnModification.getStatut());
 
-            // Dates
             if (projetEnModification.getDateDebut() != null) {
                 dateDebut.setValue(((java.sql.Date) projetEnModification.getDateDebut()).toLocalDate());
             }
             if (projetEnModification.getDateFin() != null) {
                 dateFin.setValue(((java.sql.Date) projetEnModification.getDateFin()).toLocalDate());
             }
-
-            // 1. Sélectionner le responsable actuel dans la ComboBox
             for (String item : cbResponsable.getItems()) {
                 if (item.startsWith(projetEnModification.getResponsableId() + " - ")) {
                     cbResponsable.setValue(item);
@@ -81,7 +72,6 @@ public class ModifierProjetController {
                 }
             }
 
-            // 2. Sélectionner les membres actuels dans la ListView
             if (projetEnModification.getEquipeMembres() != null && !projetEnModification.getEquipeMembres().isEmpty()) {
                 List<String> membresEnregistres = Arrays.asList(projetEnModification.getEquipeMembres().split(", "));
 
@@ -109,18 +99,15 @@ public class ModifierProjetController {
             projetEnModification.setDateDebut(java.sql.Date.valueOf(dateDebut.getValue()));
             projetEnModification.setDateFin(java.sql.Date.valueOf(dateFin.getValue()));
 
-            // Extraction du nouvel ID Chef
             String selectedChef = cbResponsable.getValue();
             int idChef = Integer.parseInt(selectedChef.split(" - ")[0]);
             projetEnModification.setResponsableId(idChef);
 
-            // Extraction de la nouvelle liste des membres
             String nouveauxMembres = lvMembres.getSelectionModel().getSelectedItems()
                     .stream()
                     .collect(Collectors.joining(", "));
             projetEnModification.setEquipeMembres(nouveauxMembres);
 
-            // Sauvegarde
             service.mettreAJourProjet(projetEnModification);
 
             afficherAlerte(Alert.AlertType.INFORMATION, "Succès", "Projet mis à jour avec succès !");

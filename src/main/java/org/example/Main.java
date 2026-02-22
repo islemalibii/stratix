@@ -1,8 +1,8 @@
 package org.example;
 
-import model.Projet;
-import service.ProjetService;
-import java.util.Date;
+import models.Projet;
+import services.ProjetService;
+
 import java.util.List;
 
 public class Main {

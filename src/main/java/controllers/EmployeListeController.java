@@ -1,4 +1,4 @@
-package controller;
+package controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,8 +10,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import model.Projet;
-import service.ProjetService;
+import models.Projet;
+import services.ProjetService;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -51,7 +51,7 @@ public class EmployeListeController {
     private VBox creerCarteSimple(Projet p) {
         VBox card = new VBox(15);
         card.getStyleClass().add("project-card");
-        card.setPrefWidth(350); // Taille harmonisée pour la grille
+        card.setPrefWidth(350);
 
         Label lblStatut = new Label(p.getStatut().toUpperCase());
         lblStatut.getStyleClass().addAll("statut-badge", "badge-" + p.getStatut().toLowerCase().replace(" ", "-"));

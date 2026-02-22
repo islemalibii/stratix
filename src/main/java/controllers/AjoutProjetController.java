@@ -1,11 +1,11 @@
-package controller;
+package controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import model.Projet;
-import service.ProjetService;
-import util.DBConnection;
+import models.Projet;
+import services.ProjetService;
+import utils.MyDataBase;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -56,7 +56,7 @@ public class AjoutProjetController {
     private void chargerUtilisateurs() {
         String sql = "SELECT id, nom, prenom FROM utilisateur";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = MyDataBase.getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
