@@ -88,7 +88,7 @@ public class EventDetailsAdminController {
 
         for (EventFeedback f : feedbacks) {
             Label lbl = new Label("Note: " + f.getRating() + " - " + f.getCommentaire());
-            lbl.setStyle("-fx-font-size:14; -fx-padding:5;");
+            lbl.setStyle("-fx-font-size:14; -fx-padding:5; -fx-color-label-visible: black");
             feedbackContainer.getChildren().add(lbl);
         }
     }
@@ -122,7 +122,7 @@ public class EventDetailsAdminController {
         }
     }
     @FXML
-    private void handleEvenements(ActionEvent event) {
+    private void handleEvenements() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventDashboard.fxml"));
             Parent root = loader.load();
