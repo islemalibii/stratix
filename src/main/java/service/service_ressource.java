@@ -2,7 +2,7 @@ package service;
 
 import Interface.service;
 import models.ressource;
-import utils.Mydatabase;
+import utils.mydatabase;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class service_ressource implements service<ressource> {
         String req="INSERT INTO `ressource`(`id`, `nom`, `type_ressource`, `quantite`, `fournisseur`) VALUES (?,?,?,?,?)";
 
         try {
-            Connection cnx = Mydatabase.getInstance().getCnx();
+            Connection cnx = mydatabase.getInstance().getCnx();
             PreparedStatement ps = cnx.prepareStatement(req);
 
             ps.setInt(1, ressource.getid());
@@ -42,7 +42,7 @@ public class service_ressource implements service<ressource> {
         String req = "SELECT * FROM ressource";
 
         try {
-            Connection cnx = Mydatabase.getInstance().getCnx();
+            Connection cnx = mydatabase.getInstance().getCnx();
             Statement st = cnx.createStatement();
             ResultSet rs = st.executeQuery(req);
 
@@ -73,7 +73,7 @@ public class service_ressource implements service<ressource> {
         String req = "UPDATE ressource SET nom=?, type_ressource=?, quantite=?, fournisseur=? WHERE id=?";
 
         try {
-            Connection cnx = Mydatabase.getInstance().getCnx();
+            Connection cnx = mydatabase.getInstance().getCnx();
             PreparedStatement ps = cnx.prepareStatement(req);
 
             ps.setString(1, ressource.getNom());
@@ -101,7 +101,7 @@ public class service_ressource implements service<ressource> {
         String req = "DELETE FROM ressource WHERE id=?";
 
         try {
-            Connection cnx = Mydatabase.getInstance().getCnx();
+            Connection cnx = mydatabase.getInstance().getCnx();
             PreparedStatement ps = cnx.prepareStatement(req);
 
             ps.setInt(1, ressource.getid());
@@ -122,7 +122,7 @@ public class service_ressource implements service<ressource> {
 
         String req = "DELETE FROM ressource";
 
-        Connection cnx = Mydatabase.getInstance().getCnx();
+        Connection cnx = mydatabase.getInstance().getCnx();
         Statement st = cnx.createStatement();
         st.executeUpdate(req);
 

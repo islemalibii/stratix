@@ -4,15 +4,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class Mydatabase {
+public class mydatabase {
 
-    private static Mydatabase instance;
+    private static mydatabase instance;
     final String URL="jdbc:mysql://127.0.0.1:3306/stratix";
     final String USERNAME= "root";
     final String PASSWORD="";
     private Connection cnx;
 
-    private Mydatabase() throws SQLException {
+    private mydatabase() throws SQLException {
         try {
             this.cnx= DriverManager.getConnection(URL,USERNAME,PASSWORD);
             System.out.println("connected...");
@@ -22,10 +22,10 @@ public class Mydatabase {
 
     }
 
-public static Mydatabase getInstance(){
+public static mydatabase getInstance(){
         if (instance== null) {
             try {
-                instance= new Mydatabase();
+                instance= new mydatabase();
             } catch (SQLException e) {
 
 
