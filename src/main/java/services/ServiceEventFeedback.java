@@ -31,6 +31,7 @@ public class ServiceEventFeedback {
         }
     }
 
+
     public List<EventFeedback> getByEvent(int eventId) {
 
         List<EventFeedback> list = new ArrayList<>();
@@ -52,11 +53,20 @@ public class ServiceEventFeedback {
 
                 list.add(f);
             }
-
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
         return list;
+    }
+
+    public boolean exists(int eventId, String comment) {
+        String sql = "SELECT count(*) FROM event_feedback WHERE evenement_id = ? AND TRIM(commentaire) = TRIM(?)";
+        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
+            ps.setInt(1, eventId);
+            ps.setString(2, comment.trim());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1) > 0;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
     }
 }

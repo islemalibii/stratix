@@ -16,9 +16,13 @@ import models.enums.EventStatus;
 import services.ServiceEvenemnet;
 
 import javafx.scene.image.ImageView;
+import services.ServiceEventFeedback;
+
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class EventDashboardController {
 
@@ -213,6 +217,45 @@ public class EventDashboardController {
             eventContainer.getScene().setRoot(root);
 
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+    // teb3a api qr code bch l sheet tt3aba f database
+    @FXML
+    private void syncWithGoogle() {
+        String csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_V85FbQ-ggyuPiPlHHxHc9EHt85oY8LFpcL2VI_tS46Z1EmYGePe0kAk3ky_27zC4c8U_Nfgvs9-n/pub?output=csv";
+
+        ServiceEventFeedback serviceFeedback = new ServiceEventFeedback();
+        int newItems = 0;
+
+        try (Scanner scanner = new Scanner(new URL(csvUrl).openStream(), "UTF-8")) {
+            if (scanner.hasNextLine()) scanner.nextLine();
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                System.out.println("Ligne lue : " + line);
+                String[] data = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
+                if (data.length >= 4) {
+                    int rating = Integer.parseInt(data[1].replaceAll("\"", ""));
+                    String comment = data[2].replaceAll("\"", "");
+                    int eventId = Integer.parseInt(data[3].replaceAll("\"", ""));
+                    if (!serviceFeedback.exists(eventId, comment)) {
+                        models.EventFeedback fb = new models.EventFeedback();
+                        fb.setEvenementId(eventId);
+                        fb.setRating(rating);
+                        fb.setCommentaire(comment);
+                        fb.setDateFeedback(java.time.LocalDate.now());
+                        serviceFeedback.add(fb);
+                        newItems++;
+                    }
+                }
+            }
+            System.out.println("Synchronisation reussie : " + newItems + " nouveaux feedbacks ajoutes");
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la synchronisation : " + e.getMessage());
             e.printStackTrace();
         }
     }

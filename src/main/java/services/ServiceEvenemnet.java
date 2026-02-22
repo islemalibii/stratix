@@ -207,13 +207,13 @@ public class ServiceEvenemnet implements Services<Evenement> {
     }
 
     //llemployee
-    public List<Evenement> getPlanifierOnly() {
+    public List<Evenement> getVisibleEventsForEmployee() {
         List<Evenement> list = new ArrayList<>();
-        String req = "SELECT * FROM evenement WHERE statut = ? AND isArchived = 0";
+        String req = "SELECT * FROM evenement WHERE statut IN (?, ?) AND isArchived = 0";
 
         try (PreparedStatement ps = cnx.prepareStatement(req)) {
-
-            ps.setString(1, EventStatus.planifier.name());
+            ps.setString(1, "planifier");
+            ps.setString(2, "terminer");
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -224,12 +224,11 @@ public class ServiceEvenemnet implements Services<Evenement> {
                 e.setLieu(rs.getString("lieu"));
                 e.setDate_event(rs.getDate("date_event").toLocalDate());
                 e.setImageUrl(rs.getString("image_url"));
-                e.setStatut(EventStatus.valueOf(rs.getString("statut").toLowerCase()));
+                e.setStatut(EventStatus.valueOf(rs.getString("statut")));
                 e.setType_event(EventType.valueOf(rs.getString("type_event")));
 
                 list.add(e);
             }
-
         } catch (SQLException ex) {
             System.err.println(ex.getMessage());
         }

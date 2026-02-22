@@ -49,6 +49,7 @@
             <Button onAction="#goToAddEvent" text="Ajouter un événement" styleClass="btn-primary" />
             <Button onAction="#goToArchived" text="Archives" styleClass="btn-secondary" />
 
+            <Button text="Synchroniser les avis" onAction="#syncWithGoogle" styleClass="btn-secondary" />
 
             <Button onAction="#switchToEmployeeView" text="Vue Employé (Test)" styleClass="btn-ghost" />
 

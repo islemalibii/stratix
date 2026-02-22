@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.image.*?>
 
+<?import javafx.geometry.Insets?>
 <HBox prefHeight="700.0" prefWidth="1100.0" styleClass="main-bg"
       stylesheets="@/style/global.css" xmlns="http://javafx.com/javafx/20"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.EventDetailsEmployeeController">
@@ -41,8 +42,15 @@
                     <Label fx:id="descriptionLabel" styleClass="card-description" wrapText="true" />
                 </VBox>
 
+                <VBox fx:id="qrCodeContainer" spacing="10" alignment="CENTER">
+                    <Label text="Scannez pour donner votre avis :" styleClass="input-label" />
+                    <ImageView fx:id="qrCodeImageView" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
+                        <VBox.margin> <Insets top="10" /> </VBox.margin>
+                    </ImageView>
+                </VBox>
+
                 <HBox spacing="15" alignment="BOTTOM_RIGHT">
-                    <Button text="Participer à l'événement" styleClass="btn-primary1" prefHeight="45" prefWidth="250" />
+                    <Button fx:id="participateBtn" text="Participer à l'événement" styleClass="btn-primary1" prefHeight="45" prefWidth="250" />
                 </HBox>
             </VBox>
         </HBox>

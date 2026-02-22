@@ -15,6 +15,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import models.Evenement;
+import models.enums.EventStatus;
 import models.enums.EventType;
 import services.ServiceEvenemnet;
 
@@ -42,7 +43,7 @@ public class EventEmployeeController {
         }
         typeFilterCombo.setValue("Tous");
 
-        events = service.getPlanifierOnly();
+        events = service.getVisibleEventsForEmployee();
         displayEvents(events);
     }
 
@@ -94,8 +95,7 @@ public class EventEmployeeController {
         HBox actions = new HBox(10);
         actions.setAlignment(Pos.CENTER);
 
-        Button participeBtn = new Button("Participer");
-        participeBtn.getStyleClass().add("btn-modify-card");
+
         Button moreBtn = new Button("Voir plus");
         moreBtn.getStyleClass().add("btn-archive-card");
 
@@ -111,8 +111,17 @@ public class EventEmployeeController {
                 ex.printStackTrace();
             }
         });
+        if (e.getStatut() == EventStatus.planifier) {
+            Button participeBtn = new Button("Participer");
+            participeBtn.getStyleClass().add("btn-modify-card");
+            actions.getChildren().add(participeBtn);
+        } else if (e.getStatut() == EventStatus.terminer) {
+            Label feedbackLabel = new Label("Donner feedback");
+            feedbackLabel.setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
+            actions.getChildren().add(feedbackLabel);
+        }
 
-        actions.getChildren().addAll(participeBtn, moreBtn);
+        actions.getChildren().addAll(moreBtn);
         infoBox.getChildren().addAll(title, typeLabel, dateLieu, actions);
         card.getChildren().addAll(imageView, infoBox);
 
@@ -141,9 +150,8 @@ public class EventEmployeeController {
             EventType type = EventType.valueOf(selectedType);
             results = service.filterByType(type);
         }
-        // Cas 4: Rien du tout (Reset)
         else {
-            results = service.getPlanifierOnly();
+            results = service.getVisibleEventsForEmployee();
         }
 
         displayEvents(results);
