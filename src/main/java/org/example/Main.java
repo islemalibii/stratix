@@ -7,36 +7,59 @@ import models.Evenement;
 import utils.MyDataBase;
 import models.Service;
 import services.ServiceService;
+import models.Projet;
+import services.ProjetService;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.time.LocalDate;
 
 public class Main {
     public static void main(String[] args) {
-
-        //MyDataBase m = MyDataBase.getInstance();
-
-        Evenement e1 = new Evenement(1, "Jaw", "barchajaw", EventType.formation, EventStatus.annuler, "jarda", LocalDate.of(2026, 2, 16));
-        Evenement e2 = new Evenement(2, "7aflaa", "jawbdhawedds", EventType.recrutement, EventStatus.planifier, "salleM002", LocalDate.of(2026, 2, 16));
-
+        // Initializing Services
+        ProjetService projetService = new ProjetService();
         ServiceService serviceManager = null;
         ServiceEvenemnet evenementManager = null;
 
         try {
+            // Establishing Connections
             serviceManager = new ServiceService();
             evenementManager = new ServiceEvenemnet();
             System.out.println("Connexion établie via Singleton");
 
+
             System.out.println("\n--- Tests Événements ---");
-            // evenementManager.add(e1); // Optionnel selon votre DB
+            Evenement e1 = new Evenement(1, "Jaw", "barchajaw", EventType.formation, EventStatus.annuler, "jarda", LocalDate.of(2026, 2, 16));
+            Evenement e2 = new Evenement(2, "7aflaa", "jawbdhawedds", EventType.recrutement, EventStatus.planifier, "salleM002", LocalDate.of(2026, 2, 16));
+
+            // evenementManager.add(e1);
             evenementManager.update(e2);
+
             System.out.println("Événements actifs : " + evenementManager.getAll());
-            System.out.println("Événements archivés : " + evenementManager.getAllArchieved());
 
             int idEventToArchive = 1;
             evenementManager.archiver(idEventToArchive);
             System.out.println("Événement ID " + idEventToArchive + " archivé.");
+            System.out.println("Événements archivés : " + evenementManager.getAllArchieved());
+
+            System.out.println("\n--- Tests Projets ---");
+
+            // Optional Creation/Update tests
+            // Projet p = new Projet(14, "Projet2", "Description", new Date(), new Date(), 1234, "En cours", 98);
+            // projetService.ajouterProjet(p);
+
+            System.out.println("Liste des projets disponibles:");
+            projetService.listerTousLesProjets().forEach(System.out::println);
+
+            System.out.println("\nListe des projets archivés:");
+            List<Projet> archives = projetService.listerArchives();
+            if (archives.isEmpty()) {
+                System.out.println("Aucun projet dans les archives.");
+            } else {
+                archives.forEach(System.out::println);
+            }
+
 
             System.out.println("\n--- Tests Services ---");
 
@@ -79,7 +102,6 @@ public class Main {
             System.err.println("Erreur SQL détectée : " + e.getMessage());
             e.printStackTrace();
         } finally {
-
             System.out.println("\nTests terminés.");
         }
     }

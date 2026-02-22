@@ -26,7 +26,7 @@ public class MainController implements Initializable {
     @FXML private Button btnCategories;
     @FXML private Button btnResources;
     @FXML private Button btnResource;
-    @FXML private Button btnPlanning;
+    @FXML private Button btnProjet;
     @FXML private Button btnTaches;
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
@@ -68,7 +68,7 @@ public class MainController implements Initializable {
 
     private void applyRoleBasedVisibility(Utilisateur user) {
         if (user.getRole() == Role.EMPLOYE) {
-            Button[] toHide = {btnCategories, btnResources, btnResource, btnPlanning, btnTaches};
+            Button[] toHide = {btnCategories, btnResources, btnResource, btnTaches};
             for (Button btn : toHide) {
                 if (btn != null) {
                     btn.setVisible(false);
@@ -96,13 +96,23 @@ public class MainController implements Initializable {
                 "/EventEmployeeDashboard.fxml" : "/EventDashboard.fxml";
         loadView(fxml);
     }
+
+    @FXML
+    private void showProjet(ActionEvent event) {
+        Utilisateur user = UserRole.getInstance().getUser();
+        String fxml = (user != null && user.getRole() == Role.EMPLOYE) ?
+                "/EmployeListeProjets.fxml" : "/ListeProjets.fxml";
+        loadView(fxml);
+    }
     private void loadView(String fxmlPath) {
         try {
+            // Load the FXML (which is now just the VBox content)
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Node view = loader.load();
+            Parent view = loader.load();
+
+            // Clear the StackPane and inject only the new content
             contentArea.getChildren().setAll(view);
         } catch (IOException e) {
-            System.err.println("Erreur chargement : " + fxmlPath);
             e.printStackTrace();
         }
     }
