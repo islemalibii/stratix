@@ -53,7 +53,7 @@
                 <Button text=" Produits" fx:id="btnResources" styleClass="sidebar-button" onAction="#showResources" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
                 <Button text=" Ressources" fx:id="btnResource" styleClass="sidebar-button" onAction="#showResources" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
                 <Button text=" Projets" fx:id="btnProjet" styleClass="sidebar-button" onAction="#showProjet" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
-                <Button text=" Tâches" fx:id="btnTaches" styleClass="sidebar-button" onAction="#showPlanning" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
+                <Button text=" Tâches et Planning" fx:id="btnTaches" styleClass="sidebar-button" onAction="#showPlanning" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
                 <Button text=" Événements" fx:id="btnEvents" styleClass="sidebar-button" onAction="#handleEvenements" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
 
                 <Region VBox.vgrow="ALWAYS"/>

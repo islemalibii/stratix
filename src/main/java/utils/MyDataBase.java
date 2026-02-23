@@ -31,7 +31,13 @@ public class MyDataBase {
     }
 
     public Connection getCnx() {
+        try {
+            if (cnx == null || cnx.isClosed()) {
+                cnx = DriverManager.getConnection(URL, USER, PASSWORD);
+            }
+        } catch (SQLException e) {
+            System.err.println("Database Reconnection Error: " + e.getMessage());
+        }
         return cnx;
     }
-
 }

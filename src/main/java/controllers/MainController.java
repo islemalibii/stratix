@@ -31,13 +31,12 @@ public class MainController implements Initializable {
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
     @FXML private Label lblUserAvatar;
-
-
+    public static StackPane staticContentArea; // Change the name to be clear
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-    }
+        staticContentArea = contentArea;    }
 
     public void initData(Utilisateur user) {
         updateUserInfo(user);
@@ -68,7 +67,7 @@ public class MainController implements Initializable {
 
     private void applyRoleBasedVisibility(Utilisateur user) {
         if (user.getRole() == Role.EMPLOYE) {
-            Button[] toHide = {btnCategories, btnResources, btnResource, btnTaches};
+            Button[] toHide = {btnCategories, btnResources, btnResource};
             for (Button btn : toHide) {
                 if (btn != null) {
                     btn.setVisible(false);
@@ -128,9 +127,10 @@ public class MainController implements Initializable {
 
     @FXML
     private void showPlanning() {
-        if (!UserRole.getInstance().isEmployee()) {
-            loadView("/planning-tab.fxml");
-        }
+        Utilisateur user = UserRole.getInstance().getUser();
+        String fxml = (user != null && user.getRole() == Role.EMPLOYE) ?
+                "/EmpTacheView.fxml" : "/dashboard-view.fxml";
+        loadView(fxml);
     }
 
 
