@@ -2,7 +2,7 @@ package services;
 
 import interfaces.Services;
 import models.Evenement;
-import models.Ressource;
+import models.ressource;
 import models.enums.EventStatus;
 import models.enums.EventType;
 import utils.MyDataBase;
@@ -45,7 +45,7 @@ public class ServiceEvenemnet implements Services<Evenement> {
 
                 ServiceEventRessource link = new ServiceEventRessource();
 
-                for (Ressource r : evenement.getRessources()) {
+                for (ressource r : evenement.getRessources()) {
                     link.addRessourceToEvent(eventId, r.getid(), r.getQuatite());
                 }
             }

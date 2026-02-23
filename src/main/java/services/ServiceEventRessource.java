@@ -1,6 +1,6 @@
 package services;
 
-import models.Ressource;
+import models.ressource;
 import utils.MyDataBase;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,16 +34,16 @@ public class ServiceEventRessource {
 
 
     //temporary
-    public List<Ressource> getAllRessources() {
+    public List<ressource> getAllRessources() {
 
-        List<Ressource> list = new ArrayList<>();
+        List<ressource> list = new ArrayList<>();
         String req = "SELECT * FROM ressource";
 
         try (PreparedStatement ps = cnx.prepareStatement(req);
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Ressource r = new Ressource();
+                ressource r = new ressource();
 
                 r.setid(rs.getInt("id"));
                 r.setNom(rs.getString("nom"));

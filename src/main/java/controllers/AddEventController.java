@@ -10,9 +10,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import models.Evenement;
-import models.Ressource;
+import models.ressource;
 import models.enums.EventStatus;
 import models.enums.EventType;
+import models.ressource;
 import services.ServiceEvenemnet;
 import javafx.stage.FileChooser;
 import services.ServiceEventRessource;
@@ -38,7 +39,7 @@ public class AddEventController {
     @FXML private ComboBox<EventType> typeCombo;
     @FXML private ComboBox<EventStatus> statusCombo;
 
-    private List<Ressource> selectedRessources = new ArrayList<>();
+    private List<ressource> selectedRessources = new ArrayList<>();
     private ServiceEvenemnet service = new ServiceEvenemnet();
 
     @FXML
@@ -57,8 +58,8 @@ public class AddEventController {
 
         //for the ressources
         ServiceEventRessource resService = new ServiceEventRessource();
-        List<Ressource> ressources = resService.getAllRessources();
-        for (Ressource r : ressources) {
+        List<ressource> ressources = resService.getAllRessources();
+        for (ressource r : ressources) {
             CheckBox check = new CheckBox(
                     r.getNom() + " (Stock: " + r.getQuatite() + ")"
             );

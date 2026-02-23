@@ -25,13 +25,12 @@ public class MainController implements Initializable {
     @FXML private StackPane contentArea;
     @FXML private Button btnCategories;
     @FXML private Button btnResources;
-    @FXML private Button btnResource;
     @FXML private Button btnProjet;
     @FXML private Button btnTaches;
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
     @FXML private Label lblUserAvatar;
-    public static StackPane staticContentArea; // Change the name to be clear
+    public static StackPane staticContentArea;
 
 
     @Override
@@ -67,7 +66,7 @@ public class MainController implements Initializable {
 
     private void applyRoleBasedVisibility(Utilisateur user) {
         if (user.getRole() == Role.EMPLOYE) {
-            Button[] toHide = {btnCategories, btnResources, btnResource};
+            Button[] toHide = {btnCategories};
             for (Button btn : toHide) {
                 if (btn != null) {
                     btn.setVisible(false);
@@ -120,9 +119,18 @@ public class MainController implements Initializable {
 
     @FXML
     private void showResources() {
-        if (UserRole.getInstance().getUser().isAdmin() || UserRole.getInstance().getUser().isCEO()) {
-            loadView("/resources-tab.fxml");
-        }
+        Utilisateur user = UserRole.getInstance().getUser();
+        String fxml = (user != null && user.getRole() == Role.EMPLOYE) ?
+                "/FrontRessources.fxml" : "/ressource.fxml";
+        loadView(fxml);
+    }
+
+    @FXML
+    private void showProduits() {
+        Utilisateur user = UserRole.getInstance().getUser();
+        String fxml = (user != null && user.getRole() == Role.EMPLOYE) ?
+                "/FrontProduits.fxml" : "/produit.fxml";
+        loadView(fxml);
     }
 
     @FXML
