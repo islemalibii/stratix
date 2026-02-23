@@ -158,7 +158,7 @@ public class WhiteboardController {
 
         HBox prioriteBar = new HBox();
         prioriteBar.setPrefHeight(4);
-        prioriteBar.setStyle("-fx-background-color: " + prioriteColor + "; -fx-background-radius: 4;");
+        prioriteBar.setStyle("-fx-background-color:4 " + prioriteColor + "; -fx-background-radius: 4;");
 
         // Titre avec priorité
         HBox titleBox = new HBox(5);
