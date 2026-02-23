@@ -6,7 +6,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -20,6 +19,7 @@ import javafx.scene.layout.VBox;
 import models.Evenement;
 import models.enums.EventStatus;
 import models.enums.EventType;
+import services.EventEmailApi;
 import services.ServiceEvenemnet;
 
 
@@ -124,7 +124,34 @@ public class EventEmployeeController {
         if (e.getStatut() == EventStatus.planifier) {
             Button participeBtn = new Button("Participer");
             participeBtn.getStyleClass().add("btn-modify-card");
+
+            participeBtn.setOnAction(event -> {
+                String userEmail = utils.SessionManager.getInstance().getEmail();
+                if (userEmail == null || userEmail.isEmpty()) {
+                    System.err.println("Erreur: Aucun email trouvé dans la session.");
+                    participeBtn.setText("Session Error ");
+                    return;
+                }
+                participeBtn.setText("Envoi en cours...");
+                participeBtn.setDisable(true);
+                new Thread(() -> {
+                    try {
+                        EventEmailApi.sendEmail(userEmail, e.getTitre(), e.getDate_event().toString());
+                        javafx.application.Platform.runLater(() -> {
+                            participeBtn.setText("Inscrit ");
+                        });
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        javafx.application.Platform.runLater(() -> {
+                            participeBtn.setText("Erreur ");
+                            participeBtn.setDisable(false);
+                        });
+                    }
+                }).start();
+            });
+
             actions.getChildren().add(participeBtn);
+
         } else if (e.getStatut() == EventStatus.terminer) {
             Label feedbackLabel = new Label("Donner feedback");
             feedbackLabel.setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold;");

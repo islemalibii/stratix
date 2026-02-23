@@ -89,7 +89,7 @@ public class EventDetailsAdminController {
 
         for (EventFeedback f : feedbacks) {
             Label lbl = new Label("Note: " + f.getRating() + " - " + f.getCommentaire());
-            lbl.setStyle("-fx-font-size:14; -fx-padding:5; -fx-color-label-visible: black");
+            lbl.setStyle("-fx-font-size:14px; -fx-padding:5; -fx-text-fill: black;");
             feedbackContainer.getChildren().add(lbl);
         }
     }
