@@ -13,9 +13,9 @@ import models.Evenement;
 import models.Ressource;
 import models.enums.EventStatus;
 import models.enums.EventType;
-import services.ServiceEvenemnet;
+import Services.ServiceEvenemnet;
 import javafx.stage.FileChooser;
-import services.ServiceEventRessource;
+import Services.ServiceEventRessource;
 
 import java.io.File;
 

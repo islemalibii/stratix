@@ -12,7 +12,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import models.CategorieService;
-import services.CategorieServiceService;
+import Services.CategorieServiceService;
 
 import java.net.URL;
 import java.sql.SQLException;

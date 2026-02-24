@@ -8,7 +8,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import models.Projet;
-import services.ProjetService;
+import Services.ProjetService;
 
 import java.util.List;
 

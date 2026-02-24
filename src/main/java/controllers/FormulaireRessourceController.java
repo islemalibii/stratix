@@ -6,7 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import models.Ressource;
-import services.service_ressource;
+import Services.service_ressource;
 
 public class FormulaireRessourceController {
 

@@ -11,7 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import models.Projet;
-import services.ProjetService;
+import Services.ProjetService;
 
 import java.io.IOException;
 import java.net.URLEncoder;

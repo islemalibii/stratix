@@ -1,4 +1,4 @@
-package services;
+package Services;
 
 import models.CalendarEvent;
 import models.Planning;

@@ -14,7 +14,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.Projet;
-import services.ProjetService;
+import Services.ProjetService;
 
 // Bibliothèques PDF (OpenPDF / iText)
 import com.lowagie.text.Document;

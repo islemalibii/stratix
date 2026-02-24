@@ -17,10 +17,10 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import models.Evenement;
 import models.enums.EventStatus;
-import services.ServiceEvenemnet;
+import Services.ServiceEvenemnet;
 
 import javafx.scene.image.ImageView;
-import services.ServiceEventFeedback;
+import Services.ServiceEventFeedback;
 
 import java.io.IOException;
 import java.net.URL;

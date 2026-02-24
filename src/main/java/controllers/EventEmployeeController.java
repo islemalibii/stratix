@@ -19,8 +19,8 @@ import javafx.scene.layout.VBox;
 import models.Evenement;
 import models.enums.EventStatus;
 import models.enums.EventType;
-import services.EventEmailApi;
-import services.ServiceEvenemnet;
+import Services.EventEmailApi;
+import Services.ServiceEvenemnet;
 
 
 import java.io.IOException;

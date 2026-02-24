@@ -6,7 +6,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
-import services.StatistiquesService;
+import Services.StatistiquesService;
 
 import java.net.URL;
 import java.sql.SQLException;
