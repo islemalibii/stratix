@@ -4,7 +4,7 @@ import models.*;
 import models.enums.EventStatus;
 import models.enums.EventType;
 import services.*;
-import services.service_ressource;
+import Services.service_ressource;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
@@ -12,15 +12,15 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         // 1. Initialize Services
-        ProjetService projetService = new ProjetService();
-        ServiceService serviceManager = null;
-        ServiceEvenemnet evenementManager = null;
+        Services.ProjetService projetService = new Services.ProjetService();
+        Services.ServiceService serviceManager = null;
+        Services.ServiceEvenemnet evenementManager = null;
         service_ressource sr = new service_ressource();
 
         try {
             // 2. Establishing Connections
-            serviceManager = new ServiceService();
-            evenementManager = new ServiceEvenemnet();
+            serviceManager = new Services.ServiceService();
+            evenementManager = new Services.ServiceEvenemnet();
             System.out.println("✅ Connexion établie via Singleton");
 
             // --- SECTION 1: ÉVÉNEMENTS ---
