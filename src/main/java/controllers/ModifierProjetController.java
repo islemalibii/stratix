@@ -17,7 +17,6 @@ public class ModifierProjetController {
     @FXML private TextArea txtDescription;
     @FXML private DatePicker dateDebut, dateFin;
     @FXML private ChoiceBox<String> comboStatut;
-
     @FXML private ComboBox<String> cbResponsable;
     @FXML private ListView<String> lvMembres;
 

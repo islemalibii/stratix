@@ -19,7 +19,6 @@ public class AjoutProjetController {
     @FXML private ChoiceBox<String> cbStatut;
     @FXML private ComboBox<String> cbResponsable;
     @FXML private ListView<String> lvMembres;
-
     private ProjetService projetService = new ProjetService();
 
     @FXML
@@ -141,7 +140,6 @@ public class AjoutProjetController {
                     "Erreur lors de l'ajout du projet.");
         }
     }
-
     @FXML
     private void annuler() {
         ((Stage) tfNom.getScene().getWindow()).close();

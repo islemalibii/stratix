@@ -18,11 +18,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
-
 public class EmployeListeController {
     @FXML private FlowPane flowPaneProjets;
     @FXML private TextField searchField;
-
     private ProjetService projetService = new ProjetService();
 
     @FXML

@@ -7,11 +7,9 @@
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="controllers.ListeProjetsController" styleClass="root-container">
-
     <stylesheets>
         <URL value="@styles.css" />
     </stylesheets>
-
     <left>
         <VBox spacing="10" styleClass="sidebar" prefWidth="260">
             <padding><Insets top="30" right="20" bottom="20" left="20"/></padding>

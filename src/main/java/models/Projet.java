@@ -12,7 +12,6 @@ public class Projet {
     private String statut;
     private int progression;
     private boolean isArchived;
-
     private int responsableId;
     private String equipeMembres;
 

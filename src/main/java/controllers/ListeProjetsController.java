@@ -62,7 +62,6 @@ public class ListeProjetsController {
         if (searchField != null) {
             searchField.textProperty().addListener((obs, oldVal, newVal) -> filtrerEtAfficher());
         }
-
         rafraichirDonnees();
     }
 
