@@ -15,7 +15,7 @@
             <Label fx:id="lblBudgetMoyen" text="0 DT" styleClass="stat-number"/>
         </VBox>
         <VBox styleClass="stat-card orange" alignment="CENTER" spacing="5" prefWidth="180">
-            <Label text="Total Services" styleClass="stat-label"/>
+            <Label text="Total services" styleClass="stat-label"/>
             <Label fx:id="lblTotalServices" text="0" styleClass="stat-number"/>
         </VBox>
         <VBox styleClass="stat-card green" alignment="CENTER" spacing="5" prefWidth="180">
@@ -36,7 +36,7 @@
     </TitledPane>
 
     <HBox spacing="20" HBox.hgrow="ALWAYS">
-        <TitledPane text="Répartition des Services" HBox.hgrow="ALWAYS">
+        <TitledPane text="Répartition des services" HBox.hgrow="ALWAYS">
             <PieChart fx:id="repartitionChart" title="Répartition par Catégorie" animated="false"
                       labelsVisible="true" prefHeight="250"/>
         </TitledPane>

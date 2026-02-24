@@ -48,7 +48,7 @@
                     <VBox.margin><Insets bottom="10.0" left="10.0" /></VBox.margin>
                 </Label>
 
-                <Button text=" Services" fx:id="btnServices" styleClass="sidebar-button" onAction="#showServices" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
+                <Button text=" services" fx:id="btnServices" styleClass="sidebar-button" onAction="#showServices" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
                 <Button text=" Catégories" fx:id="btnCategories" styleClass="sidebar-button" onAction="#showCategories" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
                 <Button text=" Produits" fx:id="btnProduits" styleClass="sidebar-button" onAction="#showProduits" maxWidth="Infinity" alignment="BASELINE_LEFT"/>
                 <Button text=" Ressources" fx:id="btnResources" styleClass="sidebar-button" onAction="#showResources" maxWidth="Infinity" alignment="BASELINE_LEFT"/>

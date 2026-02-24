@@ -8,7 +8,7 @@
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ServiceTabController">
 
     <HBox styleClass="sub-nav-bar" spacing="5" alignment="CENTER_LEFT">
-        <Button text=" Liste des Services" fx:id="btnServicesView" onAction="#showServicesList" styleClass="sub-nav-button-active"/>
+        <Button text=" Liste des services" fx:id="btnServicesView" onAction="#showServicesList" styleClass="sub-nav-button-active"/>
         <Button text=" Statistiques" fx:id="btnStatsView" onAction="#showStatistics" styleClass="sub-nav-button"/>
         <Region HBox.hgrow="ALWAYS"/>
     </HBox>
