@@ -1,7 +1,7 @@
 package services.export;
 
+import models.Ressource;
 import models.produit;
-import models.ressource;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -116,7 +116,7 @@ public class ExportExcelService {
 
     // ==================== EXPORT DES RESSOURCES VERS EXCEL ====================
 
-    public static void exporterRessourcesVersExcel(List<ressource> ressources, String cheminFichier) throws IOException {
+    public static void exporterRessourcesVersExcel(List<Ressource> Ressources, String cheminFichier) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Ressources");
 
@@ -159,7 +159,7 @@ public class ExportExcelService {
 
         // Données
         int rowNum = 1;
-        for (ressource r : ressources) {
+        for (Ressource r : Ressources) {
             Row row = sheet.createRow(rowNum++);
 
             // ID

@@ -14,7 +14,7 @@
         <VBox spacing="10" style="-fx-background-color: linear-gradient(to right, #764ba2, #667eea); -fx-padding: 20;">
             <Label text=" INVENTAIRE DES RESSOURCES"
                    style="-fx-text-fill: white; -fx-font-size: 24; -fx-font-weight: bold; -fx-alignment: center;"/>
-            <Label text="Consultez toutes les ressources disponibles"
+            <Label text="Consultez toutes les Ressources disponibles"
                    style="-fx-text-fill: rgba(255,255,255,0.9); -fx-font-size: 14; -fx-alignment: center;"/>
         </VBox>
     </top>
@@ -41,7 +41,7 @@
                         onAction="#voirProduits"/>
             </HBox>
 
-            <!-- Liste des ressources -->
+            <!-- Liste des Ressources -->
             <ListView fx:id="listViewRessources" VBox.vgrow="ALWAYS"
                       style="-fx-background-radius: 10; -fx-background-color: transparent;"/>
 
@@ -51,7 +51,7 @@
     <!-- Bas de page -->
     <bottom>
         <HBox spacing="20" style="-fx-background-color: #ecf0f1; -fx-padding: 15;" alignment="CENTER">
-            <Label fx:id="statsTotal" text="Total ressources: 0"
+            <Label fx:id="statsTotal" text="Total Ressources: 0"
                    style="-fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-size: 14;"/>
             <Label fx:id="statsQuantiteTotale" text="Quantité totale: 0"
                    style="-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 14;"/>

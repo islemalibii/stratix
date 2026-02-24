@@ -39,21 +39,21 @@ public class Main {
 
             // --- SECTION 2: RESSOURCES ---
             System.out.println("\n--- 📦 Tests Ressources ---");
-            ressource r = new ressource(1, "Ordinateur", "Materiel", 10, "HP");
-            ressource r4 = new ressource(2, "tables", "Materiel", 100, "f2");
+            Ressource r = new Ressource(1, "Ordinateur", "Materiel", 10, "HP");
+            Ressource r4 = new Ressource(2, "tables", "Materiel", 100, "f2");
 
             sr.add(r);
             sr.add(r4);
 
             // Coherent Loop: Now uses 'rs' to display all resources in the list
-            List<ressource> resourceList = sr.getAll();
+            List<Ressource> resourceList = sr.getAll();
             System.out.println("Liste des ressources enregistrées :");
-            for (ressource rs : resourceList) {
+            for (Ressource rs : resourceList) {
                 System.out.println(rs.getid() + " | " + rs.getNom() + " | " + rs.getType_ressource() + " | " + rs.getQuatite() + " | " + rs.getFournisseur());
             }
 
             // Resource Update/Delete tests
-            ressource r1_update = new ressource(1, "Ordinateur Portable", "Materiel Informatique", 20, "Dell");
+            Ressource r1_update = new Ressource(1, "Ordinateur Portable", "Materiel Informatique", 20, "Dell");
             sr.update(r1_update);
             System.out.println("Ressource ID 1 mise à jour.");
 

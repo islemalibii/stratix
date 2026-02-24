@@ -1,16 +1,16 @@
 package services;
 
 import interfaces.service;
-import models.ressource;
+import models.Ressource;
 import utils.MyDataBase;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class service_ressource implements service<ressource> {
+public class service_ressource implements service<Ressource> {
     @Override
-    public void add(ressource ressource) {
+    public void add(Ressource ressource) {
 
         String req="INSERT INTO `ressource`(`id`, `nom`, `type_ressource`, `quantite`, `fournisseur`) VALUES (?,?,?,?,?)";
 
@@ -35,9 +35,9 @@ public class service_ressource implements service<ressource> {
 
 
     @Override
-    public List<ressource> getAll() {
+    public List<Ressource> getAll() {
 
-        List<ressource> list = new ArrayList<>();
+        List<Ressource> list = new ArrayList<>();
 
         String req = "SELECT * FROM ressource";
 
@@ -48,7 +48,7 @@ public class service_ressource implements service<ressource> {
 
             while (rs.next()) {
 
-                ressource r = new ressource();
+                Ressource r = new Ressource();
 
                 r.setid(rs.getInt("id"));
                 r.setNom(rs.getString("nom"));
@@ -68,7 +68,7 @@ public class service_ressource implements service<ressource> {
 
 
     @Override
-    public void update(ressource ressource) {
+    public void update(Ressource ressource) {
 
         String req = "UPDATE ressource SET nom=?, type_ressource=?, quantite=?, fournisseur=? WHERE id=?";
 
@@ -96,7 +96,7 @@ public class service_ressource implements service<ressource> {
 
 
     @Override
-    public void delete(ressource ressource) {
+    public void delete(Ressource ressource) {
 
         String req = "DELETE FROM ressource WHERE id=?";
 

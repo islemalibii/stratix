@@ -1,6 +1,6 @@
 package services;
 
-import models.ressource;
+import models.Ressource;
 import org.junit.jupiter.api.*;
 
 import java.sql.SQLException;
@@ -25,7 +25,7 @@ class service_ressourceTest {
     @Order(1)
     void testAjouterRessource() throws SQLException {
 
-        ressource r = new ressource(1,
+        Ressource r = new Ressource(1,
                 "Clavier HP",
                 "Matériel informatique",
                 20,
@@ -34,12 +34,12 @@ class service_ressourceTest {
 
         service.add(r);
 
-        List<ressource> ressources = service.getAll();
+        List<Ressource> Ressources = service.getAll();
 
-        assertFalse(ressources.isEmpty());
+        assertFalse(Ressources.isEmpty());
 
         assertTrue(
-                ressources.stream().anyMatch(res ->
+                Ressources.stream().anyMatch(res ->
                         res.getNom().equals("Clavier HP")
                 )
         );
@@ -50,7 +50,7 @@ class service_ressourceTest {
     @Order(2)
     void testModifierRessource() throws SQLException {
 
-        ressource r = new ressource();
+        Ressource r = new Ressource();
         r.setid(1);
         r.setNom("Clavier Gamer RGB");
         r.setType_ressource("Gaming");
@@ -59,9 +59,9 @@ class service_ressourceTest {
 
         service.update(r);
 
-        List<ressource> ressources = service.getAll();
+        List<Ressource> Ressources = service.getAll();
 
-        boolean trouve = ressources.stream()
+        boolean trouve = Ressources.stream()
                 .anyMatch(res ->
                         res.getNom().equals("Clavier Gamer RGB")
                 );

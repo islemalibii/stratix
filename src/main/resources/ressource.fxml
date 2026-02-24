@@ -34,7 +34,7 @@
 
             <!-- Boutons d'action -->
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="Liste des ressources" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+                <Label text="Liste des Ressources" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
                 <Region HBox.hgrow="ALWAYS"/>
                 <Button text=" Ajouter" style="-fx-background-color: #27ae60; -fx-text-fill: white;" onAction="#ouvrirAjoutRessource"/>
                 <Button text=" Modifier" style="-fx-background-color: #f39c12; -fx-text-fill: white;" onAction="#ouvrirModifierRessource"/>
@@ -42,7 +42,7 @@
                 <Button text="Rafraîchir" style="-fx-background-color: #3498db; -fx-text-fill: white;" onAction="#rafraichirListe"/>
             </HBox>
 
-            <!-- ListView pour les ressources -->
+            <!-- ListView pour les Ressources -->
             <ListView fx:id="listViewRessources" VBox.vgrow="ALWAYS"/>
 
         </VBox>
@@ -51,7 +51,7 @@
     <!-- Bas de page avec statistiques -->
     <bottom>
         <HBox spacing="30" style="-fx-background-color: #ecf0f1; -fx-padding: 15;" alignment="CENTER">
-            <Label fx:id="statsTotal" text="Total ressources: 0" style="-fx-font-weight: bold;"/>
+            <Label fx:id="statsTotal" text="Total Ressources: 0" style="-fx-font-weight: bold;"/>
             <Label fx:id="statsQuantiteTotale" text="Quantité totale: 0" style="-fx-font-weight: bold;"/>
             <Label fx:id="statsTypes" text="Types: 0" style="-fx-font-weight: bold;"/>
         </HBox>

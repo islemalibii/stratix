@@ -5,7 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import models.ressource;
+import models.Ressource;
 import services.service_ressource;
 
 public class FormulaireRessourceController {
@@ -87,7 +87,7 @@ public class FormulaireRessourceController {
         fournisseurField.clear();
     }
 
-    public void setModeModification(ressource r) {
+    public void setModeModification(Ressource r) {
         titreFormulaire.setText("Modifier une ressource");
         btnValider.setText("Modifier");
 
@@ -155,7 +155,7 @@ public class FormulaireRessourceController {
         }
 
         try {
-            ressource r = new ressource();
+            Ressource r = new Ressource();
 
             if (idField.getText() != null && !idField.getText().isEmpty()) {
                 r.setid(Integer.parseInt(idField.getText()));

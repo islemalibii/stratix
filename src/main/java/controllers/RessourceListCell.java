@@ -8,12 +8,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import models.ressource;
+import models.Ressource;
 
-public class RessourceListCell extends ListCell<ressource> {
+public class RessourceListCell extends ListCell<Ressource> {
 
     @Override
-    protected void updateItem(ressource r, boolean empty) {
+    protected void updateItem(Ressource r, boolean empty) {
         super.updateItem(r, empty);
 
         if (empty || r == null) {

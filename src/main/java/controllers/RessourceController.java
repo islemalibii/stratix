@@ -10,7 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import models.ressource;
+import models.Ressource;
 import services.service_ressource;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
 public class RessourceController implements Initializable {
 
     @FXML
-    private ListView<ressource> listViewRessources;
+    private ListView<Ressource> listViewRessources;
     @FXML
     private Label statsTotal;
     @FXML
@@ -39,8 +39,8 @@ public class RessourceController implements Initializable {
     private Button btnClearSearch;
 
     private service_ressource serviceRessource = new service_ressource();
-    private ObservableList<ressource> observableList = FXCollections.observableArrayList();
-    private FilteredList<ressource> filteredData;
+    private ObservableList<Ressource> observableList = FXCollections.observableArrayList();
+    private FilteredList<Ressource> filteredData;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -118,11 +118,11 @@ public class RessourceController implements Initializable {
         int total = filteredData.size();
 
         int quantiteTotale = filteredData.stream()
-                .mapToInt(ressource::getQuatite)
+                .mapToInt(Ressource::getQuatite)
                 .sum();
 
         long typesUniques = filteredData.stream()
-                .map(ressource::getType_ressource)
+                .map(Ressource::getType_ressource)
                 .distinct()
                 .count();
 
@@ -138,8 +138,8 @@ public class RessourceController implements Initializable {
     }
 
     private void chargerDonnees() {
-        List<ressource> ressources = serviceRessource.getAll();
-        observableList.setAll(ressources);
+        List<Ressource> Ressources = serviceRessource.getAll();
+        observableList.setAll(Ressources);
         // Réappliquer le filtre après rechargement
         if (filteredData != null) {
             filtrerRessources(searchField != null ? searchField.getText() : "");
@@ -152,10 +152,10 @@ public class RessourceController implements Initializable {
     private void mettreAJourStatistiques() {
         int total = observableList.size();
         int quantiteTotale = observableList.stream()
-                .mapToInt(ressource::getQuatite)
+                .mapToInt(Ressource::getQuatite)
                 .sum();
         long typesUniques = observableList.stream()
-                .map(ressource::getType_ressource)
+                .map(Ressource::getType_ressource)
                 .distinct()
                 .count();
 
@@ -190,7 +190,7 @@ public class RessourceController implements Initializable {
 
     @FXML
     private void ouvrirModifierRessource() {
-        ressource selected = listViewRessources.getSelectionModel().getSelectedItem();
+        Ressource selected = listViewRessources.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert(Alert.AlertType.WARNING, "Attention",
                     "Veuillez sélectionner une ressource à modifier");
@@ -219,7 +219,7 @@ public class RessourceController implements Initializable {
 
     @FXML
     private void supprimerRessource() {
-        ressource selected = listViewRessources.getSelectionModel().getSelectedItem();
+        Ressource selected = listViewRessources.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert(Alert.AlertType.WARNING, "Attention",
                     "Veuillez sélectionner une ressource à supprimer");

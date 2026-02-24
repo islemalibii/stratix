@@ -37,8 +37,8 @@
                         style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 8 15;"/>
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <!-- Bouton pour voir les ressources -->
-                <Button text=" Voir les ressources"
+                <!-- Bouton pour voir les Ressources -->
+                <Button text=" Voir les Ressources"
                         style="-fx-background-color: #764ba2; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 8 15;"
                         onAction="#voirRessources"/>
             </HBox>

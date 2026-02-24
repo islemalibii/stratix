@@ -12,7 +12,7 @@ public class Evenement {
     private LocalDate date_event;
     private EventType type_event;
     private EventStatus statut;
-    private List<ressource> ressources = new ArrayList<>();
+    private List<Ressource> Ressources = new ArrayList<>();
     private boolean isArchived;
     private String image_url;
 
@@ -84,12 +84,12 @@ public class Evenement {
         this.date_event = date_event;
     }
 
-    public List<ressource> getRessources() {
-        return ressources;
+    public List<Ressource> getRessources() {
+        return Ressources;
     }
 
-    public void setRessources(List<ressource> ressources) {
-        this.ressources = ressources;
+    public void setRessources(List<Ressource> Ressources) {
+        this.Ressources = Ressources;
     }
 
     public boolean isArchived() {
