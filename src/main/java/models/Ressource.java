@@ -1,19 +1,18 @@
 package models;
 
-import java.io.StringReader;
 
 public class Ressource {
     private int id;
     private String nom;
     private String type_ressource;
-    private int quantite;
+    private int quatite;
     private String fournisseur;
     public Ressource(){}
-    public Ressource(int id, String nom, String type_ressource, int quatite,String fournisseur) {
+    public Ressource(int id, String nom, String type_ressource, int quatite, String fournisseur) {
         this.id = id;
         this.nom=nom;
         this.type_ressource=type_ressource;
-        this.quantite=quatite;
+        this.quatite=quatite;
         this.fournisseur=fournisseur;
 
     }
@@ -43,11 +42,11 @@ public class Ressource {
     }
 
     public int getQuatite() {
-        return quantite;
+        return quatite;
     }
 
     public void setQuatite(int quatite) {
-        this.quantite = quatite;
+        this.quatite = quatite;
     }
 
     public String getFournisseur() {
@@ -64,7 +63,7 @@ public class Ressource {
                 "id=" + id +
                 ", nom='" + nom + '\'' +
                 ", type_ressource='" + type_ressource + '\'' +
-                ", quatite=" + quantite +
+                ", quatite=" + quatite +
                 ", fournisseur='" + fournisseur + '\'' +
                 '}';
     }
