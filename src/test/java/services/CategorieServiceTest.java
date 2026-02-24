@@ -1,5 +1,6 @@
 package services;
 
+import Services.CategorieServiceService;
 import models.CategorieService;
 import org.junit.jupiter.api.*;
 
