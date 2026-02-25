@@ -9,8 +9,8 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import models.Employe;
 import models.Planning;
-import Services.EmployeeService;
-import Services.SERVICEPlanning;
+import services.EmployeeService;
+import services.SERVICEPlanning;
 
 import java.sql.Date;
 import java.sql.Time;

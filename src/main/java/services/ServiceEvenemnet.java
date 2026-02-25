@@ -1,4 +1,4 @@
-package Services;
+package services;
 
 import interfaces.Services;
 import models.Evenement;

@@ -14,9 +14,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.Service;
 import models.UserRole;
-import Services.PDFService;
-import Services.ServiceService;
-import Services.ExchangeRateService;
+import services.PDFService;
+import services.ServiceService;
+import services.ExchangeRateService;
 
 import java.io.File;
 import java.io.IOException;

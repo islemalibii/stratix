@@ -11,7 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import models.Ressource;
-import Services.service_ressource;
+import services.service_ressource;
 
 import java.io.IOException;
 import java.net.URL;

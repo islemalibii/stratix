@@ -1,4 +1,4 @@
-package Services;
+package services;
 
 import models.CategorieService;
 import utils.MyDataBase; // Utilisation de votre nouveau package

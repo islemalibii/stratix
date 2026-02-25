@@ -6,7 +6,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import models.CategorieService;
 import models.UserRole;
-import Services.CategorieServiceService;
+import services.CategorieServiceService;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;

@@ -1,4 +1,4 @@
-package Services;
+package services;
 
 import models.Employe;
 import utils.MyDataBase; // Updated import to your Singleton

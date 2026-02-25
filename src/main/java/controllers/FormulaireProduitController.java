@@ -10,7 +10,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import models.produit;
-import Services.service_produit;
+import services.service_produit;
 
 import java.io.File;
 import java.io.IOException;

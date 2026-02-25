@@ -22,8 +22,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import models.Service;
-import Services.PDFService;
-import Services.ServiceService;
+import services.PDFService;
+import services.ServiceService;
 
 public class ServiceController implements Initializable {
 

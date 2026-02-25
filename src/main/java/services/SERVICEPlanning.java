@@ -1,4 +1,4 @@
-package Services;
+package services;
 
 import models.Planning;
 import utils.MyDataBase; // Corrected import to match your Singleton

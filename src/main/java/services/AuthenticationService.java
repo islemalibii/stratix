@@ -1,4 +1,4 @@
-package Services;
+package services;
 
 import utils.MyDataBase;
 import utils.PasswordValidator;

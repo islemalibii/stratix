@@ -4,7 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import models.Projet;
-import Services.ProjetService;
+import services.ProjetService;
 import utils.MyDataBase;
 
 import java.sql.*;

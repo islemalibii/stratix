@@ -13,10 +13,10 @@ import javafx.stage.FileChooser;
 
 import models.Tache;
 import models.Employe;
-import Services.SERVICETache;
-import Services.EmployeeService;
-import Services.PDFExportService;
-import Services.ExcelExportService;
+import services.SERVICETache;
+import services.EmployeeService;
+import services.PDFExportService;
+import services.ExcelExportService;
 import controllers.StatsChartController;  // ← NOUVEL IMPORT
 
 import java.io.File;

@@ -7,7 +7,7 @@ import javafx.scene.control.*;
 import models.Evenement;
 import models.enums.EventStatus;
 import models.enums.EventType;
-import Services.ServiceEvenemnet;
+import services.ServiceEvenemnet;
 
 import java.io.IOException;
 
