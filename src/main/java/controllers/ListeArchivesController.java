@@ -13,12 +13,9 @@ import services.ProjetService;
 import java.util.List;
 
 public class ListeArchivesController {
-
     @FXML private VBox containerArchives;
     @FXML private Label lblNbArchives;
-
     private ProjetService projetService;
-
     @FXML
     public void initialize() {
         projetService = new ProjetService();

@@ -1,5 +1,8 @@
 package services;
 
+import interfaces.Services;
+import models.Projet;
+import utils.MyDataBase;
 import interfaces.ProjServices;
 import models.Projet;
 import utils.MyDataBase; // Mise à jour de l'import
@@ -36,12 +39,12 @@ public class ProjetService implements ProjServices {
 
     @Override
     public List<Projet> listerTousLesProjets() {
-        return recupererParEtat(0); // 0 = Non archivés
+        return recupererParEtat(0);
     }
 
     @Override
     public List<Projet> listerArchives() {
-        return recupererParEtat(1); // 1 = Archivés
+        return recupererParEtat(1);
     }
 
     private List<Projet> recupererParEtat(int etat) {
@@ -94,6 +97,7 @@ public class ProjetService implements ProjServices {
 
     @Override
     public void mettreAJourProjet(Projet p) {
+        // Mise à jour incluant le chef et l'équipe
         String sql = "UPDATE projet SET nom=?, description=?, date_debut=?, date_fin=?, budget=?, statut=?, responsable_id=?, equipe_membres=?, progression=? WHERE id=?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, p.getNom());

@@ -227,20 +227,9 @@ public class ListeProjetsController {
         }
     }
 
-    @FXML
-    private void allerAjouterProjet() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/AjouterProjet.fxml"));
-            Parent root = loader.load();
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-
-            stage.showAndWait();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }    @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Archives"); }
+    // --- NAVIGATION ET FENÊTRES ---
+    @FXML private void allerAjouterProjet() { chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet"); }
+    @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Archives"); }
 
     private void ouvrirFenetreModification(Projet p) {
         try {
@@ -263,14 +252,12 @@ public class ListeProjetsController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
             Stage stage = new Stage();
-            stage.setTitle(titre);
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.initOwner(containerProjets.getScene().getWindow());
             stage.setScene(new Scene(root));
             stage.showAndWait();
             rafraichirDonnees();
         } catch (IOException e) {
-            afficherErreur("Erreur", "Fichier FXML non trouvé : " + fxmlPath);
+            afficherErreur("Erreur", "Fichier FXML non trouvé.");
         }
     }
 
@@ -281,17 +268,8 @@ public class ListeProjetsController {
         alert.showAndWait();
     }
 
-    @FXML private void allerAuFront() {
-        try {
+    @FXML private void allerAuFront() { changerEspace("/EmployeListeProjets.fxml", "Espace Employé"); }
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EmployeListeProjets.fxml"));
-            Parent root = loader.load();
-            Scene scene = containerProjets.getScene();
-            scene.setRoot(root);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     private void changerEspace(String fxmlPath, String titre) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));

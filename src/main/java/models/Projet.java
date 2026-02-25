@@ -12,10 +12,8 @@ public class Projet {
     private String statut;
     private int progression;
     private boolean isArchived;
-
-    // Nouveaux champs pour la gestion d'équipe
-    private int responsableId;    // L'ID du chef de projet (utilisateur)
-    private String equipeMembres; // Les noms ou IDs des membres (ex: "Sophie, Julie, Antoine")
+    private int responsableId;
+    private String equipeMembres;
 
     public Projet() {}
 
@@ -35,7 +33,6 @@ public class Projet {
         this.equipeMembres = equipeMembres;
     }
 
-    // --- Getters et Setters ---
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

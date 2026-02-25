@@ -20,9 +20,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class EmployeListeProjetController {
-    @FXML private FlowPane flowPaneProjets;
-    @FXML private TextField searchField;
-
+    @FXML
+    private FlowPane flowPaneProjets;
+    @FXML
+    private TextField searchField;
     private ProjetService projetService = new ProjetService();
 
     @FXML
@@ -51,7 +52,7 @@ public class EmployeListeProjetController {
     private VBox creerCarteSimple(Projet p) {
         VBox card = new VBox(15);
         card.getStyleClass().add("project-card");
-        card.setPrefWidth(350); // Taille harmonisée pour la grille
+        card.setPrefWidth(350);
 
         Label lblStatut = new Label(p.getStatut().toUpperCase());
         lblStatut.getStyleClass().addAll("statut-badge", "badge-" + p.getStatut().toLowerCase().replace(" ", "-"));
