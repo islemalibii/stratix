@@ -1,6 +1,6 @@
 package utils;
 
-import Services.UtilisateurService;
+import services.UtilisateurService;
 import models.*;
 import java.util.List;
 

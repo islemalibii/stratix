@@ -5,7 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import models.Utilisateur;
-import Services.UtilisateurService;
+import services.UtilisateurService;
 import utils.SessionManager;
 
 public class MainApp extends Application {
