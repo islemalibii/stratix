@@ -1,13 +1,18 @@
 package controllers;
 
-import models.Planning;
-import services.SERVICEPlanning;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.StackPane;
+import models.Planning;
+import services.SERVICEPlanning;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -26,25 +31,28 @@ public class EmpPlanningController {
     public void initialize() {
         System.out.println("=== Initialisation EmpPlanningController ===");
 
+        // Date Column Formatting
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         colDate.setCellValueFactory(cellData -> {
             Planning p = cellData.getValue();
-            return new javafx.beans.property.SimpleStringProperty(
-                    p.getDate().toLocalDate().format(dateFormatter)
+            return new SimpleStringProperty(
+                    p.getDate() != null ? p.getDate().toLocalDate().format(dateFormatter) : ""
             );
         });
 
+        // Start Time Formatting (HH:mm)
         colHeureDebut.setCellValueFactory(cellData -> {
             Planning p = cellData.getValue();
-            return new javafx.beans.property.SimpleStringProperty(
-                    p.getHeureDebut().toString().substring(0, 5)
+            return new SimpleStringProperty(
+                    p.getHeureDebut() != null ? p.getHeureDebut().toString().substring(0, 5) : ""
             );
         });
 
+        // End Time Formatting (HH:mm)
         colHeureFin.setCellValueFactory(cellData -> {
             Planning p = cellData.getValue();
-            return new javafx.beans.property.SimpleStringProperty(
-                    p.getHeureFin().toString().substring(0, 5)
+            return new SimpleStringProperty(
+                    p.getHeureFin() != null ? p.getHeureFin().toString().substring(0, 5) : ""
             );
         });
 
@@ -57,11 +65,26 @@ public class EmpPlanningController {
     private void chargerTousPlannings() {
         List<Planning> tousPlannings = planningService.getAllPlannings();
         tablePlannings.setItems(FXCollections.observableArrayList(tousPlannings));
-        System.out.println("✅ " + tousPlannings.size() + " plannings chargés");
     }
 
     @FXML
-    private void retourAccueil() {
-        MainController.showEmpMain();
+    private void showMesTaches() {
+        try {
+            if (MainController.staticContentArea != null) {
+                Node node = FXMLLoader.load(getClass().getResource("/EmpTacheView.fxml"));
+                MainController.staticContentArea.getChildren().setAll(node);
+                System.out.println("🔄 Navigation vers Tâches réussie");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+    @FXML
+    private void showMonPlanning() {
+        chargerTousPlannings();
+        System.out.println("🔄 Données planning actualisées");
+    }
+
+
 }

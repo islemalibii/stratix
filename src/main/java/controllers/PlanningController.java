@@ -41,6 +41,7 @@ public class PlanningController {
         List<Employe> employes = employeService.getAllEmployes();
         cmbEmploye.setItems(FXCollections.observableArrayList(employes));
 
+        // Configuration de l'affichage des employés dans le ComboBox
         cmbEmploye.setCellFactory(param -> new ListCell<Employe>() {
             @Override
             protected void updateItem(Employe emp, boolean empty) {
@@ -182,35 +183,56 @@ public class PlanningController {
         }
     }
 
+    // UNE SEULE méthode setPlanningToEdit (pas de doublon !)
     public void setPlanningToEdit(Planning planning) {
-        if (planning != null) {
-            this.selectedPlanningId = planning.getId();
+        if (planning == null) {
+            System.out.println("⚠️ Aucun planning à éditer");
+            return;
+        }
 
-            Employe emp = employeService.getEmployeById(planning.getEmployeId());
-            if (emp != null) {
-                cmbEmploye.setValue(emp);
+        this.selectedPlanningId = planning.getId();
+        System.out.println("🔄 Édition planning ID: " + selectedPlanningId);
+
+        // 1. Trouver et sélectionner l'employé dans le ComboBox
+        Employe emp = employeService.getEmployeById(planning.getEmployeId());
+        if (emp != null) {
+            cmbEmploye.setValue(emp);
+        } else {
+            // Chercher dans la liste du ComboBox
+            for (Employe e : cmbEmploye.getItems()) {
+                if (e.getId() == planning.getEmployeId()) {
+                    cmbEmploye.setValue(e);
+                    break;
+                }
             }
+        }
 
+        // 2. Date
+        if (planning.getDate() != null) {
             dpDate.setValue(planning.getDate().toLocalDate());
+        }
 
-            String type = planning.getTypeShift();
+        // 3. Type
+        String type = planning.getTypeShift();
+        if (type != null) {
             cbTypeShift.setValue(type);
+        }
 
-            if (type.equals("CONGE") || type.equals("MALADIE")) {
-                txtHeureDebut.setText("00:00");
-                txtHeureFin.setText("23:59");
-                txtHeureDebut.setDisable(true);
-                txtHeureFin.setDisable(true);
-            } else {
-                String debut = planning.getHeureDebut().toString();
-                String fin = planning.getHeureFin().toString();
-                txtHeureDebut.setText(debut.substring(0, 5));
-                txtHeureFin.setText(fin.substring(0, 5));
-                txtHeureDebut.setDisable(false);
-                txtHeureFin.setDisable(false);
-            }
+        // 4. Heures
+        if (planning.getHeureDebut() != null && planning.getHeureFin() != null) {
+            String debut = planning.getHeureDebut().toString();
+            String fin = planning.getHeureFin().toString();
+            txtHeureDebut.setText(debut.length() >= 5 ? debut.substring(0, 5) : debut);
+            txtHeureFin.setText(fin.length() >= 5 ? fin.substring(0, 5) : fin);
+        }
 
-            System.out.println("🔄 Formulaire pré-rempli pour ID: " + selectedPlanningId);
+        // 5. Désactiver les heures si congé/maladie
+        if ("CONGE".equals(type) || "MALADIE".equals(type)) {
+            txtHeureDebut.setDisable(true);
+            txtHeureFin.setDisable(true);
+        } else {
+            txtHeureDebut.setDisable(false);
+            txtHeureFin.setDisable(false);
         }
     }
 
@@ -292,11 +314,22 @@ public class PlanningController {
 
     private void chargerStatistiques() {
         try {
-            lblTotalEmployes.setText(String.valueOf(employeService.getAllEmployes().size()));
-            lblEnPoste.setText(String.valueOf(service.compterEnPoste()));
-            lblAbsents.setText(String.valueOf(service.compterAbsents()));
+            List<Employe> employes = employeService.getAllEmployes();
+            lblTotalEmployes.setText(String.valueOf(employes.size()));
+
+            // Calculer les stats
+            long enPoste = employes.stream()
+                    .filter(e -> e.getStatut() != null && e.getStatut().equals("actif"))
+                    .count();
+
+            lblEnPoste.setText(String.valueOf(enPoste));
+            lblAbsents.setText(String.valueOf(employes.size() - enPoste));
+
         } catch (Exception e) {
-            System.err.println("Erreur: " + e.getMessage());
+            System.err.println("Erreur chargement stats: " + e.getMessage());
+            lblTotalEmployes.setText("0");
+            lblEnPoste.setText("0");
+            lblAbsents.setText("0");
         }
     }
 

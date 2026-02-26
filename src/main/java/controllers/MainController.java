@@ -1,163 +1,202 @@
 package controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.control.Alert;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import models.Role;
+import models.UserRole;
+import models.Utilisateur;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ResourceBundle;
 
-public class MainController {
+public class MainController implements Initializable {
 
-    @FXML
-    private StackPane mainPane;
+    @FXML private StackPane contentArea;
+    @FXML private Button btnCategories;
+    @FXML private Button btnResources;
+    @FXML private Button btnProjet;
+    @FXML private Button btnTaches;
+    @FXML private Label lblUserName;
+    @FXML private Label lblUserRole;
+    @FXML private Label lblUserAvatar;
+    public static StackPane staticContentArea;
 
-    private static MainController instance;
 
-    private Parent dashboardView;
-    private Parent planningView;
-    private Parent tacheView;
-    private Parent calendarView;
-    private Parent whiteboardView;
-    private Parent empMainView;  // ← Pour l'espace employé
-
-    @FXML
-    public void initialize() {
-        instance = this;
-
-        System.out.println("=== DÉBOGAGE CHARGEMENT DES FICHIERS FXML ===");
-        System.out.println("Répertoire de travail: " + System.getProperty("user.dir"));
-
-        try {
-            // Dashboard
-            URL dashboardUrl = getClass().getResource("/dashboard-view.fxml");
-            if (dashboardUrl != null) {
-                dashboardView = FXMLLoader.load(dashboardUrl);
-                System.out.println("   ✅ Dashboard chargé");
-            }
-
-            // Planning
-            URL planningUrl = getClass().getResource("/PlanningView.fxml");
-            if (planningUrl != null) {
-                planningView = FXMLLoader.load(planningUrl);
-                System.out.println("   ✅ Planning chargé");
-            }
-
-            // Tâches
-            URL tacheUrl = getClass().getResource("/TacheView.fxml");
-            if (tacheUrl != null) {
-                tacheView = FXMLLoader.load(tacheUrl);
-                System.out.println("   ✅ Tâches chargé");
-            }
-
-            // Calendar
-            URL calendarUrl = getClass().getResource("/calendar-view.fxml");
-            if (calendarUrl != null) {
-                calendarView = FXMLLoader.load(calendarUrl);
-                System.out.println("   ✅ Calendar chargé");
-            }
-
-            // Whiteboard
-            URL whiteboardUrl = getClass().getResource("/WhiteboardView.fxml");
-            if (whiteboardUrl != null) {
-                whiteboardView = FXMLLoader.load(whiteboardUrl);
-                System.out.println("   ✅ Whiteboard chargé");
-            }
-
-            // Espace Employé
-            URL empMainUrl = getClass().getResource("/EmpMainView.fxml");
-            if (empMainUrl != null) {
-                empMainView = FXMLLoader.load(empMainUrl);
-                System.out.println("   ✅ Espace Employé chargé");
-            }
-
-            System.out.println("\n=== RÉSULTAT FINAL ===");
-            System.out.println("Dashboard: " + (dashboardView != null ? "✅" : "❌"));
-            System.out.println("Planning: " + (planningView != null ? "✅" : "❌"));
-            System.out.println("Tâches: " + (tacheView != null ? "✅" : "❌"));
-            System.out.println("Calendrier: " + (calendarView != null ? "✅" : "❌"));
-            System.out.println("Whiteboard: " + (whiteboardView != null ? "✅" : "❌"));
-            System.out.println("Espace Employé: " + (empMainView != null ? "✅" : "❌"));
-
-            // Afficher dashboard par défaut
-            showDashboard();
-
-        } catch (IOException e) {
-            System.err.println("❌ ERREUR: " + e.getMessage());
-            e.printStackTrace();
-            showAlert("Erreur", "Impossible de charger les vues: " + e.getMessage());
-        }
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        staticContentArea = contentArea;
+        System.out.println("✅ MainController initialisé");
     }
 
-    public static void showDashboard() {
-        if (instance != null && instance.mainPane != null && instance.dashboardView != null) {
-            instance.mainPane.getChildren().clear();
-            instance.mainPane.getChildren().add(instance.dashboardView);
-            System.out.println("🔄 Navigation vers Dashboard");
-        }
-    }
+    public void initData(Utilisateur user) {
+        updateUserInfo(user);
+        applyRoleBasedVisibility(user);
 
-    public static void showPlanning() {
-        if (instance != null && instance.mainPane != null && instance.planningView != null) {
-            instance.mainPane.getChildren().clear();
-            instance.mainPane.getChildren().add(instance.planningView);
-            System.out.println("🔄 Navigation vers Planning");
-        }
-    }
-
-    public static void showTaches() {
-        if (instance != null && instance.mainPane != null && instance.tacheView != null) {
-            instance.mainPane.getChildren().clear();
-            instance.mainPane.getChildren().add(instance.tacheView);
-            System.out.println("🔄 Navigation vers Tâches");
-        }
-    }
-
-    public static void showCalendar() {
-        if (instance != null && instance.mainPane != null && instance.calendarView != null) {
-            instance.mainPane.getChildren().clear();
-            instance.mainPane.getChildren().add(instance.calendarView);
-            System.out.println("🔄 Navigation vers Calendrier");
-        }
-    }
-
-    public static void showWhiteboard() {
-        if (instance != null && instance.mainPane != null && instance.whiteboardView != null) {
-            instance.mainPane.getChildren().clear();
-            instance.mainPane.getChildren().add(instance.whiteboardView);
-            System.out.println("🔄 Navigation vers Whiteboard");
-        }
-    }
-
-    // NOUVELLE MÉTHODE
-    public static void showEmpMain() {
-        if (instance != null && instance.mainPane != null && instance.empMainView != null) {
-            instance.mainPane.getChildren().clear();
-            instance.mainPane.getChildren().add(instance.empMainView);
-            System.out.println("🔄 Retour à l'accueil employé");
+        if (user.getRole() == Role.EMPLOYE) {
+            loadView("/EventEmployeeDashboard.fxml");
         } else {
-            System.err.println("❌ Impossible d'afficher l'accueil employé");
+            loadView("/EventDashboard.fxml");
+        }
+    }
+
+    private void updateUserInfo(Utilisateur user) {
+        if (lblUserName == null) return;
+
+        lblUserName.setText(user.getNom() + " " + user.getPrenom());
+
+        if (user.getRole() == Role.EMPLOYE) {
+            lblUserRole.setText("Session Employé");
+            if (lblUserAvatar != null) lblUserAvatar.setText("👤");
+        } else {
+            lblUserRole.setText(user.getRole().name());
+            if (lblUserAvatar != null) lblUserAvatar.setText("👑");
+        }
+    }
+
+    private void applyRoleBasedVisibility(Utilisateur user) {
+        if (user.getRole() == Role.EMPLOYE) {
+            Button[] toHide = {btnCategories};
+            for (Button btn : toHide) {
+                if (btn != null) {
+                    btn.setVisible(false);
+                    btn.setManaged(false);
+                }
+            }
         }
     }
 
     @FXML
-    private void showPlanningFromButton() { showPlanning(); }
-    @FXML
-    private void showTachesFromButton() { showTaches(); }
-    @FXML
-    private void showDashboardFromButton() { showDashboard(); }
-    @FXML
-    private void showCalendarFromButton() { showCalendar(); }
-    @FXML
-    private void showWhiteboardFromButton() { showWhiteboard(); }
+    private void showServices(ActionEvent event) {
+        loadView("/service-tab.fxml");
+    }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    @FXML
+    private void showCategories(ActionEvent event) {
+        loadView("/categorie-tab.fxml");
+    }
+
+    @FXML
+    private void handleEvenements(ActionEvent event) {
+        Utilisateur user = UserRole.getInstance().getUser();
+        String fxml = (user != null && user.getRole() == Role.EMPLOYE) ?
+                "/EventEmployeeDashboard.fxml" : "/EventDashboard.fxml";
+        loadView(fxml);
+    }
+
+    @FXML
+    private void showProjet(ActionEvent event) {
+        Utilisateur user = UserRole.getInstance().getUser();
+        String fxml = (user != null && user.getRole() == Role.EMPLOYE) ?
+                "/EmployeListeProjets.fxml" : "/ListeProjets.fxml";
+        loadView(fxml);
+    }
+
+    private void loadView(String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent view = loader.load();
+            contentArea.getChildren().setAll(view);
+            System.out.println("✅ Vue chargée: " + fxmlPath);
+        } catch (IOException e) {
+            System.err.println("❌ Erreur chargement " + fxmlPath + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void showResources() {
+        Utilisateur user = UserRole.getInstance().getUser();
+        String fxml = (user != null && user.getRole() == Role.EMPLOYE) ?
+                "/FrontRessources.fxml" : "/ressource.fxml";
+        loadView(fxml);
+    }
+
+    @FXML
+    private void showProduits() {
+        Utilisateur user = UserRole.getInstance().getUser();
+        String fxml = (user != null && user.getRole() == Role.EMPLOYE) ?
+                "/FrontProduits.fxml" : "/produit.fxml";
+        loadView(fxml);
+    }
+
+    // ⭐ MÉTHODE D'INSTANCE POUR LE BOUTON DU MENU ⭐
+    @FXML
+    private void showPlanning() {
+        System.out.println("🔄 Navigation vers Planning depuis le menu");
+
+        Utilisateur user = UserRole.getInstance().getUser();
+        String fxml = (user != null && user.getRole() == Role.EMPLOYE) ?
+                "/EmpPlanningView.fxml" : "/PlanningView.fxml";
+
+        loadView(fxml);
+    }
+
+    // ⭐ MÉTHODES STATIQUES POUR DASHBOARD (renommées) ⭐
+    public static void showTachesFromDashboard() {
+        if (staticContentArea != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(MainController.class.getResource("/TacheView.fxml"));
+                Parent view = loader.load();
+                staticContentArea.getChildren().setAll(view);
+                System.out.println("✅ Navigation vers Tâches depuis Dashboard");
+            } catch (IOException e) {
+                System.err.println("❌ Erreur chargement Tâches: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void showPlanningFromDashboard() {
+        if (staticContentArea != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(MainController.class.getResource("/PlanningView.fxml"));
+                Parent view = loader.load();
+                staticContentArea.getChildren().setAll(view);
+                System.out.println("✅ Navigation vers Planning depuis Dashboard");
+            } catch (IOException e) {
+                System.err.println("❌ Erreur chargement Planning: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void showCalendarFromDashboard() {
+        if (staticContentArea != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(MainController.class.getResource("/calendar-view.fxml"));
+                Parent view = loader.load();
+                staticContentArea.getChildren().setAll(view);
+                System.out.println("✅ Navigation vers Calendrier depuis Dashboard");
+            } catch (IOException e) {
+                System.err.println("❌ Erreur chargement Calendrier: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @FXML
+    private void handleLogout() {
+        try {
+            Stage stage = (Stage) contentArea.getScene().getWindow();
+            Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
+            Scene scene = new Scene(root, 800, 500);
+            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+            stage.setScene(scene);
+            stage.setTitle("stratiX - Accueil");
+            stage.centerOnScreen();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

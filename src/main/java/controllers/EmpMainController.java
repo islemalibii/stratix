@@ -60,13 +60,18 @@ public class EmpMainController {
     @FXML
     private void logout() {
         try {
-            SessionManager.logout();
+            // ✅ CORRIGÉ: utiliser getInstance() pour appeler logout()
+            SessionManager.getInstance().logout();
+
             Parent loginView = FXMLLoader.load(getClass().getResource("/PagePrincipaleView.fxml"));
             Stage stage = (Stage) mainPane.getScene().getWindow();
             stage.setScene(new Scene(loginView));
             stage.setMaximized(true);
             stage.show();
+
+            System.out.println("🔓 Déconnexion réussie");
         } catch (IOException e) {
+            System.err.println("❌ Erreur déconnexion: " + e.getMessage());
             e.printStackTrace();
         }
     }

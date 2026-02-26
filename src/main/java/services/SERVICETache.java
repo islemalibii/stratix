@@ -1,13 +1,14 @@
 package services;
 
 import models.Tache;
-import utils.MyDataBase;
+import utils.MyDataBase; // Corrected import to match your Singleton
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SERVICETache {
+
     // CREATE
     public void addTache(Tache t) {
         String sql = """
@@ -15,8 +16,8 @@ public class SERVICETache {
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """;
 
-        try (Connection c = MyDataBase.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        Connection c = MyDataBase.getInstance().getCnx();
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, t.getTitre());
             ps.setString(2, t.getDescription());
@@ -39,8 +40,8 @@ public class SERVICETache {
         List<Tache> list = new ArrayList<>();
         String sql = "SELECT * FROM tache";
 
-        try (Connection c = MyDataBase.getConnection();
-             Statement st = c.createStatement();
+        Connection c = MyDataBase.getInstance().getCnx();
+        try (Statement st = c.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
@@ -71,8 +72,8 @@ public class SERVICETache {
             WHERE id=?
         """;
 
-        try (Connection c = MyDataBase.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        Connection c = MyDataBase.getInstance().getCnx();
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, t.getTitre());
             ps.setString(2, t.getDescription());
@@ -84,48 +85,50 @@ public class SERVICETache {
             ps.setInt(8, t.getId());
 
             ps.executeUpdate();
-            System.out.println(" Tâche mise à jour");
+            System.out.println("✅ Tâche mise à jour");
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    // Ajoute cette méthode dans SERVICETache.java
+
+    // DELETE
     public void deleteTache(int id) {
         String sql = "DELETE FROM tache WHERE id=?";
 
-        try (Connection c = MyDataBase.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        Connection c = MyDataBase.getInstance().getCnx();
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             ps.executeUpdate();
-            System.out.println(" Tâche supprimée");
+            System.out.println("✅ Tâche supprimée");
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    // Ajoute cette méthode pour récupérer une tâche par son ID
+
+    // GET BY ID
     public Tache getTacheById(int id) {
         String sql = "SELECT * FROM tache WHERE id = ?";
 
-        try (Connection c = MyDataBase.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        Connection c = MyDataBase.getInstance().getCnx();
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                Tache t = new Tache();
-                t.setId(rs.getInt("id"));
-                t.setTitre(rs.getString("titre"));
-                t.setDescription(rs.getString("description"));
-                t.setDeadline(rs.getDate("deadline"));
-                t.setStatut(rs.getString("statut"));
-                t.setEmployeId(rs.getInt("employe_id"));
-                t.setProjetId(rs.getInt("projet_id"));
-                t.setPriorite(rs.getString("priorite"));
-                return t;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Tache t = new Tache();
+                    t.setId(rs.getInt("id"));
+                    t.setTitre(rs.getString("titre"));
+                    t.setDescription(rs.getString("description"));
+                    t.setDeadline(rs.getDate("deadline"));
+                    t.setStatut(rs.getString("statut"));
+                    t.setEmployeId(rs.getInt("employe_id"));
+                    t.setProjetId(rs.getInt("projet_id"));
+                    t.setPriorite(rs.getString("priorite"));
+                    return t;
+                }
             }
 
         } catch (SQLException e) {
@@ -133,6 +136,4 @@ public class SERVICETache {
         }
         return null;
     }
-
-
-}//
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="25" styleClass="main-bg" stylesheets="@/style/global.css"
+      xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ArchivedEventsController">
+
+    <padding>
+        <Insets top="25" right="30" bottom="25" left="30"/>
+    </padding>
+
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <children>
+                <Button text="Retour" onAction="#goBack" styleClass="btn-dark"/>
+                <Label text="Événements Archivés" styleClass="heading-medium" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+            </children>
+        </HBox>
+
+        <Separator prefWidth="200.0" />
+
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane">
+            <content>
+                <FlowPane fx:id="archiveContainer" hgap="25.0" vgap="25.0">
+                    <padding>
+                        <Insets bottom="30.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                </FlowPane>
+            </content>
+        </ScrollPane>
+    </children>
+</VBox>

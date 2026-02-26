@@ -1,6 +1,6 @@
 package services;
 
-import models.CalendarEvent;  // ← IMPORTANT: ajoute cet import
+import models.CalendarEvent;
 import models.Planning;
 import models.Employe;
 import utils.MyDataBase;
@@ -22,7 +22,7 @@ public class CalendarService {
         List<CalendarEvent> events = new ArrayList<>();
         String sql = "SELECT * FROM planning WHERE YEAR(date) = ? AND MONTH(date) = ?";
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, year);
@@ -58,7 +58,7 @@ public class CalendarService {
         List<CalendarEvent> events = new ArrayList<>();
         String sql = "SELECT * FROM planning WHERE date = ?";
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setDate(1, Date.valueOf(date));

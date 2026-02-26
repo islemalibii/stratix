@@ -184,27 +184,26 @@ public class DashboardController implements Initializable {
     @FXML
     private void openTaches() {
         System.out.println("🔄 Navigation vers Tâches");
-        MainController.showTaches();
+        MainController.showTachesFromDashboard();  // ✅ CORRIGÉ
     }
 
     @FXML
     private void openPlanning() {
         System.out.println("🔄 Navigation vers Planning");
-        MainController.showPlanning();
+        MainController.showPlanningFromDashboard();  // ✅ CORRIGÉ
     }
 
     @FXML
     private void openCalendar() {
         System.out.println("🔄 Navigation vers Calendrier");
-        MainController.showCalendar();
+        MainController.showCalendarFromDashboard();  // ✅ CORRIGÉ
     }
 
-    // NOUVELLE MÉTHODE DE DÉCONNEXION
     @FXML
     private void logout() {
         try {
             System.out.println("🔒 Déconnexion...");
-            SessionManager.logout();
+            SessionManager.getInstance().logout();
 
             Parent root = FXMLLoader.load(getClass().getResource("/PagePrincipaleView.fxml"));
             Stage stage = (Stage) lblTotalTaches.getScene().getWindow();

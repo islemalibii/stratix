@@ -21,7 +21,7 @@ public class EmployeeService {
         List<Employe> list = new ArrayList<>();
         String sql = "SELECT * FROM utilisateur WHERE role = 'employe' OR role = 'EMPLOYE' OR role LIKE 'responsable%'";
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
@@ -43,7 +43,7 @@ public class EmployeeService {
     public Employe getEmployeById(int id) {
         String sql = "SELECT * FROM utilisateur WHERE id = ?";
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -66,7 +66,7 @@ public class EmployeeService {
     public boolean employeExiste(int id) {
         String sql = "SELECT COUNT(*) FROM utilisateur WHERE id = ?";
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -94,7 +94,7 @@ public class EmployeeService {
 
         String sql = "SELECT * FROM utilisateur WHERE username = ? AND password = ?";
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
@@ -135,7 +135,7 @@ public class EmployeeService {
     private void handleFailedLogin(String username) {
         String sql = "UPDATE utilisateur SET failed_login_attempts = failed_login_attempts + 1 WHERE username = ?";
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
@@ -166,10 +166,10 @@ public class EmployeeService {
         String sql = "UPDATE utilisateur SET account_locked = 1, locked_until = ? WHERE username = ?";
         LocalDateTime lockUntil = LocalDateTime.now().plusMinutes(LOCK_DURATION_MINUTES);
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, lockUntil.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            ps.setString(1, lockUntil.toString());
             ps.setString(2, username);
             ps.executeUpdate();
             System.out.println("🔒 Compte verrouillé: " + username + " jusqu'à " + lockUntil);
@@ -185,7 +185,7 @@ public class EmployeeService {
     private void resetFailedAttempts(int userId) {
         String sql = "UPDATE utilisateur SET failed_login_attempts = 0 WHERE id = ?";
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
@@ -202,7 +202,7 @@ public class EmployeeService {
     public boolean isAccountLocked(String username) {
         String sql = "SELECT account_locked, locked_until FROM utilisateur WHERE username = ?";
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
@@ -213,10 +213,9 @@ public class EmployeeService {
                     return false;
                 }
                 String lockedUntil = rs.getString("locked_until");
-                if (lockedUntil != null) {
+                if (lockedUntil != null && !lockedUntil.isEmpty()) {
                     try {
-                        LocalDateTime lockTime = LocalDateTime.parse(lockedUntil,
-                                DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                        LocalDateTime lockTime = LocalDateTime.parse(lockedUntil);
                         if (lockTime.isBefore(LocalDateTime.now())) {
                             // Déverrouiller automatiquement
                             unlockAccount(username);
@@ -242,7 +241,7 @@ public class EmployeeService {
     private void unlockAccount(String username) {
         String sql = "UPDATE utilisateur SET account_locked = 0, locked_until = NULL, failed_login_attempts = 0 WHERE username = ?";
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
@@ -260,7 +259,12 @@ public class EmployeeService {
     private Employe extractEmployeFromResultSet(ResultSet rs) throws SQLException {
         Employe e = new Employe();
         e.setId(rs.getInt("id"));
-        e.setUsername(rs.getString("username"));
+
+        // Vérifier si la colonne username existe
+        try { e.setUsername(rs.getString("username")); } catch (SQLException ex) {
+            e.setUsername(rs.getString("email")); // Fallback à email
+        }
+
         e.setEmail(rs.getString("email"));
         e.setTel(rs.getString("tel"));
         e.setPassword(rs.getString("password"));
@@ -292,7 +296,7 @@ public class EmployeeService {
         List<Employe> list = new ArrayList<>();
         String sql = "SELECT * FROM utilisateur WHERE role LIKE 'responsable%' OR role = 'admin' OR role = 'ceo'";
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
@@ -313,7 +317,7 @@ public class EmployeeService {
         List<Employe> list = new ArrayList<>();
         String sql = "SELECT * FROM utilisateur WHERE role = 'employe' OR role = 'EMPLOYE'";
 
-        try (Connection conn = MyDataBase.getConnection();
+        try (Connection conn = MyDataBase.getInstance().getCnx();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 

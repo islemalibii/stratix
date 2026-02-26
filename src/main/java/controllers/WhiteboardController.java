@@ -1,6 +1,8 @@
 package controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
@@ -14,6 +16,7 @@ import models.Tache;
 import services.EmployeeService;
 import services.SERVICETache;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -155,7 +158,7 @@ public class WhiteboardController {
 
         HBox prioriteBar = new HBox();
         prioriteBar.setPrefHeight(4);
-        prioriteBar.setStyle("-fx-background-color: " + prioriteColor + "; -fx-background-radius: 4;");
+        prioriteBar.setStyle("-fx-background-color:4 " + prioriteColor + "; -fx-background-radius: 4;");
 
         // Titre avec priorité
         HBox titleBox = new HBox(5);
@@ -286,6 +289,32 @@ public class WhiteboardController {
             tacheService.updateTache(selectedTache);
             chargerTaches();
             selectedTache = null;
+        }
+    }
+
+    @FXML
+    private void showDashboardFromButton() { loadView("/dashboard-view.fxml"); }
+
+    @FXML
+    private void showPlanningFromButton() { loadView("/PlanningListeView.fxml"); }
+
+    @FXML
+    private void showTachesFromButton() { loadView("/TacheListeView.fxml"); }
+
+    @FXML
+    private void showCalendarFromButton() { loadView("/calendar-view.fxml"); }
+
+    @FXML
+    private void showWhiteboardFromButton() { loadView("/WhiteboardView.fxml"); }
+
+    private void loadView(String fxmlPath) {
+        try {
+            Parent view = FXMLLoader.load(getClass().getResource(fxmlPath));
+            if (MainController.staticContentArea != null) {
+                MainController.staticContentArea.getChildren().setAll(view);
+            }
+        } catch (IOException e) {
+            System.err.println("Navigation error: " + e.getMessage());
         }
     }
 }

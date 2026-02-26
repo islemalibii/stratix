@@ -40,10 +40,11 @@ public class TacheController {
     public void initialize() {
         System.out.println("=== Initialisation TacheController ===");
 
-        // Charger les employés
+        // Charger les employés dans la ComboBox
         List<Employe> employes = employeService.getAllEmployes();
         cmbEmploye.setItems(FXCollections.observableArrayList(employes));
 
+        // Afficher le nom dans la ComboBox
         cmbEmploye.setCellFactory(param -> new ListCell<Employe>() {
             @Override
             protected void updateItem(Employe emp, boolean empty) {
@@ -68,10 +69,55 @@ public class TacheController {
             }
         });
 
+        // Initialiser les ComboBox
         cbPriorite.getItems().addAll("HAUTE", "MOYENNE", "BASSE");
         cbStatut.getItems().addAll("A_FAIRE", "EN_COURS", "TERMINEE");
 
+        // Vérification des composants
+        System.out.println("   cmbEmploye: " + (cmbEmploye != null ? "✅" : "❌"));
+        System.out.println("   cbPriorite: " + (cbPriorite != null ? "✅" : "❌"));
+        System.out.println("   cbStatut: " + (cbStatut != null ? "✅" : "❌"));
+        System.out.println("   txtTitre: " + (txtTitre != null ? "✅" : "❌"));
+
         mettreAJourStatistiques();
+    }
+
+    public void setTacheToEdit(Tache tache) {
+        this.selectedTacheId = tache.getId();
+        txtTitre.setText(tache.getTitre());
+        txtDescription.setText(tache.getDescription());
+        txtProjetId.setText(String.valueOf(tache.getProjetId()));
+        cbPriorite.setValue(tache.getPriorite());
+        cbStatut.setValue(tache.getStatut());
+
+        if (tache.getDeadline() != null) {
+            dpDeadline.setValue(tache.getDeadline().toLocalDate());
+        }
+
+        // Auto-select the employee in the ComboBox
+        for (Employe emp : cmbEmploye.getItems()) {
+            if (emp.getId() == tache.getEmployeId()) {
+                cmbEmploye.setValue(emp);
+                break;
+            }
+        }
+    }
+
+    @FXML
+    private void openTacheListe() {
+        loadView("/TacheListeView.fxml");
+    }
+
+    private void loadView(String fxmlPath) {
+        try {
+            Parent view = FXMLLoader.load(getClass().getResource(fxmlPath));
+            if (MainController.staticContentArea != null) {
+                MainController.staticContentArea.getChildren().setAll(view);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Erreur", "Impossible de charger la vue : " + fxmlPath);
+        }
     }
 
     @FXML
@@ -91,9 +137,9 @@ public class TacheController {
             t.setProjetId(Integer.parseInt(txtProjetId.getText()));
 
             service.addTache(t);
-            showAlert("Succès", "✅ Tâche ajoutée !");
-            viderFormulaire();
+            showAlert("Succès", "✅ Tâche ajoutée avec succès !");
             mettreAJourStatistiques();
+            viderFormulaire();
 
         } catch (NumberFormatException e) {
             showAlert("Erreur", "L'ID Projet doit être un nombre !");
@@ -102,11 +148,11 @@ public class TacheController {
             e.printStackTrace();
         }
     }
-
+//
     @FXML
     void modifierTache() {
         if (selectedTacheId == -1) {
-            showAlert("Erreur", "❌ Aucune tâche sélectionnée");
+            showAlert("Erreur", "Sélectionnez d'abord une tâche dans la liste !");
             return;
         }
 
@@ -126,13 +172,12 @@ public class TacheController {
             t.setProjetId(Integer.parseInt(txtProjetId.getText()));
 
             service.updateTache(t);
-            showAlert("Succès", "✅ Tâche modifiée !");
-            viderFormulaire();
+            showAlert("Succès", "✅ Tâche modifiée avec succès !");
             mettreAJourStatistiques();
-            selectedTacheId = -1;
+            viderFormulaire();
 
         } catch (Exception e) {
-            showAlert("Erreur", "Erreur : " + e.getMessage());
+            showAlert("Erreur", "Erreur lors de la modification : " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -140,7 +185,7 @@ public class TacheController {
     @FXML
     void supprimerTache() {
         if (selectedTacheId == -1) {
-            showAlert("Erreur", "❌ Aucune tâche sélectionnée");
+            showAlert("Erreur", "Sélectionnez d'abord une tâche dans la liste !");
             return;
         }
 
@@ -149,55 +194,24 @@ public class TacheController {
         confirm.setHeaderText(null);
         confirm.setContentText("Voulez-vous vraiment supprimer cette tâche ?");
 
-        if (confirm.showAndWait().get() == ButtonType.OK) {
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             service.deleteTache(selectedTacheId);
-            showAlert("Succès", "✅ Tâche supprimée !");
-            viderFormulaire();
+            showAlert("Succès", "✅ Tâche supprimée avec succès !");
             mettreAJourStatistiques();
-            selectedTacheId = -1;
+            viderFormulaire();
         }
     }
 
-    public void setTacheToEdit(Tache tache) {
-        if (tache != null) {
-            this.selectedTacheId = tache.getId();
 
-            txtTitre.setText(tache.getTitre());
-            txtDescription.setText(tache.getDescription());
-            dpDeadline.setValue(tache.getDeadline().toLocalDate());
-            cbStatut.setValue(tache.getStatut());
-            cbPriorite.setValue(tache.getPriorite());
-            txtProjetId.setText(String.valueOf(tache.getProjetId()));
-
-            Employe emp = employeService.getEmployeById(tache.getEmployeId());
-            if (emp != null) {
-                cmbEmploye.setValue(emp);
-            }
-
-            System.out.println("🔄 Formulaire pré-rempli pour tâche ID: " + selectedTacheId);
-        }
-    }
-
-    @FXML
-    private void openTacheListe() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/TacheListeView.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) txtTitre.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setMaximized(true);
-            stage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Erreur", "Impossible d'ouvrir la liste");
-        }
-    }
 
     private boolean validerChamps() {
         if (txtTitre.getText().trim().isEmpty()) {
             showAlert("Erreur", "❌ Le titre est requis !");
+            return false;
+        }
+        if (txtDescription.getText().trim().isEmpty()) {
+            showAlert("Erreur", "❌ La description est requise !");
             return false;
         }
         if (dpDeadline.getValue() == null) {
@@ -226,7 +240,9 @@ public class TacheController {
     private void mettreAJourStatistiques() {
         List<Tache> taches = service.getAllTaches();
         int total = taches.size();
-        int aFaire = 0, enCours = 0, terminees = 0;
+        int aFaire = 0;
+        int enCours = 0;
+        int terminees = 0;
 
         for (Tache t : taches) {
             switch(t.getStatut()) {

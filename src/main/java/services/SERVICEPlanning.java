@@ -17,7 +17,7 @@ public class SERVICEPlanning {
             VALUES (?, ?, ?, ?, ?)
         """;
 
-        try (Connection c = MyDataBase.getConnection();
+        try (Connection c = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, p.getEmployeId());
@@ -39,7 +39,7 @@ public class SERVICEPlanning {
         List<Planning> list = new ArrayList<>();
         String sql = "SELECT * FROM planning ORDER BY date DESC, heure_debut ASC";
 
-        try (Connection c = MyDataBase.getConnection();
+        try (Connection c = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              Statement st = c.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
@@ -68,7 +68,7 @@ public class SERVICEPlanning {
     public Planning getPlanningById(int id) {
         String sql = "SELECT * FROM planning WHERE id = ?";
 
-        try (Connection c = MyDataBase.getConnection();
+        try (Connection c = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -99,7 +99,7 @@ public class SERVICEPlanning {
             WHERE id=?
         """;
 
-        try (Connection c = MyDataBase.getConnection();
+        try (Connection c = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, p.getEmployeId());
@@ -125,7 +125,7 @@ public class SERVICEPlanning {
     public void deletePlanning(int id) {
         String sql = "DELETE FROM planning WHERE id=?";
 
-        try (Connection c = MyDataBase.getConnection();
+        try (Connection c = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -145,7 +145,7 @@ public class SERVICEPlanning {
     // Compter le nombre total d'utilisateurs avec rôle employeeeé
     public int compterTotalEmployes() {
         String sql = "SELECT COUNT(*) FROM utilisateur WHERE role = 'employe' OR role = 'EMPLOYE' OR role LIKE 'responsable%'";
-        try (Connection c = MyDataBase.getConnection();
+        try (Connection c = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              Statement st = c.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) {
@@ -161,7 +161,7 @@ public class SERVICEPlanning {
     // Compter les employés en poste aujourd'hui
     public int compterEnPoste() {
         String sql = "SELECT COUNT(DISTINCT employe_id) FROM planning WHERE date = CURDATE()";
-        try (Connection c = MyDataBase.getConnection();
+        try (Connection c = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              Statement st = c.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) {
@@ -178,7 +178,7 @@ public class SERVICEPlanning {
     public int compterAbsents() {
         String sql = "SELECT COUNT(*) FROM utilisateur WHERE (role = 'employe' OR role = 'EMPLOYE' OR role LIKE 'responsable%') " +
                 "AND id NOT IN (SELECT DISTINCT employe_id FROM planning WHERE date = CURDATE())";
-        try (Connection c = MyDataBase.getConnection();
+        try (Connection c = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              Statement st = c.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             if (rs.next()) {
@@ -194,7 +194,7 @@ public class SERVICEPlanning {
     // Pour obtenir les statistiques du jour spécifique
     public int compterEnPosteParDate(LocalDate date) {
         String sql = "SELECT COUNT(DISTINCT employe_id) FROM planning WHERE date = ?";
-        try (Connection c = MyDataBase.getConnection();
+        try (Connection c = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setDate(1, Date.valueOf(date));
             ResultSet rs = ps.executeQuery();
@@ -211,7 +211,7 @@ public class SERVICEPlanning {
     public int compterAbsentsParDate(LocalDate date) {
         String sql = "SELECT COUNT(*) FROM utilisateur WHERE (role = 'employe' OR role = 'EMPLOYE' OR role LIKE 'responsable%') " +
                 "AND id NOT IN (SELECT DISTINCT employe_id FROM planning WHERE date = ?)";
-        try (Connection c = MyDataBase.getConnection();
+        try (Connection c = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setDate(1, Date.valueOf(date));
             ResultSet rs = ps.executeQuery();
@@ -228,7 +228,7 @@ public class SERVICEPlanning {
     // Compter par type de shift
     public int compterParShift(String shift) {
         String sql = "SELECT COUNT(*) FROM planning WHERE type_shift = ?";
-        try (Connection c = MyDataBase.getConnection();
+        try (Connection c = MyDataBase.getInstance().getCnx();  // ✅ CORRIGÉ
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, shift);
             ResultSet rs = ps.executeQuery();
@@ -241,4 +241,4 @@ public class SERVICEPlanning {
         }
         return 0;
     }
-}//
+}

@@ -1,9 +1,12 @@
 package services;
 
 import models.DashboardStats;
-import utils.MyDataBase;
+import models.Tache;
+import models.Planning;
+import utils.MyDataBase; // Corrected import
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,24 +17,28 @@ public class StatsService {
     public DashboardStats getDashboardStats() {
         DashboardStats stats = new DashboardStats();
 
-        try (Connection conn = MyDataBase.getConnection()) {
+        // Get the shared connection from the Singleton
+        Connection conn = MyDataBase.getInstance().getCnx();
 
-            // 1. Total des employés (utilisateurs avec rôle employe)
+        // We check if connection is null before proceeding
+        if (conn == null) {
+            System.err.println("❌ StatsService: Impossible de récupérer la connexion à la base de données.");
+            return stats;
+        }
+
+        try {
+            // 1. Total des employés
             String sqlEmployes = "SELECT COUNT(*) FROM utilisateur WHERE role = 'employe' OR role = 'EMPLOYE' OR role LIKE 'responsable%'";
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlEmployes)) {
-                if (rs.next()) {
-                    stats.setTotalEmployes(rs.getInt(1));
-                }
+                if (rs.next()) stats.setTotalEmployes(rs.getInt(1));
             }
 
             // 2. Total des tâches
             String sqlTaches = "SELECT COUNT(*) FROM tache";
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlTaches)) {
-                if (rs.next()) {
-                    stats.setTotalTaches(rs.getInt(1));
-                }
+                if (rs.next()) stats.setTotalTaches(rs.getInt(1));
             }
 
             // 3. Tâches par statut
@@ -41,17 +48,10 @@ public class StatsService {
                 while (rs.next()) {
                     String statut = rs.getString(1);
                     int count = rs.getInt(2);
-
                     switch(statut) {
-                        case "A_FAIRE":
-                            stats.setTachesAFaire(count);
-                            break;
-                        case "EN_COURS":
-                            stats.setTachesEnCours(count);
-                            break;
-                        case "TERMINEE":
-                            stats.setTachesTerminees(count);
-                            break;
+                        case "A_FAIRE" -> stats.setTachesAFaire(count);
+                        case "EN_COURS" -> stats.setTachesEnCours(count);
+                        case "TERMINEE" -> stats.setTachesTerminees(count);
                     }
                 }
             }
@@ -60,41 +60,31 @@ public class StatsService {
             String sqlTachesRetard = "SELECT COUNT(*) FROM tache WHERE deadline < CURDATE() AND statut != 'TERMINEE'";
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlTachesRetard)) {
-                if (rs.next()) {
-                    stats.setTachesEnRetard(rs.getInt(1));
-                }
+                if (rs.next()) stats.setTachesEnRetard(rs.getInt(1));
             }
 
             // 5. Total des plannings
             String sqlPlannings = "SELECT COUNT(*) FROM planning";
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlPlannings)) {
-                if (rs.next()) {
-                    stats.setTotalPlannings(rs.getInt(1));
-                }
+                if (rs.next()) stats.setTotalPlannings(rs.getInt(1));
             }
 
             // 6. Employés en poste aujourd'hui
             String sqlEnPoste = "SELECT COUNT(DISTINCT employe_id) FROM planning WHERE date = CURDATE()";
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlEnPoste)) {
-                if (rs.next()) {
-                    stats.setEmployesEnPoste(rs.getInt(1));
-                }
+                if (rs.next()) stats.setEmployesEnPoste(rs.getInt(1));
             }
 
-            // 7. Employés absents aujourd'hui
-            int totalEmployes = stats.getTotalEmployes();
-            int enPoste = stats.getEmployesEnPoste();
-            stats.setEmployesAbsents(totalEmployes - enPoste);
+            // 7. Calcul des absents
+            stats.setEmployesAbsents(stats.getTotalEmployes() - stats.getEmployesEnPoste());
 
             // 8. Total des projets
             String sqlProjets = "SELECT COUNT(*) FROM projet";
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlProjets)) {
-                if (rs.next()) {
-                    stats.setTotalProjets(rs.getInt(1));
-                }
+                if (rs.next()) stats.setTotalProjets(rs.getInt(1));
             }
 
             // 9. Plannings par type de shift
@@ -104,17 +94,10 @@ public class StatsService {
                 while (rs.next()) {
                     String shift = rs.getString(1);
                     int count = rs.getInt(2);
-
                     switch(shift) {
-                        case "JOUR":
-                            stats.setPlanningsMatin(count);
-                            break;
-                        case "SOIR":
-                            stats.setPlanningsSoir(count);
-                            break;
-                        case "NUIT":
-                            stats.setPlanningsNuit(count);
-                            break;
+                        case "JOUR" -> stats.setPlanningsMatin(count);
+                        case "SOIR" -> stats.setPlanningsSoir(count);
+                        case "NUIT" -> stats.setPlanningsNuit(count);
                     }
                 }
             }
@@ -127,9 +110,9 @@ public class StatsService {
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlDernieresTaches)) {
                 while (rs.next()) {
-                    String tache = rs.getString("titre") + " - " +
-                            (rs.getString("username") != null ? rs.getString("username") : "Employé " + rs.getInt("employe_id"));
-                    dernieresTaches.add(tache);
+                    String info = rs.getString("titre") + " - " +
+                            (rs.getString("username") != null ? rs.getString("username") : "ID " + rs.getInt("employe_id"));
+                    dernieresTaches.add(info);
                 }
             }
             stats.setDernieresTaches(dernieresTaches);
@@ -143,22 +126,17 @@ public class StatsService {
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlProchainsPlannings)) {
                 while (rs.next()) {
-                    String planning = rs.getString("username") + " - " +
-                            rs.getDate("date") + " " +
-                            rs.getTime("heure_debut") + "-" +
-                            rs.getTime("heure_fin");
-                    prochainsPlannings.add(planning);
+                    String info = rs.getString("username") + " - " + rs.getDate("date");
+                    prochainsPlannings.add(info);
                 }
             }
             stats.setProchainsPlannings(prochainsPlannings);
 
-            // 12. Tâches par employé
+            // 12. Tâches par employé (Map)
             Map<String, Integer> tachesParEmploye = new HashMap<>();
             String sqlTachesParEmp = "SELECT u.username, COUNT(t.id) as nb_taches " +
-                    "FROM utilisateur u " +
-                    "LEFT JOIN tache t ON u.id = t.employe_id " +
-                    "WHERE u.role = 'employe' OR u.role = 'EMPLOYE' " +
-                    "GROUP BY u.id, u.username";
+                    "FROM utilisateur u LEFT JOIN tache t ON u.id = t.employe_id " +
+                    "WHERE u.role IN ('employe', 'EMPLOYE') GROUP BY u.id, u.username";
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlTachesParEmp)) {
                 while (rs.next()) {
@@ -167,13 +145,11 @@ public class StatsService {
             }
             stats.setTachesParEmploye(tachesParEmploye);
 
-            // 13. Plannings par employé
+            // 13. Plannings par employé (Map)
             Map<String, Integer> planningsParEmploye = new HashMap<>();
             String sqlPlanningsParEmp = "SELECT u.username, COUNT(p.id) as nb_plannings " +
-                    "FROM utilisateur u " +
-                    "LEFT JOIN planning p ON u.id = p.employe_id " +
-                    "WHERE u.role = 'employe' OR u.role = 'EMPLOYE' " +
-                    "GROUP BY u.id, u.username";
+                    "FROM utilisateur u LEFT JOIN planning p ON u.id = p.employe_id " +
+                    "WHERE u.role IN ('employe', 'EMPLOYE') GROUP BY u.id, u.username";
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlPlanningsParEmp)) {
                 while (rs.next()) {
@@ -183,7 +159,7 @@ public class StatsService {
             stats.setPlanningsParEmploye(planningsParEmploye);
 
         } catch (SQLException e) {
-            System.err.println("❌ Erreur dans StatsService:");
+            System.err.println("❌ Erreur dans StatsService (Singleton Mode): " + e.getMessage());
             e.printStackTrace();
         }
 

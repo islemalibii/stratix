@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="25" stylesheets="@/style.css"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ListeProjetsController">
+
+    <padding>
+        <Insets top="30" right="40" bottom="30" left="40"/>
+    </padding>
+
+    <Label text="Gestion des Projets" styleClass="page-title" style="-fx-font-size: 28; -fx-font-weight: bold;"/>
+
+    <HBox spacing="20">
+        <VBox styleClass="summary-card" HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="110">
+            <Label fx:id="lblTotal" text="0" styleClass="summary-value"/>
+            <Label text="Total Projets" styleClass="summary-label"/>
+        </VBox>
+        <VBox styleClass="summary-card, border-en-cours" HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="110">
+            <Label fx:id="lblEnCours" text="0" styleClass="summary-value" style="-fx-text-fill: #f59e0b;"/>
+            <Label text="En cours" styleClass="summary-label"/>
+        </VBox>
+        <VBox styleClass="summary-card, border-termine" HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="110">
+            <Label fx:id="lblTermine" text="0" styleClass="summary-value" style="-fx-text-fill: #10b981;"/>
+            <Label text="Terminés" styleClass="summary-label"/>
+        </VBox>
+        <VBox styleClass="summary-card, border-annule" HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="110">
+            <Label fx:id="lblAnnule" text="0" styleClass="summary-value" style="-fx-text-fill: #ef4444;"/>
+            <Label text="Annulés" styleClass="summary-label"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="🔍 Rechercher un projet..." styleClass="modern-input" HBox.hgrow="ALWAYS"/>
+        <ComboBox fx:id="comboFiltre" styleClass="modern-input" prefWidth="180" promptText="Filtrer par..." />
+        <Button text="➕ Nouveau" onAction="#allerAjouterProjet" styleClass="btn-primary"/>
+        <Button text="📁 Archives" onAction="#voirArchives" styleClass="btn-secondary"/>
+    </HBox>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="modern-scroll" style="-fx-background-color: transparent;">
+        <content>
+            <FlowPane fx:id="containerProjets" hgap="25" vgap="25">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+            </FlowPane>
+        </content>
+    </ScrollPane>
+</VBox>
