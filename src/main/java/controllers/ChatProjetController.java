@@ -1,87 +1,122 @@
 package controllers;
 
-import com.pusher.client.Pusher;
-import com.pusher.client.PusherOptions;
-import com.pusher.client.channel.Channel;
-import com.pusher.client.channel.PusherEvent;
-import com.pusher.client.channel.SubscriptionEventListener;
 import javafx.application.Platform;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import org.json.JSONObject;
-
-import java.util.Collections;
+import javafx.scene.layout.VBox;
+import javafx.util.Duration;
+import models.UserRole;
+import models.Utilisateur;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChatProjetController {
-    @FXML private ListView<String> lvMessages;
-    @FXML private TextField tfMessage;
 
-    // Utilisation du nom complet pour éviter les conflits de classe Pusher
-    private com.pusher.rest.Pusher pusherRest;
-    private com.pusher.client.Pusher pusherClient;
+    @FXML private VBox chatContainer;
+    @FXML private TextField msgInput;
+    @FXML private Label projetTitle;
 
-    // Tes identifiants Pusher
-    private final String APP_ID = "2120858";
-    private final String KEY = "8e0521301e0b1f5449dc";
-    private final String SECRET = "e67bbcccb7e9f6bfa41a";
-    private final String CLUSTER = "mt1";
+    private int currentProjetId;
+    private String myName = "Utilisateur";
+    private Timeline autoRefresh;
 
-    @FXML
-    public void initialize() {
-        try {
-            // 1. Initialisation de l'envoi (REST)
-            pusherRest = new com.pusher.rest.Pusher(APP_ID, KEY, SECRET);
-            pusherRest.setCluster(CLUSTER);
+    private Connection getConnection() throws SQLException {
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/stratix", "root", "");
+    }
 
-            // 2. Initialisation de la réception (Client WebSocket)
-            PusherOptions options = new PusherOptions().setCluster(CLUSTER);
-            pusherClient = new com.pusher.client.Pusher(KEY, options);
+    public void initChat(int idProjet, String nomProjet) {
+        this.currentProjetId = idProjet;
+        this.projetTitle.setText("Discussion : " + nomProjet);
 
-            // 3. Connexion au canal
-            pusherClient.connect();
-            Channel channel = pusherClient.subscribe("chat-channel");
-
-            // 4. Écoute de l'événement "nouveau-message"
-            channel.bind("nouveau-message", new SubscriptionEventListener() {
-                @Override
-                public void onEvent(PusherEvent event) {
-                    // Pusher reçoit sur un thread séparé, on utilise Platform.runLater pour l'UI
-                    Platform.runLater(() -> {
-                        try {
-                            // Extraction du texte depuis le JSON
-                            JSONObject json = new JSONObject(event.getData());
-                            String messageRecu = json.getString("text");
-                            lvMessages.getItems().add(messageRecu);
-
-                            // Scroll automatique vers le bas
-                            lvMessages.scrollTo(lvMessages.getItems().size() - 1);
-                        } catch (Exception e) {
-                            System.err.println("Erreur format message : " + e.getMessage());
-                        }
-                    });
-                }
-            });
-
-        } catch (Exception e) {
-            System.err.println("Erreur d'initialisation Chat : " + e.getMessage());
+        Utilisateur user = UserRole.getInstance().getUser();
+        if (user != null) {
+            this.myName = user.getNom() + " " + (user.getPrenom() != null ? user.getPrenom() : "");
         }
+
+        loadHistory();
+        setupRealTime();
+    }
+
+    private void setupRealTime() {
+        if (autoRefresh != null) autoRefresh.stop();
+        autoRefresh = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> loadHistory()));
+        autoRefresh.setCycleCount(Timeline.INDEFINITE);
+        autoRefresh.play();
     }
 
     @FXML
-    private void envoyerMessage() {
-        String msg = tfMessage.getText();
-        if (msg != null && !msg.trim().isEmpty()) {
-            // On envoie dans un Thread pour ne pas bloquer l'interface JavaFX
-            new Thread(() -> {
-                try {
-                    pusherRest.trigger("chat-channel", "nouveau-message",
-                            Collections.singletonMap("text", "Admin: " + msg));
-                } catch (Exception e) {
-                    System.err.println("Erreur envoi Pusher : " + e.getMessage());
-                }
-            }).start();
+    private void handleSend() {
+        String text = msgInput.getText().trim();
+        if (text.isEmpty() || currentProjetId == 0) return;
 
-            tfMessage.clear();
+        try (Connection conn = getConnection()) {
+            String sql = "INSERT INTO messagesProjet (projet_id, expediteur_nom, contenu) VALUES (?, ?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, currentProjetId);
+            pstmt.setString(2, myName);
+            pstmt.setString(3, text);
+            pstmt.executeUpdate();
+
+            msgInput.clear();
+            loadHistory();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+    }
+
+    private void loadHistory() {
+        // CORRECTION : On stocke les messages dans une liste AVANT de fermer la connexion
+        List<String[]> tempMessages = new ArrayList<>();
+
+        try (Connection conn = getConnection()) {
+            String sql = "SELECT expediteur_nom, contenu FROM messagesProjet WHERE projet_id = ? ORDER BY date_envoi ASC";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, currentProjetId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                tempMessages.add(new String[]{rs.getString("expediteur_nom"), rs.getString("contenu")});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // Mise à jour de l'UI une fois les données prêtes
+        Platform.runLater(() -> {
+            chatContainer.getChildren().clear();
+            for (String[] m : tempMessages) {
+                displayMessage(m[0], m[1]);
+            }
+        });
+    }
+
+    private void displayMessage(String sender, String content) {
+        VBox msgBox = new VBox(2);
+        Label nameLbl = new Label(sender);
+        nameLbl.setStyle("-fx-font-size: 9px; -fx-text-fill: #64748b;");
+
+        Label contentLbl = new Label(content);
+        contentLbl.setWrapText(true);
+        contentLbl.setMaxWidth(260);
+
+        if (sender != null && sender.equals(myName)) {
+            msgBox.setAlignment(Pos.TOP_RIGHT);
+            contentLbl.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-padding: 7 12; -fx-background-radius: 12 12 0 12;");
+        } else {
+            msgBox.setAlignment(Pos.TOP_LEFT);
+            contentLbl.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #1e293b; -fx-padding: 7 12; -fx-background-radius: 12 12 12 0;");
+        }
+
+        msgBox.getChildren().addAll(nameLbl, contentLbl);
+        chatContainer.getChildren().add(msgBox);
+    }
+
+    public void stopChat() {
+        if (autoRefresh != null) autoRefresh.stop();
     }
 }
