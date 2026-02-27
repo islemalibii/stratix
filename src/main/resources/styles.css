@@ -1067,3 +1067,66 @@
     -fx-padding: 10 0 10 0;
     -fx-letter-spacing: -0.5px;
 }
+
+
+/* ========================================
+   CHATBOT STYLES
+   ======================================== */
+
+.chatbot-fab {
+    -fx-background-color: #4299E1;
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-min-width: 60px;
+    -fx-min-height: 60px;
+    -fx-background-radius: 30px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 3);
+}
+
+.chatbot-fab:hover {
+    -fx-background-color: #3182CE;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.chatbot-container {
+    -fx-background-color: transparent;
+}
+
+.chat-window {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 15, 0, 0, 5);
+}
+
+.chat-window .scroll-pane {
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: transparent;
+}
+
+.chat-window .scroll-pane .viewport {
+    -fx-background-color: #f5f5f5;
+}
+
+.chat-window .text-field {
+    -fx-background-color: white;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-padding: 10 15;
+}
+
+.chat-window .button-primary {
+    -fx-background-color: #4299E1;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20px;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+}
+
+.chat-window .button-primary:hover {
+    -fx-background-color: #3182CE;
+}

@@ -45,19 +45,39 @@ public class DashboardAdminController {
 
     @FXML
     private HBox userProfileSection;
+    
+    @FXML
+    private VBox chatbotContainer;
+    
+    @FXML
+    private VBox chatMessagesContainer;
+    
+    @FXML
+    private TextField chatInputField;
+    
+    @FXML
+    private ScrollPane chatScrollPane;
+    
+    @FXML
+    private Button chatbotButton;
 
     private Utilisateur currentUser;
     private UtilisateurService utilisateurService;
+    private services.ChatbotService chatbotService;
 
     private String currentView = "utilisateurs";
     private List<Utilisateur> currentData;
 
     public void initialize() {
         utilisateurService = UtilisateurService.getInstance();
+        chatbotService = services.ChatbotService.getInstance();
         loadUtilisateurs();
         
         // Recherche en temps réel
         searchField.textProperty().addListener((obs, old, newVal) -> handleSearch(null));
+        
+        // Message de bienvenue du chatbot
+        addBotMessage("👋 Bonjour! Je suis votre assistant. Tapez 'aide' pour voir ce que je peux faire.");
     }
 
     public void setCurrentUser(Utilisateur user) {
@@ -957,5 +977,72 @@ public class DashboardAdminController {
             System.err.println("Erreur de chargement de la vue " + fxmlPath + " : " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    
+    // ========== CHATBOT METHODS ==========
+    
+    @FXML
+    private void toggleChatbot() {
+        boolean isVisible = chatbotContainer.isVisible();
+        chatbotContainer.setVisible(!isVisible);
+        chatbotContainer.setManaged(!isVisible);
+    }
+    
+    @FXML
+    private void closeChatbot() {
+        chatbotContainer.setVisible(false);
+        chatbotContainer.setManaged(false);
+    }
+    
+    @FXML
+    private void sendChatMessage() {
+        String message = chatInputField.getText().trim();
+        if (message.isEmpty()) return;
+        
+        // Afficher le message de l'utilisateur
+        addUserMessage(message);
+        
+        // Effacer le champ
+        chatInputField.clear();
+        
+        // Obtenir et afficher la réponse du bot
+        String response = chatbotService.processQuestion(message);
+        addBotMessage(response);
+        
+        // Scroll vers le bas
+        javafx.application.Platform.runLater(() -> {
+            chatScrollPane.setVvalue(1.0);
+        });
+    }
+    
+    private void addUserMessage(String message) {
+        Label messageLabel = new Label(message);
+        messageLabel.setWrapText(true);
+        messageLabel.setMaxWidth(300);
+        messageLabel.setStyle("-fx-background-color: #4299E1; -fx-text-fill: white; " +
+                            "-fx-padding: 10; -fx-background-radius: 10; " +
+                            "-fx-font-size: 13px;");
+        
+        HBox messageBox = new HBox(messageLabel);
+        messageBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+        messageBox.setPadding(new javafx.geometry.Insets(5));
+        
+        chatMessagesContainer.getChildren().add(messageBox);
+    }
+    
+    private void addBotMessage(String message) {
+        Label messageLabel = new Label(message);
+        messageLabel.setWrapText(true);
+        messageLabel.setMaxWidth(300);
+        messageLabel.setStyle("-fx-background-color: white; -fx-text-fill: #2D3748; " +
+                            "-fx-padding: 10; -fx-background-radius: 10; " +
+                            "-fx-border-color: #E2E8F0; -fx-border-width: 1; " +
+                            "-fx-font-size: 13px;");
+        
+        HBox messageBox = new HBox(messageLabel);
+        messageBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        messageBox.setPadding(new javafx.geometry.Insets(5));
+        
+        chatMessagesContainer.getChildren().add(messageBox);
     }
 }
