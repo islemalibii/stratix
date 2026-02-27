@@ -99,7 +99,6 @@ public class ListeProjetsController {
         }
     }
 
-    // Récupérer le nom du chef pour l'affichage (évite les IDs moches)
     private String recupererNomChef(int id) {
         String nomComplet = "Non assigné";
         if (id <= 0) return nomComplet;
@@ -131,6 +130,7 @@ public class ListeProjetsController {
 
         Label nom = new Label(p.getNom());
         nom.getStyleClass().add("project-title");
+        nom.setWrapText(true);
 
         // QR CODE
         String qrContent = "PROJET: " + p.getNom() + "\nCHEF: " + nomChef + "\nPROG: " + p.getProgression() + "%";
@@ -141,7 +141,7 @@ public class ListeProjetsController {
 
         VBox progBox = new VBox(5, new Label("Progression: " + p.getProgression() + "%"), new ProgressBar(p.getProgression() / 100.0));
 
-        // Boutons d'action
+        // BOUTONS D'ACTION
         HBox actions = new HBox(10);
         actions.setAlignment(Pos.CENTER);
 
@@ -152,7 +152,11 @@ public class ListeProjetsController {
         btnPdf.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white;");
         btnPdf.setOnAction(e -> exporterEnPDF(p, qrUrl));
 
-        actions.getChildren().addAll(btnMod, btnPdf);
+        Button btnArch = new Button("Archiver");
+        btnArch.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white;");
+        btnArch.setOnAction(e -> handleArchiver(p));
+
+        actions.getChildren().addAll(btnMod, btnPdf, btnArch);
 
         card.getChildren().addAll(statutBadge, nom, qrView, progBox, actions);
         return card;
@@ -162,8 +166,19 @@ public class ListeProjetsController {
         return switch (statut != null ? statut : "") {
             case "Terminé" -> "badge-termine";
             case "En cours" -> "badge-en-cours";
+            case "Annulé" -> "badge-annule";
             default -> "badge-planifie";
         };
+    }
+
+    private void handleArchiver(Projet p) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Archiver le projet '" + p.getNom() + "' ?", ButtonType.YES, ButtonType.NO);
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.YES) {
+                projetService.archiverUnProjet(p.getId());
+                rafraichirDonnees();
+            }
+        });
     }
 
     private void exporterEnPDF(Projet p, String qrCodeUrl) {
@@ -172,40 +187,46 @@ public class ListeProjetsController {
             String fileName = "Rapport_" + p.getNom().replace(" ", "_") + ".pdf";
             PdfWriter.getInstance(document, new FileOutputStream(fileName));
             document.open();
-            document.add(new Paragraph("STRATIX - RAPPORT DE PROJET"));
-            document.add(new Paragraph("Nom : " + p.getNom()));
-            document.add(new Paragraph("Chef : " + recupererNomChef(p.getResponsableId())));
-            document.add(new Paragraph("Statut : " + p.getStatut()));
+
+            Paragraph title = new Paragraph("STRATIX - RAPPORT TECHNIQUE");
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph("Nom du Projet : " + p.getNom()));
+            document.add(new Paragraph("Responsable : " + recupererNomChef(p.getResponsableId())));
+            document.add(new Paragraph("Statut actuel : " + p.getStatut()));
+            document.add(new Paragraph("Progression : " + p.getProgression() + "%"));
+            document.add(new Paragraph("Membres : " + (p.getEquipeMembres() != null ? p.getEquipeMembres() : "Aucun")));
             document.add(new Paragraph("Description : " + p.getDescription()));
 
+            document.add(new Paragraph(" "));
             com.lowagie.text.Image img = com.lowagie.text.Image.getInstance(new java.net.URL(qrCodeUrl));
+            img.setAlignment(Element.ALIGN_CENTER);
             img.scaleAbsolute(100, 100);
             document.add(img);
 
             document.close();
             Desktop.getDesktop().open(new File(fileName));
         } catch (Exception e) {
-            e.printStackTrace();
+            afficherErreur("Erreur PDF", "Échec de génération du rapport.");
         }
     }
 
-    // --- NOUVELLE MÉTHODE : OUVRIR LE CHAT ---
     @FXML
     private void ouvrirChat() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ChatProjet.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
-            stage.setTitle("Chat d'équipe Stratix");
-            stage.initModality(Modality.NONE); // Permet de garder la liste ouverte à côté
+            stage.setTitle("Espace Chat - Stratix");
             stage.setScene(new Scene(root));
             stage.show();
         } catch (IOException e) {
-            afficherErreur("Erreur Chat", "Impossible d'ouvrir la fenêtre de discussion.");
-            e.printStackTrace();
+            afficherErreur("Erreur Chat", "Impossible d'ouvrir le chat.");
         }
     }
 
+    @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Archives"); }
     @FXML private void allerAjouterProjet() { chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet"); }
 
     private void ouvrirFenetreModification(Projet p) {
@@ -228,11 +249,12 @@ public class ListeProjetsController {
             Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = new Stage();
             stage.setTitle(titre);
+            stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
             stage.showAndWait();
             rafraichirDonnees();
         } catch (IOException e) {
-            e.printStackTrace();
+            afficherErreur("Erreur Navigation", "Fichier introuvable.");
         }
     }
 
