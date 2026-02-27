@@ -17,7 +17,6 @@ import models.Projet;
 import services.ProjetService;
 import utils.MyDataBase;
 
-// Bibliothèques PDF (OpenPDF / iText)
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
@@ -50,24 +49,19 @@ public class ListeProjetsController {
     public void initialize() {
         projetService = new ProjetService();
 
-        // Chargement du logo
         if (logoImageView != null) {
             try {
                 Image logo = new Image(getClass().getResourceAsStream("/stratix.png"));
                 logoImageView.setImage(logo);
-            } catch (Exception e) {
-                System.out.println("Logo introuvable.");
-            }
+            } catch (Exception e) { System.out.println("Logo introuvable."); }
         }
 
-        // Configuration du filtre
         if (comboFiltre != null) {
             comboFiltre.setItems(FXCollections.observableArrayList("Tous les projets", "Planifié", "En cours", "Terminé", "Annulé"));
             comboFiltre.setValue("Tous les projets");
             comboFiltre.setOnAction(e -> filtrerEtAfficher());
         }
 
-        // Configuration de la recherche
         if (searchField != null) {
             searchField.textProperty().addListener((obs, oldVal, newVal) -> filtrerEtAfficher());
         }
@@ -99,49 +93,25 @@ public class ListeProjetsController {
         }
     }
 
-    private String recupererNomChef(int id) {
-        String nomComplet = "Non assigné";
-        if (id <= 0) return nomComplet;
-        String sql = "SELECT nom, prenom FROM utilisateur WHERE id = ?";
-        Connection conn = MyDataBase.getInstance().getCnx();
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    nomComplet = rs.getString("nom") + " " + rs.getString("prenom");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return nomComplet;
-    }
-
     private VBox creerCardProjet(Projet p) {
         VBox card = new VBox(15);
         card.setPrefWidth(320);
         card.setPadding(new Insets(20));
-        card.getStyleClass().add("project-card");
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: #e2e8f0; -fx-border-radius: 15;");
 
         String nomChef = recupererNomChef(p.getResponsableId());
 
         Label statutBadge = new Label(p.getStatut());
-        statutBadge.getStyleClass().addAll("statut-badge", getStatutClass(p.getStatut()));
+        statutBadge.setStyle("-fx-background-color: " + getStatusHexColor(p.getStatut()) + "; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 10;");
 
         Label nom = new Label(p.getNom());
-        nom.getStyleClass().add("project-title");
+        nom.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
         nom.setWrapText(true);
-
-        // QR CODE
-        String qrContent = "PROJET: " + p.getNom() + "\nCHEF: " + nomChef + "\nPROG: " + p.getProgression() + "%";
-        String qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(qrContent, StandardCharsets.UTF_8);
-        ImageView qrView = new ImageView(new Image(qrUrl, true));
-        qrView.setFitWidth(80);
-        qrView.setPreserveRatio(true);
 
         VBox progBox = new VBox(5, new Label("Progression: " + p.getProgression() + "%"), new ProgressBar(p.getProgression() / 100.0));
 
-        HBox actions = new HBox(10);
+        // --- SECTION ACTIONS ---
+        HBox actions = new HBox(8);
         actions.setAlignment(Pos.CENTER);
 
         Button btnMod = new Button("Modifier");
@@ -149,29 +119,89 @@ public class ListeProjetsController {
 
         Button btnPdf = new Button("PDF");
         btnPdf.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white;");
-        btnPdf.setOnAction(e -> exporterEnPDF(p, qrUrl));
+        btnPdf.setOnAction(e -> {
+            String qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(p.getNom(), StandardCharsets.UTF_8);
+            exporterEnPDF(p, qrUrl);
+        });
 
-        Button btnArch = new Button("Archiver");
+        // NOUVEAU : Bouton Chat spécifique au projet
+        Button btnChat = new Button("Chat");
+        btnChat.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;");
+        btnChat.setOnAction(e -> ouvrirChatSpecifique(p));
+
+        actions.getChildren().addAll(btnMod, btnPdf, btnChat);
+
+        // Bouton Archiver en dessous (plus large)
+        Button btnArch = new Button("Archiver le projet");
+        btnArch.setMaxWidth(Double.MAX_VALUE);
         btnArch.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white;");
         btnArch.setOnAction(e -> handleArchiver(p));
 
-        actions.getChildren().addAll(btnMod, btnPdf, btnArch);
-
-        card.getChildren().addAll(statutBadge, nom, qrView, progBox, actions);
+        card.getChildren().addAll(statutBadge, nom, progBox, actions, btnArch);
         return card;
     }
 
-    private String getStatutClass(String statut) {
+    /**
+     * Ouvre le chat pour un projet précis (ADMIN)
+     */
+    private void ouvrirChatSpecifique(Projet p) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ChatProjet.fxml"));
+            Parent root = loader.load();
+
+            ChatProjetController chatCtrl = loader.getController();
+            // L'ID du projet lie l'admin et l'employé sur la même discussion
+            chatCtrl.initChat(p.getId(), p.getNom());
+
+            Stage stage = new Stage();
+            stage.setTitle("Discussion Admin : " + p.getNom());
+            stage.setScene(new Scene(root));
+
+            // On stoppe le rafraîchissement auto quand l'admin ferme la fenêtre
+            stage.setOnCloseRequest(e -> chatCtrl.stopChat());
+            stage.show();
+        } catch (IOException e) {
+            afficherErreur("Erreur Chat", "Impossible de charger la discussion pour " + p.getNom());
+        }
+    }
+
+    /**
+     * Méthode liée au bouton "Espace Chat" de la Sidebar
+     */
+    @FXML
+    private void ouvrirChat() {
+        if (listeCompleteProjets != null && !listeCompleteProjets.isEmpty()) {
+            // Ouvre par défaut le chat du premier projet de la liste
+            ouvrirChatSpecifique(listeCompleteProjets.get(0));
+        } else {
+            afficherErreur("Chat", "Aucun projet actif pour ouvrir une discussion.");
+        }
+    }
+
+    private String getStatusHexColor(String statut) {
         return switch (statut != null ? statut : "") {
-            case "Terminé" -> "badge-termine";
-            case "En cours" -> "badge-en-cours";
-            case "Annulé" -> "badge-annule";
-            default -> "badge-planifie";
+            case "Terminé" -> "#6366f1";
+            case "En cours" -> "#10b981";
+            case "Annulé" -> "#ef4444";
+            default -> "#3b82f6";
         };
     }
 
+    private String recupererNomChef(int id) {
+        String nomComplet = "Non assigné";
+        if (id <= 0) return nomComplet;
+        String sql = "SELECT nom, prenom FROM utilisateur WHERE id = ?";
+        try (PreparedStatement pstmt = MyDataBase.getInstance().getCnx().prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) nomComplet = rs.getString("nom") + " " + rs.getString("prenom");
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return nomComplet;
+    }
+
     private void handleArchiver(Projet p) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Archiver le projet '" + p.getNom() + "' ?", ButtonType.YES, ButtonType.NO);
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Archiver '" + p.getNom() + "' ?", ButtonType.YES, ButtonType.NO);
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
                 projetService.archiverUnProjet(p.getId());
@@ -186,62 +216,30 @@ public class ListeProjetsController {
             String fileName = "Rapport_" + p.getNom().replace(" ", "_") + ".pdf";
             PdfWriter.getInstance(document, new FileOutputStream(fileName));
             document.open();
-
-            Paragraph title = new Paragraph("STRATIX - RAPPORT TECHNIQUE");
-            title.setAlignment(Element.ALIGN_CENTER);
-            document.add(title);
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("Nom du Projet : " + p.getNom()));
+            document.add(new Paragraph("STRATIX - RAPPORT PROJET"));
+            document.add(new Paragraph("Projet : " + p.getNom()));
             document.add(new Paragraph("Responsable : " + recupererNomChef(p.getResponsableId())));
-            document.add(new Paragraph("Statut actuel : " + p.getStatut()));
-            document.add(new Paragraph("Progression : " + p.getProgression() + "%"));
-            document.add(new Paragraph("Membres : " + (p.getEquipeMembres() != null ? p.getEquipeMembres() : "Aucun")));
             document.add(new Paragraph("Description : " + p.getDescription()));
-
-            document.add(new Paragraph(" "));
-            com.lowagie.text.Image img = com.lowagie.text.Image.getInstance(new java.net.URL(qrCodeUrl));
-            img.setAlignment(Element.ALIGN_CENTER);
-            img.scaleAbsolute(100, 100);
-            document.add(img);
-
             document.close();
             Desktop.getDesktop().open(new File(fileName));
-        } catch (Exception e) {
-            afficherErreur("Erreur PDF", "Échec de génération du rapport.");
-        }
+        } catch (Exception e) { e.printStackTrace(); }
     }
-
-    @FXML
-    private void ouvrirChat() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ChatProjet.fxml"));
-            Parent root = loader.load();
-            Stage stage = new Stage();
-            stage.setTitle("Espace Chat - Stratix");
-            stage.setScene(new Scene(root));
-            stage.show();
-        } catch (IOException e) {
-            afficherErreur("Erreur Chat", "Impossible d'ouvrir le chat.");
-        }
-    }
-
-    @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Archives"); }
-    @FXML private void allerAjouterProjet() { chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet"); }
 
     private void ouvrirFenetreModification(Projet p) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ModifierProjet.fxml"));
             Parent root = loader.load();
-            ModifierProjetController controller = loader.getController();
-            controller.chargerDonnees(p.getId());
+            ModifierProjetController ctrl = loader.getController();
+            ctrl.chargerDonnees(p.getId());
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
             stage.showAndWait();
             rafraichirDonnees();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) { e.printStackTrace(); }
     }
+
+    @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Archives"); }
+    @FXML private void allerAjouterProjet() { chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet"); }
 
     private void chargerFenetre(String fxmlPath, String titre) {
         try {
@@ -252,9 +250,7 @@ public class ListeProjetsController {
             stage.setScene(new Scene(root));
             stage.showAndWait();
             rafraichirDonnees();
-        } catch (IOException e) {
-            afficherErreur("Erreur Navigation", "Fichier introuvable.");
-        }
+        } catch (IOException e) { e.printStackTrace(); }
     }
 
     private void afficherErreur(String titre, String msg) {
