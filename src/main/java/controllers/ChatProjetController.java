@@ -1,122 +1,200 @@
 package controllers;
 
+import com.pusher.client.PusherOptions;
+import com.pusher.client.channel.Channel;
+import com.pusher.client.channel.PusherEvent;
 import javafx.application.Platform;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 import models.UserRole;
 import models.Utilisateur;
+import org.json.JSONObject;
+import utils.MyDataBase;
+
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ChatProjetController {
 
     @FXML private VBox chatContainer;
     @FXML private TextField msgInput;
     @FXML private Label projetTitle;
+    @FXML private ScrollPane scrollPane; // Ajout du ScrollPane pour l'auto-scroll
 
     private int currentProjetId;
-    private String myName = "Utilisateur";
-    private Timeline autoRefresh;
+    private String myName;
 
-    private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost:3306/stratix", "root", "");
-    }
+    // --- Identifiants Pusher ---
+    private static final String APP_ID = "2120858";
+    private static final String PUSHER_KEY = "8e0521301e0b1f5449dc";
+    private static final String PUSHER_SECRET = "e67bbcccb7e9f6bfa41a";
+    private static final String PUSHER_CLUSTER = "mt1";
+
+    private com.pusher.client.Pusher pusherClient;
 
     public void initChat(int idProjet, String nomProjet) {
         this.currentProjetId = idProjet;
-        this.projetTitle.setText("Discussion : " + nomProjet);
+        this.projetTitle.setText("Chat : " + nomProjet);
 
         Utilisateur user = UserRole.getInstance().getUser();
-        if (user != null) {
-            this.myName = user.getNom() + " " + (user.getPrenom() != null ? user.getPrenom() : "");
-        }
+        this.myName = (user != null)
+                ? user.getNom() + " " + user.getPrenom()
+                : "Anonyme";
 
-        loadHistory();
-        setupRealTime();
+        chatContainer.getChildren().clear();
+
+        // Permet de scroller vers le bas à chaque nouveau message
+        chatContainer.heightProperty().addListener((observable, oldValue, newValue) -> {
+            // Si ton container est dans un ScrollPane (ex: @FXML ScrollPane scrollPane)
+            if (scrollPane != null) {
+                scrollPane.setVvalue(1.0);
+            }
+        });
+
+        loadHistoryFromMySQL();
+        setupPusherReceiver();
     }
 
-    private void setupRealTime() {
-        if (autoRefresh != null) autoRefresh.stop();
-        autoRefresh = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> loadHistory()));
-        autoRefresh.setCycleCount(Timeline.INDEFINITE);
-        autoRefresh.play();
+    private void setupPusherReceiver() {
+        PusherOptions options = new PusherOptions().setCluster(PUSHER_CLUSTER);
+        pusherClient = new com.pusher.client.Pusher(PUSHER_KEY, options);
+
+        Channel channel = pusherClient.subscribe("projet-" + currentProjetId);
+
+        // ✅ VERSION CORRIGÉE
+        channel.bind("nouveau-message", (PusherEvent event) -> {
+
+            String data = event.getData();
+
+            JSONObject json = new JSONObject(data);
+            String sender = json.getString("sender");
+            String text = json.getString("text");
+
+            if (!sender.equals(myName)) {
+                Platform.runLater(() -> displayMessage(sender, text));
+            }
+        });
+
+        pusherClient.connect();
     }
 
     @FXML
     private void handleSend() {
         String text = msgInput.getText().trim();
-        if (text.isEmpty() || currentProjetId == 0) return;
+        if (text.isEmpty()) return;
 
-        try (Connection conn = getConnection()) {
-            String sql = "INSERT INTO messagesProjet (projet_id, expediteur_nom, contenu) VALUES (?, ?, ?)";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, currentProjetId);
-            pstmt.setString(2, myName);
-            pstmt.setString(3, text);
-            pstmt.executeUpdate();
+        saveToDatabase(text);
+        displayMessage(myName, text);
 
-            msgInput.clear();
-            loadHistory();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+        new Thread(() -> {
+            try {
+                com.pusher.rest.Pusher server =
+                        new com.pusher.rest.Pusher(APP_ID, PUSHER_KEY, PUSHER_SECRET);
+                server.setCluster(PUSHER_CLUSTER);
 
-    private void loadHistory() {
-        // CORRECTION : On stocke les messages dans une liste AVANT de fermer la connexion
-        List<String[]> tempMessages = new ArrayList<>();
+                JSONObject payload = new JSONObject();
+                payload.put("sender", myName);
+                payload.put("text", text);
 
-        try (Connection conn = getConnection()) {
-            String sql = "SELECT expediteur_nom, contenu FROM messagesProjet WHERE projet_id = ? ORDER BY date_envoi ASC";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, currentProjetId);
-            ResultSet rs = pstmt.executeQuery();
+                server.trigger(
+                        "projet-" + currentProjetId,
+                        "nouveau-message",
+                        payload.toString()
+                );
 
-            while (rs.next()) {
-                tempMessages.add(new String[]{rs.getString("expediteur_nom"), rs.getString("contenu")});
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return;
-        }
+        }).start();
 
-        // Mise à jour de l'UI une fois les données prêtes
-        Platform.runLater(() -> {
-            chatContainer.getChildren().clear();
-            for (String[] m : tempMessages) {
-                displayMessage(m[0], m[1]);
-            }
-        });
+        msgInput.clear();
     }
 
     private void displayMessage(String sender, String content) {
         VBox msgBox = new VBox(2);
         Label nameLbl = new Label(sender);
-        nameLbl.setStyle("-fx-font-size: 9px; -fx-text-fill: #64748b;");
+        nameLbl.setStyle(
+                "-fx-font-size: 10px; " +
+                        "-fx-text-fill: #64748b; " +
+                        "-fx-font-weight: bold;"
+        );
 
         Label contentLbl = new Label(content);
         contentLbl.setWrapText(true);
-        contentLbl.setMaxWidth(260);
+        contentLbl.setMaxWidth(280);
 
-        if (sender != null && sender.equals(myName)) {
+        if (sender.equals(myName)) {
             msgBox.setAlignment(Pos.TOP_RIGHT);
-            contentLbl.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-padding: 7 12; -fx-background-radius: 12 12 0 12;");
+            contentLbl.setStyle(
+                    "-fx-background-color: #3b82f6; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-padding: 8 12; " +
+                            "-fx-background-radius: 15 15 0 15;"
+            );
         } else {
             msgBox.setAlignment(Pos.TOP_LEFT);
-            contentLbl.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #1e293b; -fx-padding: 7 12; -fx-background-radius: 12 12 12 0;");
+            contentLbl.setStyle(
+                    "-fx-background-color: #f1f5f9; " +
+                            "-fx-text-fill: #1e293b; " +
+                            "-fx-padding: 8 12; " +
+                            "-fx-background-radius: 15 15 15 0;"
+            );
         }
 
         msgBox.getChildren().addAll(nameLbl, contentLbl);
         chatContainer.getChildren().add(msgBox);
     }
 
+    private void loadHistoryFromMySQL() {
+        String sql = """
+                SELECT expediteur_nom, contenu
+                FROM messages_projet
+                WHERE projet_id = ?
+                ORDER BY id ASC
+                """;
+
+        try (PreparedStatement pstmt =
+                     MyDataBase.getInstance().getCnx().prepareStatement(sql)) {
+
+            pstmt.setInt(1, currentProjetId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                displayMessage(
+                        rs.getString("expediteur_nom"),
+                        rs.getString("contenu")
+                );
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveToDatabase(String text) {
+        String sql = """
+                INSERT INTO messages_projet
+                (projet_id, expediteur_nom, contenu)
+                VALUES (?, ?, ?)
+                """;
+
+        try (PreparedStatement pstmt =
+                     MyDataBase.getInstance().getCnx().prepareStatement(sql)) {
+
+            pstmt.setInt(1, currentProjetId);
+            pstmt.setString(2, myName);
+            pstmt.setString(3, text);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void stopChat() {
-        if (autoRefresh != null) autoRefresh.stop();
+        if (pusherClient != null) {
+            pusherClient.disconnect();
+        }
     }
 }
