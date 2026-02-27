@@ -19,9 +19,9 @@ public class GoogleAuthService {
     private static GoogleAuthService instance;
     
     // Configuration OAuth Google
+    // ⚠️ DÉVELOPPEMENT UNIQUEMENT - Ne jamais commiter ces valeurs dans Git!
     private static final String CLIENT_ID = "333706582213-1ubk3268msr4cc8agvtsovn64eb7sjji.apps.googleusercontent.com";
-    private static final String CLIENT_SECRET = "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";
-    private static final String REDIRECT_URI = "http://localhost:8888/Callback";
+    private static final String CLIENT_SECRET = "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";
     
     private final NetHttpTransport httpTransport;
     private final GsonFactory jsonFactory;
@@ -48,18 +48,22 @@ public class GoogleAuthService {
                 .setInstalled(new GoogleClientSecrets.Details()
                     .setClientId(CLIENT_ID)
                     .setClientSecret(CLIENT_SECRET)
-                    .setRedirectUris(Collections.singletonList(REDIRECT_URI)));
+                    .setRedirectUris(Collections.singletonList("http://localhost")));
             
             GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 httpTransport,
                 jsonFactory,
                 clientSecrets,
-                Collections.singleton("https://www.googleapis.com/auth/userinfo.email")
+                java.util.Arrays.asList(
+                    "https://www.googleapis.com/auth/userinfo.email",
+                    "https://www.googleapis.com/auth/userinfo.profile"
+                )
             ).setAccessType("online").build();
             
             // Ouvrir le navigateur pour l'authentification
+            // Utiliser un port aléatoire disponible pour éviter les conflits
             LocalServerReceiver receiver = new LocalServerReceiver.Builder()
-                .setPort(8888)
+                .setPort(0)  // 0 = port aléatoire disponible (évite les conflits)
                 .build();
             
             Credential credential = new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
@@ -79,7 +83,12 @@ public class GoogleAuthService {
             );
             
         } catch (Exception e) {
-            System.err.println("Erreur d'authentification Google: " + e.getMessage());
+            System.err.println("=== ERREUR DÉTAILLÉE GOOGLE AUTH ===");
+            System.err.println("Type d'erreur: " + e.getClass().getName());
+            System.err.println("Message: " + e.getMessage());
+            System.err.println("Cause: " + (e.getCause() != null ? e.getCause().getMessage() : "Aucune"));
+            e.printStackTrace();
+            System.err.println("=== FIN ERREUR ===");
             throw e;
         }
     }

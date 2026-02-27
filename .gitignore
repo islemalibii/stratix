@@ -40,3 +40,12 @@ build/
 
 ### Session ###
 session.properties
+
+### Environment Variables & Secrets ###
+.env
+credentials.json
+client_secret*.json
+token.json
+
+### Google OAuth - Ne pas commiter avec les vraies valeurs ###
+src/main/java/services/GoogleAuthService.java
