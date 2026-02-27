@@ -29,37 +29,109 @@ public class ChatbotService {
         String q = normalizeText(question);
         
         // Questions d'aide (très flexible)
-        if (matchesAny(q, "aide", "help", "?", "commande", "que peux tu", "quoi faire")) {
+        if (matchesAny(q, "aide", "help", "commande", "que peux tu", "quoi faire") || q.equals("?")) {
             return getHelp();
         }
         
+        // Recherche d'utilisateur par nom (priorité haute)
+        if (matchesAny(q, "trouve", "cherche", "recherche") || 
+            matchesAny(q, "info sur", "information sur")) {
+            return             private String searchUser(String question) {
+                    try {
+                        // Extraire le nom de la question
+                        String[] words = question.split("\\s+");
+                        StringBuilder searchName = new StringBuilder();
+                        boolean foundKeyword = false;
+
+                        // Chercher après les mots clés
+                        for (int i = 0; i < words.length; i++) {
+                            String word = words[i].toLowerCase();
+
+                            // Si on trouve un mot clé, on commence à collecter les mots suivants
+                            if (word.matches("(trouve|cherche|recherche|info|information)")) {
+                                foundKeyword = true;
+                                continue;
+                            }
+
+                            // Ignorer "sur", "utilisateur", "user"
+                            if (word.matches("(sur|utilisateur|user)")) {
+                                continue;
+                            }
+
+                            // Si on a trouvé un mot clé, collecter tous les mots suivants comme nom
+                            if (foundKeyword && !word.isEmpty()) {
+                                if (searchName.length() > 0) {
+                                    searchName.append(" ");
+                                }
+                                searchName.append(words[i]); // Garder la casse originale
+                            }
+                        }
+
+                        // Si rien trouvé, prendre le dernier mot
+                        if (searchName.length() == 0 && words.length > 0) {
+                            searchName.append(words[words.length - 1]);
+                        }
+
+                        String finalSearchName = searchName.toString().trim();
+
+                        if (finalSearchName.isEmpty()) {
+                            return "❌ Veuillez préciser le nom de l'utilisateur.\nExemple: 'Info sur Taha' ou 'Cherche Hamdouni'";
+                        }
+
+                        List<Utilisateur> users = utilisateurService.getAll();
+                        String searchLower = finalSearchName.toLowerCase();
+
+                        List<Utilisateur> found = users.stream()
+                            .filter(u -> u.getNom().toLowerCase().contains(searchLower) ||
+                                       u.getPrenom().toLowerCase().contains(searchLower) ||
+                                       (u.getNom() + " " + u.getPrenom()).toLowerCase().contains(searchLower))
+                            .limit(3)
+                            .collect(Collectors.toList());
+
+                        if (found.isEmpty()) {
+                            return "❌ Aucun utilisateur trouvé avec le nom '" + finalSearchName + "'";
+                        }
+
+                        StringBuilder sb = new StringBuilder("🔍 Résultats de recherche:\n\n");
+                        for (Utilisateur u : found) {
+                            sb.append(String.format("👤 %s %s\n", u.getNom(), u.getPrenom()));
+                            sb.append(String.format("   📧 %s\n", u.getEmail()));
+                            sb.append(String.format("   📱 %s\n", u.getTel()));
+                            sb.append(String.format("   👔 %s\n", getRoleDisplay(u.getRole())));
+                            sb.append(String.format("   📊 %s\n\n", u.isActif() ? "Actif" : "Inactif"));
+                        }
+
+                        return sb.toString();
+                    } catch (Exception e) {
+                        return "❌ Erreur lors de la recherche.";
+                    }
+                }
+;
+        }
+        
         // Questions statistiques - Employés
-        if (matchesAll(q, new String[]{"combien", "employe"}) || 
+        if ((matchesAny(q, "combien", "nombre", "total") && matchesAny(q, "employe", "employee")) ||
+            matchesAll(q, new String[]{"combien", "employe"}) || 
             matchesAll(q, new String[]{"nombre", "employe"}) ||
             matchesAll(q, new String[]{"total", "employe"})) {
             return getEmployeesCount();
         }
         
         // Questions statistiques - Admins
-        if (matchesAll(q, new String[]{"combien", "admin"}) || 
+        if ((matchesAny(q, "combien", "nombre", "total") && matchesAny(q, "admin", "administrateur")) ||
+            matchesAll(q, new String[]{"combien", "admin"}) || 
             matchesAll(q, new String[]{"nombre", "admin"})) {
             return getAdminsCount();
         }
         
-        // Questions statistiques - Total utilisateurs
-        if ((matchesAny(q, "combien", "nombre", "total") && matchesAny(q, "utilisateur", "user", "personne")) ||
-            matchesAny(q, "statistique", "stat")) {
-            return getTotalUsersCount();
-        }
-        
         // Questions statistiques - Inactifs
-        if (matchesAny(q, "inactif", "desactive", "inactiv") || 
+        if ((matchesAny(q, "combien", "nombre", "total") && matchesAny(q, "inactif", "desactive", "inactiv")) || 
             (matchesAny(q, "combien", "nombre") && matchesAny(q, "pas actif", "non actif"))) {
             return getInactiveUsersCount();
         }
         
         // Questions d'identification - Responsable RH
-        if ((matchesAny(q, "qui", "quel", "liste") && matchesAny(q, "rh", "ressource humaine")) ||
+        if ((matchesAny(q, "qui", "quel") && matchesAny(q, "rh", "ressource humaine")) ||
             matchesAny(q, "responsable rh", "resp rh")) {
             return getResponsablesRH();
         }
@@ -71,20 +143,19 @@ public class ChatbotService {
         }
         
         // Questions d'identification - Liste admins
-        if ((matchesAny(q, "liste", "affiche", "montre", "voir") && matchesAny(q, "admin", "administrateur")) ||
-            matchesAny(q, "tous les admin", "les admin")) {
+        if (matchesAny(q, "liste", "affiche", "montre", "voir") && matchesAny(q, "admin", "administrateur")) {
             return getAdminsList();
         }
         
         // Questions d'identification - Liste employés
-        if ((matchesAny(q, "liste", "affiche", "montre", "voir") && matchesAny(q, "employe", "employee", "salarie")) ||
-            matchesAny(q, "tous les employe", "les employe")) {
+        if (matchesAny(q, "liste", "affiche", "montre", "voir") && matchesAny(q, "employe", "employee", "salarie")) {
             return getEmployeesList();
         }
         
-        // Recherche d'utilisateur par nom
-        if (matchesAny(q, "trouve", "cherche", "recherche", "info sur", "information sur")) {
-            return searchUser(question);
+        // Questions statistiques - Total utilisateurs (après les questions spécifiques)
+        if ((matchesAny(q, "combien", "nombre", "total") && matchesAny(q, "utilisateur", "user", "personne")) ||
+            matchesAny(q, "statistique", "stat")) {
+            return getTotalUsersCount();
         }
         
         // Question non reconnue avec suggestion
@@ -135,38 +206,59 @@ public class ChatbotService {
         try {
             // Extraire le nom de la question
             String[] words = question.split("\\s+");
-            String searchName = "";
+            StringBuilder searchName = new StringBuilder();
+            boolean foundKeyword = false;
             
             // Chercher après les mots clés
-            for (int i = 0; i < words.length - 1; i++) {
-                if (words[i].matches("(?i)(trouve|cherche|recherche|info|information|sur)")) {
-                    searchName = words[i + 1];
-                    break;
+            for (int i = 0; i < words.length; i++) {
+                String word = words[i].toLowerCase();
+                
+                // Si on trouve un mot clé, on commence à collecter les mots suivants
+                if (word.matches("(trouve|cherche|recherche|info|information)")) {
+                    foundKeyword = true;
+                    continue;
+                }
+                
+                // Ignorer "sur", "utilisateur", "user"
+                if (word.matches("(sur|utilisateur|user)")) {
+                    continue;
+                }
+                
+                // Si on a trouvé un mot clé, collecter tous les mots suivants comme nom
+                if (foundKeyword && !word.isEmpty()) {
+                    if (searchName.length() > 0) {
+                        searchName.append(" ");
+                    }
+                    searchName.append(words[i]); // Garder la casse originale
                 }
             }
             
-            if (searchName.isEmpty() && words.length > 1) {
-                searchName = words[words.length - 1];
+            // Si rien trouvé, prendre le dernier mot
+            if (searchName.length() == 0 && words.length > 0) {
+                searchName.append(words[words.length - 1]);
             }
             
-            if (searchName.isEmpty()) {
-                return "❌ Veuillez préciser le nom de l'utilisateur.\nExemple: 'Trouve utilisateur Taha'";
+            String finalSearchName = searchName.toString().trim();
+            
+            if (finalSearchName.isEmpty()) {
+                return "❌ Veuillez préciser le nom de l'utilisateur.\nExemple: 'Info sur Taha' ou 'Cherche Hamdouni'";
             }
             
             List<Utilisateur> users = utilisateurService.getAll();
-            String finalSearchName = searchName.toLowerCase();
+            String searchLower = finalSearchName.toLowerCase();
             
             List<Utilisateur> found = users.stream()
-                .filter(u -> u.getNom().toLowerCase().contains(finalSearchName) || 
-                           u.getPrenom().toLowerCase().contains(finalSearchName))
+                .filter(u -> u.getNom().toLowerCase().contains(searchLower) || 
+                           u.getPrenom().toLowerCase().contains(searchLower) ||
+                           (u.getNom() + " " + u.getPrenom()).toLowerCase().contains(searchLower))
                 .limit(3)
                 .collect(Collectors.toList());
             
             if (found.isEmpty()) {
-                return "❌ Aucun utilisateur trouvé avec le nom '" + searchName + "'";
+                return "❌ Aucun utilisateur trouvé avec le nom '" + finalSearchName + "'";
             }
             
-            StringBuilder sb = new StringBuilder("� Résultats de recherche:\n\n");
+            StringBuilder sb = new StringBuilder("🔍 Résultats de recherche:\n\n");
             for (Utilisateur u : found) {
                 sb.append(String.format("👤 %s %s\n", u.getNom(), u.getPrenom()));
                 sb.append(String.format("   📧 %s\n", u.getEmail()));
