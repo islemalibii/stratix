@@ -21,14 +21,16 @@ import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
 import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
 
+import java.awt.Color;
 import java.io.FileOutputStream;
 import java.io.File;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -101,20 +103,17 @@ public class ListeProjetsController {
                 "-fx-border-color: #e2e8f0; -fx-border-radius: 15; " +
                 "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);");
 
-        // 1. Badge de Statut
         Label statutBadge = new Label(p.getStatut().toUpperCase());
         statutBadge.setStyle("-fx-background-color: " + getStatusHexColor(p.getStatut()) +
                 "; -fx-text-fill: white; -fx-padding: 5 12; -fx-background-radius: 20; " +
                 "-fx-font-size: 11px; -fx-font-weight: bold;");
 
-        // 2. NOM DU PROJET (Gros, Gras et Clair)
         Label nom = new Label(p.getNom());
         nom.setStyle("-fx-font-weight: 900; -fx-font-size: 20px; -fx-text-fill: #1a202c;");
         nom.setWrapText(true);
         nom.setMinHeight(60);
         nom.setAlignment(Pos.CENTER_LEFT);
 
-        // 3. Progression
         VBox progBox = new VBox(8);
         Label lblProg = new Label("Progression: " + p.getProgression() + "%");
         lblProg.setStyle("-fx-text-fill: #4a5568; -fx-font-size: 13px; -fx-font-weight: bold;");
@@ -125,7 +124,6 @@ public class ListeProjetsController {
         pb.setStyle("-fx-accent: #3182ce;");
         progBox.getChildren().addAll(lblProg, pb);
 
-        // 4. Actions (Modifier, PDF, Chat spécifique)
         HBox actions = new HBox(8);
         actions.setAlignment(Pos.CENTER);
 
@@ -135,10 +133,7 @@ public class ListeProjetsController {
 
         Button btnPdf = new Button("PDF");
         btnPdf.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-cursor: hand;");
-        btnPdf.setOnAction(e -> {
-            String qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(p.getNom(), StandardCharsets.UTF_8);
-            exporterEnPDF(p, qrUrl);
-        });
+        btnPdf.setOnAction(e -> exporterEnPDF(p));
 
         Button btnChat = new Button("Chat");
         btnChat.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
@@ -146,7 +141,6 @@ public class ListeProjetsController {
 
         actions.getChildren().addAll(btnMod, btnPdf, btnChat);
 
-        // 5. Bouton Archiver
         Button btnArch = new Button("Archiver le projet");
         btnArch.setMaxWidth(Double.MAX_VALUE);
         btnArch.setPrefHeight(40);
@@ -157,36 +151,69 @@ public class ListeProjetsController {
         return card;
     }
 
+    private void exporterEnPDF(Projet p) {
+        Document document = new Document();
+        try {
+            String fileName = "Rapport_" + p.getNom().replace(" ", "_") + ".pdf";
+            PdfWriter.getInstance(document, new FileOutputStream(fileName));
+            document.open();
+
+            // 1. Titre
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, Color.BLUE);
+            Paragraph titre = new Paragraph("STRATIX - RAPPORT DÉTAILLÉ DU PROJET", titleFont);
+            titre.setAlignment(Element.ALIGN_CENTER);
+            document.add(titre);
+            document.add(new Paragraph(" "));
+
+            // 2. Informations détaillées (Sauf ID)
+            document.add(new Paragraph("Nom du Projet : " + p.getNom()));
+            document.add(new Paragraph("Responsable : " + recupererNomChef(p.getResponsableId())));
+            document.add(new Paragraph("Statut : " + p.getStatut()));
+            document.add(new Paragraph("Budget : " + p.getBudget() + " DT"));
+            document.add(new Paragraph("Date de Début : " + p.getDateDebut()));
+            document.add(new Paragraph("Date de Fin : " + p.getDateFin()));
+            document.add(new Paragraph("Progression : " + p.getProgression() + "%"));
+            document.add(new Paragraph("Description : " + p.getDescription()));
+            document.add(new Paragraph(" "));
+
+            // 3. Génération du QR Code complet (Toutes les infos sauf ID)
+            String qrData = String.format(
+                    "STRATIX - FICHE PROJET\nNom: %s\nResponsable: %s\nStatut: %s\nBudget: %s DT\nProgression: %d%%\nDescription: %s",
+                    p.getNom(), recupererNomChef(p.getResponsableId()), p.getStatut(), p.getBudget(), p.getProgression(), p.getDescription()
+            );
+
+            String qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + URLEncoder.encode(qrData, StandardCharsets.UTF_8);
+
+            // Insertion de l'image QR Code dans le PDF
+            com.lowagie.text.Image qrImage = com.lowagie.text.Image.getInstance(new java.net.URL(qrCodeUrl));
+            qrImage.setAlignment(Element.ALIGN_CENTER);
+            qrImage.scalePercent(80);
+            document.add(qrImage);
+
+            document.close();
+            Desktop.getDesktop().open(new File(fileName));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            afficherErreur("Erreur PDF", "Erreur lors de la génération du PDF.");
+        }
+    }
+
     private void ouvrirChatSpecifique(Projet p) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ChatProjet.fxml"));
             Parent root = loader.load();
-
             ChatProjetController chatCtrl = loader.getController();
-
-            // INITIALISATION PUSHER
             chatCtrl.initChat(p.getId(), p.getNom());
-
             Stage stage = new Stage();
             stage.setTitle("Discussion Admin : " + p.getNom());
             stage.setScene(new Scene(root));
-
-            // ✅ CRUCIAL : On coupe la connexion Pusher à la fermeture
-            stage.setOnCloseRequest(e -> {
-                chatCtrl.stopChat();
-            });
-
+            stage.setOnCloseRequest(e -> chatCtrl.stopChat());
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, "Impossible d'ouvrir le chat en temps réel.").showAndWait();
+            afficherErreur("Erreur Chat", "Impossible d'ouvrir le chat.");
         }
-    }
-
-    // Le bouton Chat global a été supprimé du FXML, cette méthode peut être retirée ou laissée vide
-    @FXML
-    private void ouvrirChat() {
-        // Supprimé pour éviter toute confusion
     }
 
     private String getStatusHexColor(String statut) {
@@ -219,20 +246,6 @@ public class ListeProjetsController {
                 rafraichirDonnees();
             }
         });
-    }
-
-    private void exporterEnPDF(Projet p, String qrCodeUrl) {
-        Document document = new Document();
-        try {
-            String fileName = "Rapport_" + p.getNom().replace(" ", "_") + ".pdf";
-            PdfWriter.getInstance(document, new FileOutputStream(fileName));
-            document.open();
-            document.add(new Paragraph("STRATIX - RAPPORT PROJET"));
-            document.add(new Paragraph("Projet : " + p.getNom()));
-            document.add(new Paragraph("Responsable : " + recupererNomChef(p.getResponsableId())));
-            document.close();
-            Desktop.getDesktop().open(new File(fileName));
-        } catch (Exception e) { e.printStackTrace(); }
     }
 
     private void ouvrirFenetreModification(Projet p) {
