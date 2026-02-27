@@ -108,6 +108,9 @@ public class MainApp extends Application {
      * Ouvrir le dashboard pour les autres utilisateurs (CEO, Employés, Responsables)
      */
     private void openStandardUserDashboard(Stage primaryStage, Utilisateur user) throws Exception {
+        // IMPORTANT: Définir l'utilisateur dans UserRole pour la session
+        models.UserRole.getInstance().setUser(user);
+        
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/service-view.fxml"));
         Parent root = loader.load();
         
