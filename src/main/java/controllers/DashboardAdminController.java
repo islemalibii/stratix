@@ -1,6 +1,7 @@
 package controllers;
 
 import services.UtilisateurService;
+import services.ChatbotService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
