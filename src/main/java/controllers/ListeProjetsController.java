@@ -141,7 +141,6 @@ public class ListeProjetsController {
 
         VBox progBox = new VBox(5, new Label("Progression: " + p.getProgression() + "%"), new ProgressBar(p.getProgression() / 100.0));
 
-        // BOUTONS D'ACTION
         HBox actions = new HBox(10);
         actions.setAlignment(Pos.CENTER);
 

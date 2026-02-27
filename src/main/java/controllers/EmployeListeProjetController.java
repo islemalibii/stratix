@@ -27,8 +27,7 @@ public class EmployeListeProjetController {
 
     private ProjetService projetService = new ProjetService();
 
-    // TODO: Récupérer le nom de l'utilisateur réellement connecté via une classe Session
-    private String nomEmployeConnecte = "Jean Dupont";
+    private String nomEmployeConnecte = "eya employee";
 
     @FXML
     public void initialize() {
@@ -108,19 +107,5 @@ public class EmployeListeProjetController {
         afficherLesCartes(filtrés);
     }
 
-    @FXML
-    private void versBackOffice() {
-        changerEspace("/ListeProjets.fxml", "Stratix - Administration");
-    }
 
-    private void changerEspace(String fxmlPath, String titre) {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
-            Stage stage = (Stage) searchField.getScene().getWindow();
-            stage.setScene(new Scene(root, stage.getWidth(), stage.getHeight()));
-            stage.setTitle(titre);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

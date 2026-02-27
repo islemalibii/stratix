@@ -22,8 +22,6 @@
         <HBox spacing="10">
             <Button text="💬 Chat d'équipe" onAction="#ouvrirChat"
                     style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 20;"/>
-            <Button text="⚙ Admin" onAction="#versBackOffice"
-                    style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-background-radius: 20;"/>
         </HBox>
     </HBox>
 
