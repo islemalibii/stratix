@@ -174,12 +174,12 @@
    
    <!-- Chatbot Overlay -->
    <VBox fx:id="chatbotContainer" styleClass="chatbot-container" managed="false" visible="false" 
-         maxWidth="400" maxHeight="500" StackPane.alignment="BOTTOM_RIGHT" pickOnBounds="false">
+         maxWidth="400" maxHeight="500" StackPane.alignment="BOTTOM_RIGHT" mouseTransparent="false">
       <padding>
          <Insets bottom="90.0" right="30.0" />
       </padding>
       <!-- Chat Window -->
-      <VBox styleClass="chat-window" spacing="10" pickOnBounds="true">
+      <VBox styleClass="chat-window" spacing="10" mouseTransparent="false">
          <padding>
             <Insets top="15.0" bottom="15.0" left="15.0" right="15.0" />
          </padding>
@@ -213,7 +213,7 @@
    
    <!-- Floating Chat Button -->
    <Button fx:id="chatbotButton" text="💬" onAction="#toggleChatbot" styleClass="chatbot-fab" 
-           StackPane.alignment="BOTTOM_RIGHT" pickOnBounds="true">
+           StackPane.alignment="BOTTOM_RIGHT" mouseTransparent="false">
       <StackPane.margin>
          <Insets bottom="30.0" right="30.0" />
       </StackPane.margin>

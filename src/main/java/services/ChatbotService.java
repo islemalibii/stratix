@@ -26,57 +26,188 @@ public class ChatbotService {
             return "Posez-moi une question! 😊";
         }
         
-        String q = question.toLowerCase().trim();
+        String q = normalizeText(question);
         
-        // Questions d'aide
-        if (q.contains("aide") || q.contains("help") || q.equals("?")) {
+        // Questions d'aide (très flexible)
+        if (matchesAny(q, "aide", "help", "?", "commande", "que peux tu", "quoi faire")) {
             return getHelp();
         }
         
-        // Questions statistiques
-        if (q.contains("combien") && q.contains("employé")) {
+        // Questions statistiques - Employés
+        if (matchesAll(q, new String[]{"combien", "employe"}) || 
+            matchesAll(q, new String[]{"nombre", "employe"}) ||
+            matchesAll(q, new String[]{"total", "employe"})) {
             return getEmployeesCount();
         }
-        if (q.contains("combien") && q.contains("admin")) {
+        
+        // Questions statistiques - Admins
+        if (matchesAll(q, new String[]{"combien", "admin"}) || 
+            matchesAll(q, new String[]{"nombre", "admin"})) {
             return getAdminsCount();
         }
-        if (q.contains("combien") && q.contains("utilisateur")) {
+        
+        // Questions statistiques - Total utilisateurs
+        if ((matchesAny(q, "combien", "nombre", "total") && matchesAny(q, "utilisateur", "user", "personne")) ||
+            matchesAny(q, "statistique", "stat")) {
             return getTotalUsersCount();
         }
-        if (q.contains("combien") && q.contains("inactif")) {
+        
+        // Questions statistiques - Inactifs
+        if (matchesAny(q, "inactif", "desactive", "inactiv") || 
+            (matchesAny(q, "combien", "nombre") && matchesAny(q, "pas actif", "non actif"))) {
             return getInactiveUsersCount();
         }
         
-        // Questions d'identification
-        if (q.contains("qui") && q.contains("responsable rh")) {
+        // Questions d'identification - Responsable RH
+        if ((matchesAny(q, "qui", "quel", "liste") && matchesAny(q, "rh", "ressource humaine")) ||
+            matchesAny(q, "responsable rh", "resp rh")) {
             return getResponsablesRH();
         }
-        if (q.contains("qui") && q.contains("ceo")) {
+        
+        // Questions d'identification - CEO
+        if ((matchesAny(q, "qui", "quel") && matchesAny(q, "ceo", "directeur", "patron", "chef")) ||
+            matchesAny(q, "directeur general")) {
             return getCEOs();
         }
-        if (q.contains("liste") && q.contains("admin")) {
+        
+        // Questions d'identification - Liste admins
+        if ((matchesAny(q, "liste", "affiche", "montre", "voir") && matchesAny(q, "admin", "administrateur")) ||
+            matchesAny(q, "tous les admin", "les admin")) {
             return getAdminsList();
         }
-        if (q.contains("liste") && q.contains("employé")) {
+        
+        // Questions d'identification - Liste employés
+        if ((matchesAny(q, "liste", "affiche", "montre", "voir") && matchesAny(q, "employe", "employee", "salarie")) ||
+            matchesAny(q, "tous les employe", "les employe")) {
             return getEmployeesList();
         }
         
-        // Question non reconnue
-        return "Je n'ai pas compris votre question. Tapez 'aide' pour voir ce que je peux faire. 🤔";
+        // Recherche d'utilisateur par nom
+        if (matchesAny(q, "trouve", "cherche", "recherche", "info sur", "information sur")) {
+            return searchUser(question);
+        }
+        
+        // Question non reconnue avec suggestion
+        return "Je n'ai pas compris votre question. 🤔\n\n" +
+               "Essayez:\n" +
+               "• 'Combien d'employés?'\n" +
+               "• 'Qui est responsable RH?'\n" +
+               "• 'Liste des admins'\n" +
+               "• Tapez 'aide' pour plus d'options";
+    }
+    
+    // Normalise le texte pour la comparaison
+    private String normalizeText(String text) {
+        return text.toLowerCase()
+                   .trim()
+                   .replaceAll("[éèêë]", "e")
+                   .replaceAll("[àâä]", "a")
+                   .replaceAll("[ùûü]", "u")
+                   .replaceAll("[ïî]", "i")
+                   .replaceAll("[ôö]", "o")
+                   .replaceAll("[ç]", "c")
+                   .replaceAll("[^a-z0-9\\s]", " ")
+                   .replaceAll("\\s+", " ");
+    }
+    
+    // Vérifie si le texte contient au moins un des mots
+    private boolean matchesAny(String text, String... keywords) {
+        for (String keyword : keywords) {
+            if (text.contains(normalizeText(keyword))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    // Vérifie si le texte contient tous les mots
+    private boolean matchesAll(String text, String[] keywords) {
+        for (String keyword : keywords) {
+            if (!text.contains(normalizeText(keyword))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    // Recherche un utilisateur par nom
+    private String searchUser(String question) {
+        try {
+            // Extraire le nom de la question
+            String[] words = question.split("\\s+");
+            String searchName = "";
+            
+            // Chercher après les mots clés
+            for (int i = 0; i < words.length - 1; i++) {
+                if (words[i].matches("(?i)(trouve|cherche|recherche|info|information|sur)")) {
+                    searchName = words[i + 1];
+                    break;
+                }
+            }
+            
+            if (searchName.isEmpty() && words.length > 1) {
+                searchName = words[words.length - 1];
+            }
+            
+            if (searchName.isEmpty()) {
+                return "❌ Veuillez préciser le nom de l'utilisateur.\nExemple: 'Trouve utilisateur Taha'";
+            }
+            
+            List<Utilisateur> users = utilisateurService.getAll();
+            String finalSearchName = searchName.toLowerCase();
+            
+            List<Utilisateur> found = users.stream()
+                .filter(u -> u.getNom().toLowerCase().contains(finalSearchName) || 
+                           u.getPrenom().toLowerCase().contains(finalSearchName))
+                .limit(3)
+                .collect(Collectors.toList());
+            
+            if (found.isEmpty()) {
+                return "❌ Aucun utilisateur trouvé avec le nom '" + searchName + "'";
+            }
+            
+            StringBuilder sb = new StringBuilder("� Résultats de recherche:\n\n");
+            for (Utilisateur u : found) {
+                sb.append(String.format("👤 %s %s\n", u.getNom(), u.getPrenom()));
+                sb.append(String.format("   📧 %s\n", u.getEmail()));
+                sb.append(String.format("   📱 %s\n", u.getTel()));
+                sb.append(String.format("   👔 %s\n", getRoleDisplay(u.getRole())));
+                sb.append(String.format("   📊 %s\n\n", u.isActif() ? "Actif" : "Inactif"));
+            }
+            
+            return sb.toString();
+        } catch (Exception e) {
+            return "❌ Erreur lors de la recherche.";
+        }
+    }
+    
+    private String getRoleDisplay(Role role) {
+        switch (role) {
+            case ADMIN: return "Administrateur";
+            case CEO: return "CEO";
+            case EMPLOYE: return "Employé";
+            case RESPONSABLE_RH: return "Responsable RH";
+            case RESPONSABLE_PROJET: return "Responsable Projet";
+            case RESPONSABLE_PRODUCTION: return "Responsable Production";
+            default: return role.name();
+        }
     }
     
     private String getHelp() {
         return "🤖 Je peux répondre à ces questions:\n\n" +
                "📊 Statistiques:\n" +
-               "• Combien d'employés actifs?\n" +
+               "• Combien d'employés?\n" +
                "• Combien d'admins?\n" +
-               "• Combien d'utilisateurs?\n" +
-               "• Combien d'utilisateurs inactifs?\n\n" +
+               "• Nombre d'utilisateurs?\n" +
+               "• Combien d'inactifs?\n\n" +
                "👥 Identification:\n" +
                "• Qui est responsable RH?\n" +
                "• Qui est CEO?\n" +
                "• Liste des admins\n" +
-               "• Liste des employés";
+               "• Liste des employés\n\n" +
+               "🔍 Recherche:\n" +
+               "• Trouve utilisateur [nom]\n" +
+               "• Info sur [nom]";
     }
     
     private String getEmployeesCount() {
