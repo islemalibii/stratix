@@ -28,19 +28,21 @@
                 <Region HBox.hgrow="ALWAYS" />
 
                 <HBox alignment="CENTER_RIGHT" spacing="15.0">
-                    <Label fx:id="welcomeLabel" text="Bienvenue, Admin" textFill="#2D3748">
-                        <font>
-                            <Font name="System Bold" size="15.0" />
-                        </font>
-                    </Label>
-                    <StackPane>
-                        <Circle radius="22.0" fill="#EDF2F7" />
-                        <Label fx:id="avatarLabel" text="A" textFill="#3182CE">
+                    <HBox fx:id="userProfileSection" alignment="CENTER" spacing="10.0" onMouseClicked="#handleProfileClick" styleClass="user-profile-section">
+                        <Label fx:id="welcomeLabel" text="Bienvenue, Admin" textFill="#2D3748">
                             <font>
-                                <Font name="System Bold" size="16.0" />
+                                <Font name="System Bold" size="15.0" />
                             </font>
                         </Label>
-                    </StackPane>
+                        <StackPane>
+                            <Circle radius="22.0" fill="#EDF2F7" />
+                            <Label fx:id="avatarLabel" text="A" textFill="#3182CE">
+                                <font>
+                                    <Font name="System Bold" size="16.0" />
+                                </font>
+                            </Label>
+                        </StackPane>
+                    </HBox>
                     <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#handleLogout" styleClass="logout-button-modern" text="Déconnexion" />
                 </HBox>
             </children>

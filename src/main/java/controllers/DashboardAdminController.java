@@ -43,6 +43,9 @@ public class DashboardAdminController {
     @FXML
     private Button btnEvenements;
 
+    @FXML
+    private HBox userProfileSection;
+
     private Utilisateur currentUser;
     private UtilisateurService utilisateurService;
 
@@ -136,6 +139,88 @@ public class DashboardAdminController {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    void handleProfileClick() {
+        if (currentUser == null) return;
+
+        javafx.scene.control.Dialog<Void> dialog = new javafx.scene.control.Dialog<>();
+        dialog.setTitle("Profil Utilisateur");
+        dialog.setHeaderText(null);
+
+        javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(20);
+        content.setPadding(new javafx.geometry.Insets(25));
+        content.setStyle("-fx-background-color: linear-gradient(to bottom, #f7fafc 0%, #ffffff 100%); -fx-background-radius: 10px;");
+
+        javafx.scene.layout.HBox header = new javafx.scene.layout.HBox(20);
+        header.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        header.setStyle("-fx-background-color: white; -fx-background-radius: 10px; -fx-padding: 20px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);");
+
+        javafx.scene.layout.StackPane avatarContainer = new javafx.scene.layout.StackPane();
+        javafx.scene.shape.Circle avatarCircle = new javafx.scene.shape.Circle(40);
+        avatarCircle.setFill(javafx.scene.paint.Color.web("#4299E1"));
+        avatarCircle.setStroke(javafx.scene.paint.Color.web("#3182CE"));
+        avatarCircle.setStrokeWidth(3);
+        avatarCircle.setEffect(new javafx.scene.effect.DropShadow(10, javafx.scene.paint.Color.rgb(66, 153, 225, 0.3)));
+
+        javafx.scene.control.Label avatarText = new javafx.scene.control.Label(
+            currentUser.getNom().substring(0, 1).toUpperCase() + currentUser.getPrenom().substring(0, 1).toUpperCase()
+        );
+        avatarText.setStyle("-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;");
+        avatarContainer.getChildren().addAll(avatarCircle, avatarText);
+
+        javafx.scene.layout.VBox nameBox = new javafx.scene.layout.VBox(8);
+        javafx.scene.control.Label nameLabel = new javafx.scene.control.Label(currentUser.getNom() + " " + currentUser.getPrenom());
+        nameLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2D3748;");
+
+        javafx.scene.control.Label roleLabel = new javafx.scene.control.Label("Administrateur");
+        roleLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: white; -fx-background-color: #4299E1; -fx-background-radius: 12px; -fx-padding: 4px 12px;");
+        nameBox.getChildren().addAll(nameLabel, roleLabel);
+
+        header.getChildren().addAll(avatarContainer, nameBox);
+
+        javafx.scene.layout.VBox infoCard = new javafx.scene.layout.VBox(15);
+        infoCard.setStyle("-fx-background-color: white; -fx-background-radius: 10px; -fx-padding: 20px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);");
+
+        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
+        grid.setHgap(20);
+        grid.setVgap(15);
+
+        addProfileRow(grid, 0, "📧 Email:", currentUser.getEmail());
+        addProfileRow(grid, 1, "📱 Téléphone:", currentUser.getTel());
+        addProfileRow(grid, 2, "🆔 CIN:", String.valueOf(currentUser.getCin()));
+        addProfileRow(grid, 3, "📊 Statut:", currentUser.getStatut() != null ? currentUser.getStatut().toUpperCase() : "ACTIF");
+
+        infoCard.getChildren().add(grid);
+        content.getChildren().addAll(header, infoCard);
+
+        dialog.getDialogPane().setContent(content);
+
+        javafx.scene.control.ButtonType closeButtonType = new javafx.scene.control.ButtonType("Fermer", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().add(closeButtonType);
+
+        dialog.getDialogPane().setStyle("-fx-background-color: #f7fafc; -fx-border-color: #E2E8F0; -fx-border-width: 1px; -fx-border-radius: 12px; -fx-background-radius: 12px;");
+        dialog.getDialogPane().setPrefWidth(500);
+
+        javafx.scene.Node closeButton = dialog.getDialogPane().lookupButton(closeButtonType);
+        closeButton.setStyle("-fx-background-color: #4299E1; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8px; -fx-padding: 10px 30px; -fx-cursor: hand;");
+
+        dialog.showAndWait();
+    }
+
+    private void addProfileRow(javafx.scene.layout.GridPane grid, int row, String label, String value) {
+        javafx.scene.control.Label labelNode = new javafx.scene.control.Label(label);
+        labelNode.setStyle("-fx-font-weight: bold; -fx-text-fill: #4A5568; -fx-font-size: 14px;");
+
+        javafx.scene.control.Label valueNode = new javafx.scene.control.Label(value);
+        valueNode.setStyle("-fx-text-fill: #2D3748; -fx-font-size: 14px; -fx-background-color: #F7FAFC; -fx-background-radius: 6px; -fx-padding: 8px 12px;");
+        valueNode.setWrapText(true);
+        valueNode.setMaxWidth(280);
+
+        grid.add(labelNode, 0, row);
+        grid.add(valueNode, 1, row);
+    }
+
 
     private void loadUtilisateurs() {
         try {

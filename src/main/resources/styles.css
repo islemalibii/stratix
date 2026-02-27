@@ -988,6 +988,19 @@
     -fx-background-color: #FECACA;
 }
 
+/* User Profile Section - Clickable */
+.user-profile-section {
+    -fx-cursor: hand;
+    -fx-background-color: transparent;
+    -fx-background-radius: 10;
+    -fx-padding: 8 12;
+    -fx-transition: background-color 0.2s;
+}
+
+.user-profile-section:hover {
+    -fx-background-color: rgba(66, 153, 225, 0.1);
+}
+
 /* Tip Box Light */
 .tip-box-light {
     -fx-background-color: #EDF2F7;
