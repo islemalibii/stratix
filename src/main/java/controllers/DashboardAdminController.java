@@ -55,6 +55,9 @@ public class DashboardAdminController {
     public void initialize() {
         utilisateurService = UtilisateurService.getInstance();
         loadUtilisateurs();
+        
+        // Recherche en temps réel
+        searchField.textProperty().addListener((obs, old, newVal) -> handleSearch(null));
     }
 
     public void setCurrentUser(Utilisateur user) {
