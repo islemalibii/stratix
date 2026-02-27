@@ -257,6 +257,9 @@ public class LoginController {
         dialog.setHeaderText("Réinitialisation du mot de passe");
         dialog.setContentText("Entrez votre email:");
         
+        // Appliquer le CSS
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(email -> {
             try {
@@ -305,6 +308,9 @@ public class LoginController {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Réinitialiser le mot de passe");
         dialog.setHeaderText("Entrez le code reçu par email et votre nouveau mot de passe");
+        
+        // Appliquer le CSS
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
         
         ButtonType resetButtonType = new ButtonType("Réinitialiser", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(resetButtonType, ButtonType.CANCEL);
