@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="450.0" prefWidth="350.0" spacing="10"
+      style="-fx-padding: 15; -fx-background-color: #f4f4f4;"
+      xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.ChatProjetController">
+
+    <children>
+        <Label style="-fx-font-weight: bold; -fx-font-size: 18; -fx-text-fill: #2c3e50;"
+               text="Messagerie Stratix" />
+
+        <ListView fx:id="lvMessages" VBox.vgrow="ALWAYS"
+                  style="-fx-background-radius: 5; -fx-border-color: #dcdde1;" />
+
+        <HBox spacing="8">
+            <children>
+                <TextField fx:id="tfMessage" onAction="#envoyerMessage"
+                           promptText="Écrivez votre message..."
+                           HBox.hgrow="ALWAYS"
+                           style="-fx-background-radius: 15;" />
+
+                <Button onAction="#envoyerMessage"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-background-radius: 15; -fx-font-weight: bold;"
+                        text="Envoyer" />
+            </children>
+        </HBox>
+    </children>
+</VBox>
