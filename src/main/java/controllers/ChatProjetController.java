@@ -13,6 +13,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -30,15 +32,15 @@ public class ChatProjetController {
     private String myName;
     private ScheduledExecutorService scheduler;
 
-    // On garde en mémoire les IDs des messages déjà affichés pour éviter les doublons
+    // Set pour mémoriser les IDs uniques (clés Firebase) déjà affichés
     private final Set<String> displayedMessageIds = new HashSet<>();
 
-    // TON URL FIREBASE
+    // TON URL API FIREBASE
     private final String FIREBASE_URL = "https://stratixchat-default-rtdb.firebaseio.com/";
 
     public void initChat(int idProjet, String nomProjet) {
         this.currentProjetId = idProjet;
-        this.projetTitle.setText("Chat : " + nomProjet);
+        this.projetTitle.setText("Discussion : " + nomProjet);
 
         Utilisateur user = UserRole.getInstance().getUser();
         this.myName = (user != null) ? user.getNom() + " " + user.getPrenom() : "Anonyme";
@@ -51,7 +53,7 @@ public class ChatProjetController {
             if (scrollPane != null) scrollPane.setVvalue(1.0);
         });
 
-        // Lancer la synchronisation temps réel (Polling toutes les 2 secondes)
+        // Démarrer la synchronisation temps réel
         startRealTimeSync();
     }
 
@@ -60,8 +62,10 @@ public class ChatProjetController {
         String text = msgInput.getText().trim();
         if (text.isEmpty()) return;
 
-        // On envoie à l'API Cloud
+        // On envoie seulement à l'API.
+        // Le message s'affichera dès que fetchMessages le récupérera (Source de vérité unique)
         envoyerVersFirebase(text);
+
         msgInput.clear();
     }
 
@@ -85,6 +89,7 @@ public class ChatProjetController {
 
     private void startRealTimeSync() {
         scheduler = Executors.newSingleThreadScheduledExecutor();
+        // Vérification toutes les 2 secondes
         scheduler.scheduleAtFixedRate(this::fetchMessages, 0, 2, TimeUnit.SECONDS);
     }
 
@@ -100,7 +105,7 @@ public class ChatProjetController {
                         JSONObject allMsgs = new JSONObject(body);
 
                         Platform.runLater(() -> {
-                            // On ne traite que les messages qu'on n'a pas encore affichés
+                            // On filtre pour ne prendre que les nouveaux messages par leur ID unique
                             allMsgs.keySet().stream()
                                     .filter(key -> !displayedMessageIds.contains(key))
                                     .sorted((k1, k2) -> Long.compare(
@@ -108,29 +113,39 @@ public class ChatProjetController {
                                             allMsgs.getJSONObject(k2).getLong("timestamp")))
                                     .forEach(key -> {
                                         JSONObject m = allMsgs.getJSONObject(key);
-                                        displayMessage(m.getString("sender"), m.getString("text"));
-                                        displayedMessageIds.add(key); // Marquer comme affiché
+
+                                        // On affiche TOUT (les nôtres et ceux des autres)
+                                        displayMessage(m.getString("sender"), m.getString("text"), m.getLong("timestamp"));
+
+                                        // On marque cet ID comme "affiché"
+                                        displayedMessageIds.add(key);
                                     });
                         });
                     }
                 });
     }
 
-    private void displayMessage(String sender, String content) {
+    private void displayMessage(String sender, String content, long timestamp) {
         VBox msgBox = new VBox(2);
-        Label nameLbl = new Label(sender);
+
+        // Formatage de l'heure à partir du timestamp Cloud
+        String heure = new SimpleDateFormat("HH:mm").format(new Date(timestamp));
+        Label nameLbl = new Label(sender + " • " + heure);
         nameLbl.setStyle("-fx-font-size: 10px; -fx-text-fill: #64748b; -fx-font-weight: bold;");
 
         Label contentLbl = new Label(content);
         contentLbl.setWrapText(true);
         contentLbl.setMaxWidth(280);
 
+        // Si c'est moi, à droite en bleu. Sinon, à gauche en gris.
         if (sender.equals(myName)) {
             msgBox.setAlignment(Pos.TOP_RIGHT);
-            contentLbl.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-padding: 8 12; -fx-background-radius: 15 15 0 15;");
+            contentLbl.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; " +
+                    "-fx-padding: 8 12; -fx-background-radius: 15 15 0 15;");
         } else {
             msgBox.setAlignment(Pos.TOP_LEFT);
-            contentLbl.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #1e293b; -fx-padding: 8 12; -fx-background-radius: 15 15 15 0;");
+            contentLbl.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #1e293b; " +
+                    "-fx-padding: 8 12; -fx-background-radius: 15 15 15 0;");
         }
 
         msgBox.getChildren().addAll(nameLbl, contentLbl);
@@ -138,6 +153,8 @@ public class ChatProjetController {
     }
 
     public void stopChat() {
-        if (scheduler != null) scheduler.shutdownNow();
+        if (scheduler != null) {
+            scheduler.shutdownNow();
+        }
     }
 }
