@@ -50,6 +50,7 @@ public class ListeProjetsController {
     public void initialize() {
         projetService = new ProjetService();
 
+        // Chargement du logo
         if (logoImageView != null) {
             try {
                 Image logo = new Image(getClass().getResourceAsStream("/stratix.png"));
@@ -59,12 +60,14 @@ public class ListeProjetsController {
             }
         }
 
+        // Configuration du filtre
         if (comboFiltre != null) {
             comboFiltre.setItems(FXCollections.observableArrayList("Tous les projets", "Planifié", "En cours", "Terminé", "Annulé"));
             comboFiltre.setValue("Tous les projets");
             comboFiltre.setOnAction(e -> filtrerEtAfficher());
         }
 
+        // Configuration de la recherche
         if (searchField != null) {
             searchField.textProperty().addListener((obs, oldVal, newVal) -> filtrerEtAfficher());
         }
@@ -96,13 +99,10 @@ public class ListeProjetsController {
         }
     }
 
-    /**
-     * Méthode pour récupérer le nom du chef depuis la DB via son ID
-     */
+    // Récupérer le nom du chef pour l'affichage (évite les IDs moches)
     private String recupererNomChef(int id) {
         String nomComplet = "Non assigné";
         if (id <= 0) return nomComplet;
-
         String sql = "SELECT nom, prenom FROM utilisateur WHERE id = ?";
         Connection conn = MyDataBase.getInstance().getCnx();
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -113,7 +113,7 @@ public class ListeProjetsController {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Erreur SQL nom chef : " + e.getMessage());
+            e.printStackTrace();
         }
         return nomComplet;
     }
@@ -131,61 +131,30 @@ public class ListeProjetsController {
 
         Label nom = new Label(p.getNom());
         nom.getStyleClass().add("project-title");
-        nom.setWrapText(true);
 
-        // QR CODE MIS À JOUR (Affiche le NOM au lieu de l'ID)
-        String qrContent = String.format(
-                "PROJET : %s\nSTATUT : %s\nCHEF : %s\nÉQUIPE : %s\nPROGRESSION : %d%%",
-                p.getNom(), p.getStatut(), nomChef,
-                (p.getEquipeMembres() != null ? p.getEquipeMembres() : "Aucun membre"),
-                p.getProgression()
-        );
+        // QR CODE
+        String qrContent = "PROJET: " + p.getNom() + "\nCHEF: " + nomChef + "\nPROG: " + p.getProgression() + "%";
+        String qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(qrContent, StandardCharsets.UTF_8);
+        ImageView qrView = new ImageView(new Image(qrUrl, true));
+        qrView.setFitWidth(80);
+        qrView.setPreserveRatio(true);
 
-        String encodedData = URLEncoder.encode(qrContent, StandardCharsets.UTF_8);
-        String qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodedData;
+        VBox progBox = new VBox(5, new Label("Progression: " + p.getProgression() + "%"), new ProgressBar(p.getProgression() / 100.0));
 
-        ImageView qrCodeView = new ImageView(new Image(qrUrl, true));
-        qrCodeView.setFitWidth(100);
-        qrCodeView.setPreserveRatio(true);
-
-        VBox qrContainer = new VBox(qrCodeView);
-        qrContainer.setAlignment(Pos.CENTER);
-        qrContainer.setStyle("-fx-background-color: white; -fx-padding: 8; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);");
-
-        Label desc = new Label(p.getDescription());
-        desc.getStyleClass().add("project-desc");
-        desc.setWrapText(true);
-        desc.setMaxHeight(60);
-
-        VBox progBox = new VBox(8);
-        Label lblProg = new Label("Progression: " + p.getProgression() + "%");
-        lblProg.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
-        ProgressBar pb = new ProgressBar(p.getProgression() / 100.0);
-        pb.setPrefWidth(Double.MAX_VALUE);
-        progBox.getChildren().addAll(lblProg, pb);
-
+        // Boutons d'action
         HBox actions = new HBox(10);
         actions.setAlignment(Pos.CENTER);
 
         Button btnMod = new Button("Modifier");
-        btnMod.getStyleClass().add("btn-secondary");
         btnMod.setOnAction(e -> ouvrirFenetreModification(p));
 
         Button btnPdf = new Button("PDF");
-        btnPdf.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-font-weight: bold;");
+        btnPdf.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white;");
         btnPdf.setOnAction(e -> exporterEnPDF(p, qrUrl));
 
-        Button btnArch = new Button("Archiver");
-        btnArch.getStyleClass().add("btn-primary");
-        btnArch.setStyle("-fx-background-color: #f59e0b;");
-        btnArch.setOnAction(e -> {
-            projetService.archiverUnProjet(p.getId());
-            rafraichirDonnees();
-        });
+        actions.getChildren().addAll(btnMod, btnPdf);
 
-        actions.getChildren().addAll(btnMod, btnPdf, btnArch);
-
-        card.getChildren().addAll(statutBadge, nom, qrContainer, desc, progBox, new Separator(), actions);
+        card.getChildren().addAll(statutBadge, nom, qrView, progBox, actions);
         return card;
     }
 
@@ -193,7 +162,6 @@ public class ListeProjetsController {
         return switch (statut != null ? statut : "") {
             case "Terminé" -> "badge-termine";
             case "En cours" -> "badge-en-cours";
-            case "Annulé" -> "badge-annule";
             default -> "badge-planifie";
         };
     }
@@ -201,48 +169,44 @@ public class ListeProjetsController {
     private void exporterEnPDF(Projet p, String qrCodeUrl) {
         Document document = new Document();
         try {
-            String fileName = "Rapport_" + p.getNom().replaceAll("\\s+", "_") + ".pdf";
+            String fileName = "Rapport_" + p.getNom().replace(" ", "_") + ".pdf";
             PdfWriter.getInstance(document, new FileOutputStream(fileName));
             document.open();
+            document.add(new Paragraph("STRATIX - RAPPORT DE PROJET"));
+            document.add(new Paragraph("Nom : " + p.getNom()));
+            document.add(new Paragraph("Chef : " + recupererNomChef(p.getResponsableId())));
+            document.add(new Paragraph("Statut : " + p.getStatut()));
+            document.add(new Paragraph("Description : " + p.getDescription()));
 
-            // Récupération du NOM du chef pour le PDF
-            String nomChef = recupererNomChef(p.getResponsableId());
-
-            Paragraph header = new Paragraph("STRATIX - FICHE TECHNIQUE DU PROJET");
-            header.setAlignment(Element.ALIGN_CENTER);
-            document.add(header);
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("============================================"));
-
-            document.add(new Paragraph("NOM DU PROJET : " + p.getNom()));
-            document.add(new Paragraph("STATUT : " + p.getStatut()));
-            document.add(new Paragraph("PROGRESSION : " + p.getProgression() + "%"));
-            document.add(new Paragraph("CHEF DE PROJET : " + nomChef)); // AFFICHAGE DU NOM
-            document.add(new Paragraph("ÉQUIPE : " + (p.getEquipeMembres() != null ? p.getEquipeMembres() : "Non définie")));
-            document.add(new Paragraph("DESCRIPTION : " + p.getDescription()));
-            document.add(new Paragraph(" "));
-
-            try {
-                com.lowagie.text.Image qrImage = com.lowagie.text.Image.getInstance(new java.net.URL(qrCodeUrl));
-                qrImage.scaleAbsolute(120, 120);
-                qrImage.setAlignment(Element.ALIGN_CENTER);
-                document.add(qrImage);
-            } catch (Exception ex) {
-                document.add(new Paragraph("[QR Code indisponible]"));
-            }
+            com.lowagie.text.Image img = com.lowagie.text.Image.getInstance(new java.net.URL(qrCodeUrl));
+            img.scaleAbsolute(100, 100);
+            document.add(img);
 
             document.close();
-            File file = new File(fileName);
-            if (file.exists()) Desktop.getDesktop().open(file);
-
+            Desktop.getDesktop().open(new File(fileName));
         } catch (Exception e) {
-            afficherErreur("Erreur PDF", "Impossible de générer le fichier.");
+            e.printStackTrace();
         }
     }
 
-    // --- NAVIGATION ---
+    // --- NOUVELLE MÉTHODE : OUVRIR LE CHAT ---
+    @FXML
+    private void ouvrirChat() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ChatProjet.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Chat d'équipe Stratix");
+            stage.initModality(Modality.NONE); // Permet de garder la liste ouverte à côté
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            afficherErreur("Erreur Chat", "Impossible d'ouvrir la fenêtre de discussion.");
+            e.printStackTrace();
+        }
+    }
+
     @FXML private void allerAjouterProjet() { chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet"); }
-    @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Archives"); }
 
     private void ouvrirFenetreModification(Projet p) {
         try {
@@ -251,51 +215,28 @@ public class ListeProjetsController {
             ModifierProjetController controller = loader.getController();
             controller.chargerDonnees(p.getId());
             Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
             stage.showAndWait();
             rafraichirDonnees();
         } catch (IOException e) {
-            afficherErreur("Erreur", "Impossible de modifier.");
+            e.printStackTrace();
         }
     }
 
     private void chargerFenetre(String fxmlPath, String titre) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent root = loader.load();
+            Parent root = FXMLLoader.load(getClass().getResource(fxmlPath));
             Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle(titre);
             stage.setScene(new Scene(root));
             stage.showAndWait();
             rafraichirDonnees();
         } catch (IOException e) {
-            afficherErreur("Erreur", "Fichier FXML non trouvé.");
-        }
-    }
-
-    private void afficherErreur(String titre, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(titre);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    @FXML private void allerAuFront() { changerEspace("/EmployeListeProjets.fxml", "Espace Employé"); }
-
-    private void changerEspace(String fxmlPath, String titre) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent root = loader.load();
-            Stage stage = (Stage) containerProjets.getScene().getWindow();
-            Scene scene = new Scene(root, stage.getWidth(), stage.getHeight());
-            String css = getClass().getResource("/styles.css").toExternalForm();
-            scene.getStylesheets().add(css);
-            stage.setScene(scene);
-        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-
+    private void afficherErreur(String titre, String msg) {
+        new Alert(Alert.AlertType.ERROR, msg).showAndWait();
+    }
 }
