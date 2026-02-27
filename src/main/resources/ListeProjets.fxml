@@ -44,9 +44,6 @@
         <Button text="➕ Nouveau" onAction="#allerAjouterProjet" styleClass="btn-primary"/>
         <Button text="📁 Archives" onAction="#voirArchives" styleClass="btn-secondary"/>
 
-        <Button text="💬 Chat" onAction="#ouvrirChat"
-                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;"
-                styleClass="btn-secondary"/>
     </HBox>
 
     <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="modern-scroll" style="-fx-background-color: transparent; -fx-background: transparent;">

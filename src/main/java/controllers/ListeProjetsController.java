@@ -97,93 +97,94 @@ public class ListeProjetsController {
         VBox card = new VBox(15);
         card.setPrefWidth(320);
         card.setPadding(new Insets(20));
-        card.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: #e2e8f0; -fx-border-radius: 15;");
+        card.setStyle("-fx-background-color: white; -fx-background-radius: 15; " +
+                "-fx-border-color: #e2e8f0; -fx-border-radius: 15; " +
+                "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);");
 
-        String nomChef = recupererNomChef(p.getResponsableId());
+        // 1. Badge de Statut
+        Label statutBadge = new Label(p.getStatut().toUpperCase());
+        statutBadge.setStyle("-fx-background-color: " + getStatusHexColor(p.getStatut()) +
+                "; -fx-text-fill: white; -fx-padding: 5 12; -fx-background-radius: 20; " +
+                "-fx-font-size: 11px; -fx-font-weight: bold;");
 
-        Label statutBadge = new Label(p.getStatut());
-        statutBadge.setStyle("-fx-background-color: " + getStatusHexColor(p.getStatut()) + "; -fx-text-fill: white; -fx-padding: 5 10; -fx-background-radius: 10;");
-
+        // 2. NOM DU PROJET (Gros, Gras et Clair)
         Label nom = new Label(p.getNom());
-        nom.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
+        nom.setStyle("-fx-font-weight: 900; -fx-font-size: 20px; -fx-text-fill: #1a202c;");
         nom.setWrapText(true);
+        nom.setMinHeight(60);
+        nom.setAlignment(Pos.CENTER_LEFT);
 
-        VBox progBox = new VBox(5, new Label("Progression: " + p.getProgression() + "%"), new ProgressBar(p.getProgression() / 100.0));
+        // 3. Progression
+        VBox progBox = new VBox(8);
+        Label lblProg = new Label("Progression: " + p.getProgression() + "%");
+        lblProg.setStyle("-fx-text-fill: #4a5568; -fx-font-size: 13px; -fx-font-weight: bold;");
 
-        // --- SECTION ACTIONS ---
+        ProgressBar pb = new ProgressBar(p.getProgression() / 100.0);
+        pb.setPrefWidth(Double.MAX_VALUE);
+        pb.setPrefHeight(12);
+        pb.setStyle("-fx-accent: #3182ce;");
+        progBox.getChildren().addAll(lblProg, pb);
+
+        // 4. Actions (Modifier, PDF, Chat spécifique)
         HBox actions = new HBox(8);
         actions.setAlignment(Pos.CENTER);
 
         Button btnMod = new Button("Modifier");
+        btnMod.setStyle("-fx-cursor: hand;");
         btnMod.setOnAction(e -> ouvrirFenetreModification(p));
 
         Button btnPdf = new Button("PDF");
-        btnPdf.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white;");
+        btnPdf.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-cursor: hand;");
         btnPdf.setOnAction(e -> {
             String qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(p.getNom(), StandardCharsets.UTF_8);
             exporterEnPDF(p, qrUrl);
         });
 
-        // NOUVEAU : Bouton Chat spécifique au projet
         Button btnChat = new Button("Chat");
-        btnChat.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold;");
+        btnChat.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
         btnChat.setOnAction(e -> ouvrirChatSpecifique(p));
 
         actions.getChildren().addAll(btnMod, btnPdf, btnChat);
 
-        // Bouton Archiver en dessous (plus large)
+        // 5. Bouton Archiver
         Button btnArch = new Button("Archiver le projet");
         btnArch.setMaxWidth(Double.MAX_VALUE);
-        btnArch.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white;");
+        btnArch.setPrefHeight(40);
+        btnArch.setStyle("-fx-background-color: #ed8936; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;");
         btnArch.setOnAction(e -> handleArchiver(p));
 
-        card.getChildren().addAll(statutBadge, nom, progBox, actions, btnArch);
+        card.getChildren().addAll(statutBadge, nom, new Separator(), progBox, actions, btnArch);
         return card;
     }
 
-    /**
-     * Ouvre le chat pour un projet précis (ADMIN)
-     */
     private void ouvrirChatSpecifique(Projet p) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ChatProjet.fxml"));
             Parent root = loader.load();
-
             ChatProjetController chatCtrl = loader.getController();
-            // L'ID du projet lie l'admin et l'employé sur la même discussion
             chatCtrl.initChat(p.getId(), p.getNom());
-
             Stage stage = new Stage();
-            stage.setTitle("Discussion Admin : " + p.getNom());
+            stage.setTitle("Discussion : " + p.getNom());
             stage.setScene(new Scene(root));
-
-            // On stoppe le rafraîchissement auto quand l'admin ferme la fenêtre
             stage.setOnCloseRequest(e -> chatCtrl.stopChat());
             stage.show();
         } catch (IOException e) {
-            afficherErreur("Erreur Chat", "Impossible de charger la discussion pour " + p.getNom());
+            afficherErreur("Erreur Chat", "Impossible d'ouvrir le chat.");
         }
     }
 
-    /**
-     * Méthode liée au bouton "Espace Chat" de la Sidebar
-     */
+    // Le bouton Chat global a été supprimé du FXML, cette méthode peut être retirée ou laissée vide
     @FXML
     private void ouvrirChat() {
-        if (listeCompleteProjets != null && !listeCompleteProjets.isEmpty()) {
-            // Ouvre par défaut le chat du premier projet de la liste
-            ouvrirChatSpecifique(listeCompleteProjets.get(0));
-        } else {
-            afficherErreur("Chat", "Aucun projet actif pour ouvrir une discussion.");
-        }
+        // Supprimé pour éviter toute confusion
     }
 
     private String getStatusHexColor(String statut) {
         return switch (statut != null ? statut : "") {
-            case "Terminé" -> "#6366f1";
-            case "En cours" -> "#10b981";
-            case "Annulé" -> "#ef4444";
-            default -> "#3b82f6";
+            case "Terminé" -> "#48bb78";
+            case "En cours" -> "#38b2ac";
+            case "Annulé" -> "#f56565";
+            default -> "#4299e1";
         };
     }
 
@@ -219,7 +220,6 @@ public class ListeProjetsController {
             document.add(new Paragraph("STRATIX - RAPPORT PROJET"));
             document.add(new Paragraph("Projet : " + p.getNom()));
             document.add(new Paragraph("Responsable : " + recupererNomChef(p.getResponsableId())));
-            document.add(new Paragraph("Description : " + p.getDescription()));
             document.close();
             Desktop.getDesktop().open(new File(fileName));
         } catch (Exception e) { e.printStackTrace(); }

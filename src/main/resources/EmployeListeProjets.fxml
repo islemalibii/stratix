@@ -19,10 +19,6 @@
             <Label fx:id="lblBienvenue" style="-fx-text-fill: #64748b; -fx-font-size: 24px; -fx-font-weight: bold;" text="Bonjour," />
             <Label text="Espace Collaborateur - Mes Projets" style="-fx-font-size: 14px; -fx-text-fill: #94a3b8;" />
         </VBox>
-        <HBox spacing="10">
-            <Button text="💬 Chat d'équipe" onAction="#ouvrirChat"
-                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 20;"/>
-        </HBox>
     </HBox>
 
     <HBox alignment="CENTER_LEFT" spacing="15">
