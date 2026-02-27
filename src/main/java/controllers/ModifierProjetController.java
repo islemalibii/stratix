@@ -3,6 +3,7 @@ package controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import models.Projet;
 import services.ProjetService;
 import utils.MyDataBase;
@@ -18,44 +19,64 @@ public class ModifierProjetController {
     @FXML private DatePicker dateDebut, dateFin;
     @FXML private ChoiceBox<String> comboStatut;
 
-    // Nouveaux composants pour le chef et l'équipe
-    @FXML private ComboBox<String> cbResponsable;
-    @FXML private ListView<String> lvMembres;
+    // Utilisation du Wrapper pour cacher l'ID
+    @FXML private ComboBox<UserWrapper> cbResponsable;
+    @FXML private ListView<UserWrapper> lvMembres;
 
     private ProjetService service = new ProjetService();
     private Projet projetEnModification;
 
+    // Classe interne pour l'affichage propre
+    private static class UserWrapper {
+        int id;
+        String nomComplet;
+        UserWrapper(int id, String nomComplet) {
+            this.id = id;
+            this.nomComplet = nomComplet;
+        }
+        @Override
+        public String toString() { return nomComplet; }
+
+        // Utile pour la comparaison lors de la pré-sélection
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof UserWrapper) {
+                return ((UserWrapper) obj).id == this.id;
+            }
+            return false;
+        }
+    }
+
     @FXML
     public void initialize() {
-        // Initialiser les choix de statut
         comboStatut.getItems().addAll("Planifié", "En cours", "Terminé", "Annulé");
-
-        // Activer la sélection multiple pour l'équipe
         lvMembres.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        // Charger tous les utilisateurs de la base dans les listes
+        // Configurer l'affichage de la ComboBox
+        cbResponsable.setConverter(new StringConverter<UserWrapper>() {
+            @Override
+            public String toString(UserWrapper user) { return (user == null) ? "" : user.nomComplet; }
+            @Override
+            public UserWrapper fromString(String string) { return null; }
+        });
+
         chargerUtilisateurs();
     }
 
     private void chargerUtilisateurs() {
         String sql = "SELECT id, nom, prenom FROM utilisateur";
-
         Connection conn = MyDataBase.getInstance().getCnx();
-
         try (Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
-
             while (rs.next()) {
-                String label = rs.getInt("id") + " - "
-                        + rs.getString("nom") + " "
-                        + rs.getString("prenom");
-
-                cbResponsable.getItems().add(label);
-                lvMembres.getItems().add(label);
+                UserWrapper user = new UserWrapper(
+                        rs.getInt("id"),
+                        rs.getString("nom") + " " + rs.getString("prenom")
+                );
+                cbResponsable.getItems().add(user);
+                lvMembres.getItems().add(user);
             }
-
         } catch (SQLException e) {
-            System.err.println("Erreur lors du chargement des utilisateurs : " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -70,29 +91,24 @@ public class ModifierProjetController {
             txtProgression.setText(String.valueOf(projetEnModification.getProgression()));
             comboStatut.setValue(projetEnModification.getStatut());
 
-            // Dates
-            if (projetEnModification.getDateDebut() != null) {
+            if (projetEnModification.getDateDebut() != null)
                 dateDebut.setValue(((java.sql.Date) projetEnModification.getDateDebut()).toLocalDate());
-            }
-            if (projetEnModification.getDateFin() != null) {
+            if (projetEnModification.getDateFin() != null)
                 dateFin.setValue(((java.sql.Date) projetEnModification.getDateFin()).toLocalDate());
-            }
 
-            // 1. Sélectionner le responsable actuel dans la ComboBox
-            for (String item : cbResponsable.getItems()) {
-                if (item.startsWith(projetEnModification.getResponsableId() + " - ")) {
-                    cbResponsable.setValue(item);
+            // 1. Pré-sélection du Chef (par ID)
+            for (UserWrapper user : cbResponsable.getItems()) {
+                if (user.id == projetEnModification.getResponsableId()) {
+                    cbResponsable.setValue(user);
                     break;
                 }
             }
 
-            // 2. Sélectionner les membres actuels dans la ListView
-            if (projetEnModification.getEquipeMembres() != null && !projetEnModification.getEquipeMembres().isEmpty()) {
-                List<String> membresEnregistres = Arrays.asList(projetEnModification.getEquipeMembres().split(", "));
-
+            // 2. Pré-sélection des membres (par Nom car stockés en String dans ton équipe)
+            if (projetEnModification.getEquipeMembres() != null) {
+                List<String> membresNoms = Arrays.asList(projetEnModification.getEquipeMembres().split(", "));
                 for (int i = 0; i < lvMembres.getItems().size(); i++) {
-                    String currentItem = lvMembres.getItems().get(i);
-                    if (membresEnregistres.contains(currentItem)) {
+                    if (membresNoms.contains(lvMembres.getItems().get(i).nomComplet)) {
                         lvMembres.getSelectionModel().select(i);
                     }
                 }
@@ -105,7 +121,6 @@ public class ModifierProjetController {
         if (!validerChamps()) return;
 
         try {
-            // Mise à jour de l'objet projet avec les champs texte
             projetEnModification.setNom(txtNom.getText());
             projetEnModification.setDescription(txtDescription.getText());
             projetEnModification.setBudget(Double.parseDouble(txtBudget.getText()));
@@ -114,52 +129,37 @@ public class ModifierProjetController {
             projetEnModification.setDateDebut(java.sql.Date.valueOf(dateDebut.getValue()));
             projetEnModification.setDateFin(java.sql.Date.valueOf(dateFin.getValue()));
 
-            // Extraction du nouvel ID Chef
-            String selectedChef = cbResponsable.getValue();
-            int idChef = Integer.parseInt(selectedChef.split(" - ")[0]);
-            projetEnModification.setResponsableId(idChef);
+            // ID du Chef récupéré proprement
+            projetEnModification.setResponsableId(cbResponsable.getValue().id);
 
-            // Extraction de la nouvelle liste des membres
+            // Noms des membres (sans IDs)
             String nouveauxMembres = lvMembres.getSelectionModel().getSelectedItems()
                     .stream()
+                    .map(u -> u.nomComplet)
                     .collect(Collectors.joining(", "));
             projetEnModification.setEquipeMembres(nouveauxMembres);
 
-            // Sauvegarde
             service.mettreAJourProjet(projetEnModification);
-
-            afficherAlerte(Alert.AlertType.INFORMATION, "Succès", "Projet mis à jour avec succès !");
+            afficherAlerte(Alert.AlertType.INFORMATION, "Succès", "Projet mis à jour !");
             fermerFenetre();
 
         } catch (Exception e) {
-            afficherAlerte(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la mise à jour : " + e.getMessage());
+            afficherAlerte(Alert.AlertType.ERROR, "Erreur", e.getMessage());
         }
     }
 
     @FXML private void handleAnnuler() { fermerFenetre(); }
 
-    private void fermerFenetre() {
-        Stage stage = (Stage) txtNom.getScene().getWindow();
-        stage.close();
-    }
+    private void fermerFenetre() { ((Stage) txtNom.getScene().getWindow()).close(); }
 
     private boolean validerChamps() {
-        if (txtNom.getText().isEmpty() || dateDebut.getValue() == null || dateFin.getValue() == null || cbResponsable.getValue() == null) {
-            afficherAlerte(Alert.AlertType.WARNING, "Champs requis", "Veuillez remplir tous les champs (Nom, Dates et Responsable).");
-            return false;
-        }
-
-        if (dateFin.getValue().isBefore(dateDebut.getValue())) {
-            afficherAlerte(Alert.AlertType.WARNING, "Dates invalides", "La date de fin doit être après la date de début.");
-            return false;
-        }
+        if (txtNom.getText().isEmpty() || cbResponsable.getValue() == null) return false;
         return true;
     }
 
     private void afficherAlerte(Alert.AlertType type, String titre, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(titre);
-        alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
     }

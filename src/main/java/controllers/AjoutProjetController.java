@@ -23,7 +23,6 @@ public class AjoutProjetController {
 
     private ProjetService projetService = new ProjetService();
 
-    // Classe interne pour l'affichage propre (pas d'ID visible)
     private static class UserWrapper {
         int id;
         String nomComplet;
@@ -83,7 +82,6 @@ public class AjoutProjetController {
                 return;
             }
 
-            // Récupération des données nettoyées
             int idChef = cbResponsable.getValue().id;
             String nomsMembres = lvMembres.getSelectionModel().getSelectedItems()
                     .stream().map(u -> u.nomComplet).collect(Collectors.joining(", "));
