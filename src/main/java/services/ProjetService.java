@@ -1,11 +1,8 @@
 package services;
 
-import interfaces.Services;
-import models.Projet;
-import utils.MyDataBase;
 import interfaces.ProjServices;
 import models.Projet;
-import utils.MyDataBase; // Mise à jour de l'import
+import utils.MyDataBase;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,12 +46,20 @@ public class ProjetService implements ProjServices {
 
     private List<Projet> recupererParEtat(int etat) {
         List<Projet> projets = new ArrayList<>();
-        String sql = "SELECT * FROM projet WHERE is_archived = ?";
+        // JOINTURE SQL : On récupère le nom du chef depuis la table 'utilisateur'
+        String sql = "SELECT p.*, u.nom AS nom_chef " +
+                "FROM projet p " +
+                "LEFT JOIN utilisateur u ON p.responsable_id = u.id " +
+                "WHERE p.is_archived = ?";
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, etat);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                projets.add(new Projet(
+                // On nettoie la chaîne des membres avant de créer l'objet
+                String membresNettoyes = nettoyerNomsEquipe(rs.getString("equipe_membres"));
+
+                Projet p = new Projet(
                         rs.getInt("id"),
                         rs.getString("nom"),
                         rs.getString("description"),
@@ -65,13 +70,56 @@ public class ProjetService implements ProjServices {
                         rs.getInt("progression"),
                         rs.getBoolean("is_archived"),
                         rs.getInt("responsable_id"),
-                        rs.getString("equipe_membres")
-                ));
+                        membresNettoyes
+                );
+                // On injecte le nom du chef
+                p.setNomResponsable(rs.getString("nom_chef"));
+                projets.add(p);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return projets;
+    }
+
+    @Override
+    public Projet chercherProjetParId(int idProjet) {
+        String sql = "SELECT p.*, u.nom AS nom_chef FROM projet p " +
+                "LEFT JOIN utilisateur u ON p.responsable_id = u.id WHERE p.id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, idProjet);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Projet p = new Projet(
+                            rs.getInt("id"),
+                            rs.getString("nom"),
+                            rs.getString("description"),
+                            rs.getDate("date_debut"),
+                            rs.getDate("date_fin"),
+                            rs.getDouble("budget"),
+                            rs.getString("statut"),
+                            rs.getInt("progression"),
+                            rs.getBoolean("is_archived"),
+                            rs.getInt("responsable_id"),
+                            nettoyerNomsEquipe(rs.getString("equipe_membres"))
+                    );
+                    p.setNomResponsable(rs.getString("nom_chef"));
+                    return p;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Supprime les IDs et tirets (ex: "17 - Nom" devient "Nom")
+     */
+    private String nettoyerNomsEquipe(String bruts) {
+        if (bruts == null || bruts.isEmpty()) return "Aucun membre";
+        // Expression régulière : remplace [un ou plusieurs chiffres][espace][tiret][espace] par rien
+        return bruts.replaceAll("\\d+\\s*-\\s*", "");
     }
 
     @Override
@@ -85,6 +133,7 @@ public class ProjetService implements ProjServices {
         }
     }
 
+    @Override
     public void desarchiverUnProjet(int id) {
         String sql = "UPDATE projet SET is_archived = 0 WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -97,7 +146,6 @@ public class ProjetService implements ProjServices {
 
     @Override
     public void mettreAJourProjet(Projet p) {
-        // Mise à jour incluant le chef et l'équipe
         String sql = "UPDATE projet SET nom=?, description=?, date_debut=?, date_fin=?, budget=?, statut=?, responsable_id=?, equipe_membres=?, progression=? WHERE id=?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, p.getNom());
@@ -127,37 +175,8 @@ public class ProjetService implements ProjServices {
         }
     }
 
-    public Projet chercherProjetParId(int idProjet) {
-        String sql = "SELECT * FROM projet WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, idProjet);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new Projet(
-                            rs.getInt("id"),
-                            rs.getString("nom"),
-                            rs.getString("description"),
-                            rs.getDate("date_debut"),
-                            rs.getDate("date_fin"),
-                            rs.getDouble("budget"),
-                            rs.getString("statut"),
-                            rs.getInt("progression"),
-                            rs.getBoolean("is_archived"),
-                            rs.getInt("responsable_id"),
-                            rs.getString("equipe_membres")
-                    );
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Erreur lors de la recherche du projet (ID: " + idProjet + ") : " + e.getMessage());
-        }
-        return null;
-    }
-
     public List<Projet> rechercherProjets(String query, String statut) {
-        List<Projet> tous = listerTousLesProjets();
-        return tous.stream()
+        return listerTousLesProjets().stream()
                 .filter(p -> (statut.equals("Tous les projets") || p.getStatut().equals(statut)))
                 .filter(p -> p.getNom().toLowerCase().contains(query.toLowerCase()))
                 .collect(Collectors.toList());

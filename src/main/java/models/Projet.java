@@ -15,8 +15,6 @@ public class Projet {
 
     private int responsableId;
     private String equipeMembres;
-
-    // Nouveau champ pour stocker le nom récupéré de la DB
     private String nomResponsable;
 
     public Projet() {}
@@ -37,36 +35,51 @@ public class Projet {
         this.equipeMembres = equipeMembres;
     }
 
-    // --- ALIAS POUR CORRIGER LES ERREURS DU CONTROLLER ---
     public String getChefProjet() {
-        return (nomResponsable != null) ? nomResponsable : "ID: " + responsableId;
+        return (nomResponsable != null && !nomResponsable.isEmpty())
+                ? nomResponsable
+                : "ID: " + responsableId;
     }
 
-    public String getEquipe() { return equipeMembres; }
+    public String getEquipe() {
+        return (equipeMembres != null && !equipeMembres.isEmpty())
+                ? equipeMembres
+                : "Aucun membre";
+    }
 
-    // --- Getters et Setters ---
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+
     public String getNom() { return nom; }
     public void setNom(String nom) { this.nom = nom; }
+
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
     public Date getDateDebut() { return dateDebut; }
     public void setDateDebut(Date dateDebut) { this.dateDebut = dateDebut; }
+
     public Date getDateFin() { return dateFin; }
     public void setDateFin(Date dateFin) { this.dateFin = dateFin; }
+
     public double getBudget() { return budget; }
     public void setBudget(double budget) { this.budget = budget; }
+
     public String getStatut() { return statut; }
     public void setStatut(String statut) { this.statut = statut; }
+
     public int getProgression() { return progression; }
     public void setProgression(int progression) { this.progression = progression; }
+
     public boolean isArchived() { return isArchived; }
     public void setArchived(boolean archived) { isArchived = archived; }
+
     public int getResponsableId() { return responsableId; }
     public void setResponsableId(int responsableId) { this.responsableId = responsableId; }
+
     public String getEquipeMembres() { return equipeMembres; }
     public void setEquipeMembres(String equipeMembres) { this.equipeMembres = equipeMembres; }
+
     public String getNomResponsable() { return nomResponsable; }
     public void setNomResponsable(String nomResponsable) { this.nomResponsable = nomResponsable; }
 
