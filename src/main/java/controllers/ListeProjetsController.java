@@ -15,6 +15,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.Projet;
 import services.ProjetService;
+import utils.MyDataBase;
 
 // Bibliothèques PDF (OpenPDF / iText)
 import com.lowagie.text.Document;
@@ -28,6 +29,10 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 public class ListeProjetsController {
@@ -91,26 +96,47 @@ public class ListeProjetsController {
         }
     }
 
+    /**
+     * Méthode pour récupérer le nom du chef depuis la DB via son ID
+     */
+    private String recupererNomChef(int id) {
+        String nomComplet = "Non assigné";
+        if (id <= 0) return nomComplet;
+
+        String sql = "SELECT nom, prenom FROM utilisateur WHERE id = ?";
+        Connection conn = MyDataBase.getInstance().getCnx();
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    nomComplet = rs.getString("nom") + " " + rs.getString("prenom");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur SQL nom chef : " + e.getMessage());
+        }
+        return nomComplet;
+    }
+
     private VBox creerCardProjet(Projet p) {
         VBox card = new VBox(15);
         card.setPrefWidth(320);
         card.setPadding(new Insets(20));
         card.getStyleClass().add("project-card");
 
-        // 1. Badge Statut
+        String nomChef = recupererNomChef(p.getResponsableId());
+
         Label statutBadge = new Label(p.getStatut());
         statutBadge.getStyleClass().addAll("statut-badge", getStatutClass(p.getStatut()));
 
-        // 2. Titre
         Label nom = new Label(p.getNom());
         nom.getStyleClass().add("project-title");
         nom.setWrapText(true);
 
-        // 3. QR CODE
+        // QR CODE MIS À JOUR (Affiche le NOM au lieu de l'ID)
         String qrContent = String.format(
-                "PROJET : %s\nDESCRIPTION : %s\nCHEF : %s\nÉQUIPE : %s\nPROGRESSION : %d%%",
-                p.getNom(), p.getDescription(),
-                (p.getResponsableId() > 0 ? "Responsable Assigné" : "Non défini"),
+                "PROJET : %s\nSTATUT : %s\nCHEF : %s\nÉQUIPE : %s\nPROGRESSION : %d%%",
+                p.getNom(), p.getStatut(), nomChef,
                 (p.getEquipeMembres() != null ? p.getEquipeMembres() : "Aucun membre"),
                 p.getProgression()
         );
@@ -126,13 +152,11 @@ public class ListeProjetsController {
         qrContainer.setAlignment(Pos.CENTER);
         qrContainer.setStyle("-fx-background-color: white; -fx-padding: 8; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);");
 
-        // 4. Description
         Label desc = new Label(p.getDescription());
         desc.getStyleClass().add("project-desc");
         desc.setWrapText(true);
         desc.setMaxHeight(60);
 
-        // 5. Progression
         VBox progBox = new VBox(8);
         Label lblProg = new Label("Progression: " + p.getProgression() + "%");
         lblProg.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
@@ -140,7 +164,6 @@ public class ListeProjetsController {
         pb.setPrefWidth(Double.MAX_VALUE);
         progBox.getChildren().addAll(lblProg, pb);
 
-        // 6. Actions (AJOUT DU BOUTON PDF ICI)
         HBox actions = new HBox(10);
         actions.setAlignment(Pos.CENTER);
 
@@ -150,7 +173,7 @@ public class ListeProjetsController {
 
         Button btnPdf = new Button("PDF");
         btnPdf.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-font-weight: bold;");
-        btnPdf.setOnAction(e -> exporterEnPDF(p, qrUrl)); // On passe l'URL du QR Code
+        btnPdf.setOnAction(e -> exporterEnPDF(p, qrUrl));
 
         Button btnArch = new Button("Archiver");
         btnArch.getStyleClass().add("btn-primary");
@@ -175,59 +198,49 @@ public class ListeProjetsController {
         };
     }
 
-    // --- LOGIQUE D'EXPORT PDF ---
     private void exporterEnPDF(Projet p, String qrCodeUrl) {
         Document document = new Document();
         try {
             String fileName = "Rapport_" + p.getNom().replaceAll("\\s+", "_") + ".pdf";
             PdfWriter.getInstance(document, new FileOutputStream(fileName));
-
             document.open();
 
-            // En-tête
+            // Récupération du NOM du chef pour le PDF
+            String nomChef = recupererNomChef(p.getResponsableId());
+
             Paragraph header = new Paragraph("STRATIX - FICHE TECHNIQUE DU PROJET");
             header.setAlignment(Element.ALIGN_CENTER);
             document.add(header);
-            document.add(new Paragraph(" ")); // Espace
+            document.add(new Paragraph(" "));
             document.add(new Paragraph("============================================"));
 
-            // Détails
             document.add(new Paragraph("NOM DU PROJET : " + p.getNom()));
             document.add(new Paragraph("STATUT : " + p.getStatut()));
             document.add(new Paragraph("PROGRESSION : " + p.getProgression() + "%"));
-            document.add(new Paragraph("CHEF DE PROJET (ID) : " + p.getResponsableId()));
+            document.add(new Paragraph("CHEF DE PROJET : " + nomChef)); // AFFICHAGE DU NOM
             document.add(new Paragraph("ÉQUIPE : " + (p.getEquipeMembres() != null ? p.getEquipeMembres() : "Non définie")));
             document.add(new Paragraph("DESCRIPTION : " + p.getDescription()));
             document.add(new Paragraph(" "));
 
-            // Insertion du QR Code dans le PDF
             try {
                 com.lowagie.text.Image qrImage = com.lowagie.text.Image.getInstance(new java.net.URL(qrCodeUrl));
                 qrImage.scaleAbsolute(120, 120);
                 qrImage.setAlignment(Element.ALIGN_CENTER);
                 document.add(qrImage);
-                Paragraph qrLabel = new Paragraph("(Scannez pour suivre l'évolution en direct)");
-                qrLabel.setAlignment(Element.ALIGN_CENTER);
-                document.add(qrLabel);
             } catch (Exception ex) {
-                document.add(new Paragraph("[Image QR Code indisponible sans connexion internet]"));
+                document.add(new Paragraph("[QR Code indisponible]"));
             }
 
             document.close();
-
-            // Ouverture automatique du PDF
             File file = new File(fileName);
-            if (file.exists()) {
-                Desktop.getDesktop().open(file);
-            }
+            if (file.exists()) Desktop.getDesktop().open(file);
 
         } catch (Exception e) {
             afficherErreur("Erreur PDF", "Impossible de générer le fichier.");
-            e.printStackTrace();
         }
     }
 
-    // --- NAVIGATION ET FENÊTRES ---
+    // --- NAVIGATION ---
     @FXML private void allerAjouterProjet() { chargerFenetre("/AjouterProjet.fxml", "Nouveau Projet"); }
     @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Archives"); }
 
