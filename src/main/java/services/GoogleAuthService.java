@@ -18,10 +18,9 @@ import java.util.Collections;
 public class GoogleAuthService {
     private static GoogleAuthService instance;
     
-    // Configuration OAuth Google
-    // ⚠️ DÉVELOPPEMENT UNIQUEMENT - Ne jamais commiter ces valeurs dans Git!
-    private static final String CLIENT_ID = "333706582213-1ubk3268msr4cc8agvtsovn64eb7sjji.apps.googleusercontent.com";
-    private static final String CLIENT_SECRET = "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";
+    // Configuration OAuth Google - Chargée depuis google-oauth.properties
+    private final String clientId;
+    private final String clientSecret;
     
     private final NetHttpTransport httpTransport;
     private final GsonFactory jsonFactory;
@@ -29,6 +28,33 @@ public class GoogleAuthService {
     private GoogleAuthService() {
         this.httpTransport = new NetHttpTransport();
         this.jsonFactory = GsonFactory.getDefaultInstance();
+        
+        // Charger la configuration depuis le fichier properties
+        java.util.Properties props = new java.util.Properties();
+        try (java.io.InputStream input = getClass().getResourceAsStream("/google-oauth.properties")) {
+            if (input == null) {
+                throw new RuntimeException(
+                    "Fichier google-oauth.properties introuvable!\n\n" +
+                    "Copiez google-oauth.properties.example vers google-oauth.properties\n" +
+                    "et remplissez avec vos identifiants Google OAuth."
+                );
+            }
+            props.load(input);
+            this.clientId = props.getProperty("google.client.id");
+            this.clientSecret = props.getProperty("google.client.secret");
+            
+            if (clientId == null || clientSecret == null || 
+                clientId.equals("votre_client_id_ici") || 
+                clientSecret.equals("votre_client_secret_ici")) {
+                throw new RuntimeException(
+                    "Configuration Google OAuth invalide!\n\n" +
+                    "Éditez src/main/resources/google-oauth.properties\n" +
+                    "et remplissez avec vos vrais identifiants."
+                );
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur lors du chargement de la configuration OAuth", e);
+        }
     }
     
     public static GoogleAuthService getInstance() {
@@ -46,8 +72,8 @@ public class GoogleAuthService {
             // Configuration du flux OAuth
             GoogleClientSecrets clientSecrets = new GoogleClientSecrets()
                 .setInstalled(new GoogleClientSecrets.Details()
-                    .setClientId(CLIENT_ID)
-                    .setClientSecret(CLIENT_SECRET)
+                    .setClientId(clientId)
+                    .setClientSecret(clientSecret)
                     .setRedirectUris(Collections.singletonList("http://localhost")));
             
             GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(

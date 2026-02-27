@@ -3,10 +3,7 @@ package controllers;
 import models.Role;
 import models.UserRole;
 import services.AuthenticationService;
-<<<<<<< HEAD
 import services.CaptchaService;
-=======
->>>>>>> fa11101c42fa3098d0112da481062c745ca345da
 import services.EmailService;
 import services.UtilisateurService;
 import javafx.animation.Animation;
