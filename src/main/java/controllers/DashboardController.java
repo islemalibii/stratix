@@ -103,21 +103,21 @@ public class DashboardController implements Initializable {
             DashboardStats stats = statsService.getDashboardStats();
 
             // Labels principaux
-            lblTotalTaches.setText(String.valueOf(stats.getTotalTaches()));
-            lblEnCours.setText(String.valueOf(stats.getTachesEnCours()));
-            lblTerminees.setText(String.valueOf(stats.getTachesTerminees()));
-            lblEnRetard.setText(String.valueOf(stats.getTachesEnRetard()));
-            lblTotalEmployes.setText(String.valueOf(stats.getTotalEmployes()));
-            lblEnPoste.setText(String.valueOf(stats.getEmployesEnPoste()));
-            lblAbsents.setText(String.valueOf(stats.getEmployesAbsents()));
-            lblAFaire.setText(String.valueOf(stats.getTachesAFaire()));
+            if (lblTotalTaches != null) lblTotalTaches.setText(String.valueOf(stats.getTotalTaches()));
+            if (lblEnCours != null) lblEnCours.setText(String.valueOf(stats.getTachesEnCours()));
+            if (lblTerminees != null) lblTerminees.setText(String.valueOf(stats.getTachesTerminees()));
+            if (lblEnRetard != null) lblEnRetard.setText(String.valueOf(stats.getTachesEnRetard()));
+            if (lblTotalEmployes != null) lblTotalEmployes.setText(String.valueOf(stats.getTotalEmployes()));
+            if (lblEnPoste != null) lblEnPoste.setText(String.valueOf(stats.getEmployesEnPoste()));
+            if (lblAbsents != null) lblAbsents.setText(String.valueOf(stats.getEmployesAbsents()));
+            if (lblAFaire != null) lblAFaire.setText(String.valueOf(stats.getTachesAFaire()));
 
-            // Mini indicateurs
-            lblTotalEmployesMini.setText(String.valueOf(stats.getTotalEmployes()));
-            lblEnRetardMini.setText(String.valueOf(stats.getTachesEnRetard()));
+            // Mini indicateurs (vérification null)
+            if (lblTotalEmployesMini != null) lblTotalEmployesMini.setText(String.valueOf(stats.getTotalEmployes()));
+            if (lblEnRetardMini != null) lblEnRetardMini.setText(String.valueOf(stats.getTachesEnRetard()));
 
             // Projets actifs (valeur par défaut)
-            lblProjetsActifs.setText("3");
+            if (lblProjetsActifs != null) lblProjetsActifs.setText("3");
 
             // Taux de complétion
             int total = stats.getTotalTaches();

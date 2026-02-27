@@ -892,12 +892,66 @@ public class DashboardAdminController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventDashboard.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) btnEvenements.getScene().getWindow();
-            stage.getScene().setRoot(root);
-
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+            stage.setScene(scene);
             stage.centerOnScreen();
-
         } catch (IOException e) {
             System.err.println("Erreur de chargement du Dashboard Événements : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleServices(ActionEvent event) {
+        navigateToModule("/service-tab.fxml", "/style/global.css");
+    }
+
+    @FXML
+    private void handleCategories(ActionEvent event) {
+        navigateToModule("/categorie-tab.fxml", "/style/global.css");
+    }
+
+    @FXML
+    private void handleProduits(ActionEvent event) {
+        navigateToModule("/produit.fxml", "/style/global.css");
+    }
+
+    @FXML
+    private void handleRessources(ActionEvent event) {
+        navigateToModule("/ressource.fxml", "/style/global.css");
+    }
+
+    @FXML
+    private void handleProjets(ActionEvent event) {
+        navigateToModule("/ListeProjets.fxml", "/style/global.css");
+    }
+
+    @FXML
+    private void handlePlanning(ActionEvent event) {
+        navigateToModule("/dashboard-view.fxml", "/style/global.css");
+    }
+
+    private void navigateToModule(String fxmlPath, String cssPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent root = loader.load();
+            
+            // Passer l'utilisateur actuel au contrôleur si c'est MainController
+            Object controller = loader.getController();
+            if (controller instanceof MainController && currentUser != null) {
+                ((MainController) controller).initData(currentUser);
+            }
+            
+            Stage stage = (Stage) logoutButton.getScene().getWindow();
+            Scene scene = new Scene(root);
+            if (cssPath != null) {
+                scene.getStylesheets().add(getClass().getResource(cssPath).toExternalForm());
+            }
+            stage.setScene(scene);
+            stage.centerOnScreen();
+        } catch (IOException e) {
+            System.err.println("Erreur de chargement de la vue " + fxmlPath + " : " + e.getMessage());
             e.printStackTrace();
         }
     }
