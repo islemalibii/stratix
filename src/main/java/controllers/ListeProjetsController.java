@@ -161,15 +161,25 @@ public class ListeProjetsController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ChatProjet.fxml"));
             Parent root = loader.load();
+
             ChatProjetController chatCtrl = loader.getController();
+
+            // INITIALISATION PUSHER
             chatCtrl.initChat(p.getId(), p.getNom());
+
             Stage stage = new Stage();
-            stage.setTitle("Discussion : " + p.getNom());
+            stage.setTitle("Discussion Admin : " + p.getNom());
             stage.setScene(new Scene(root));
-            stage.setOnCloseRequest(e -> chatCtrl.stopChat());
+
+            // ✅ CRUCIAL : On coupe la connexion Pusher à la fermeture
+            stage.setOnCloseRequest(e -> {
+                chatCtrl.stopChat();
+            });
+
             stage.show();
         } catch (IOException e) {
-            afficherErreur("Erreur Chat", "Impossible d'ouvrir le chat.");
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "Impossible d'ouvrir le chat en temps réel.").showAndWait();
         }
     }
 

@@ -123,26 +123,32 @@ public class EmployeListeProjetController {
                 });
     }
 
-    /**
-     * Ouvre la fenêtre de chat liée à un projet précis
-     */
+
     private void ouvrirChatSpecifique(Projet p) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ChatProjet.fxml"));
             Parent root = loader.load();
 
+            // Récupération du contrôleur du Chat
             ChatProjetController chatCtrl = loader.getController();
+
+            // INITIALISATION PUSHER : On passe l'ID et le Nom
             chatCtrl.initChat(p.getId(), p.getNom());
 
             Stage stage = new Stage();
             stage.setTitle("Chat d'équipe - " + p.getNom());
             stage.setScene(new Scene(root));
 
-            // Important pour arrêter le thread de rafraîchissement à la fermeture
-            stage.setOnCloseRequest(e -> chatCtrl.stopChat());
+            // ✅ CRUCIAL : On coupe la connexion Pusher si l'employé ferme la fenêtre
+            stage.setOnCloseRequest(e -> {
+                chatCtrl.stopChat();
+                System.out.println("Déconnexion Pusher pour le projet : " + p.getNom());
+            });
+
             stage.show();
         } catch (IOException e) {
             System.err.println("Erreur chargement FXML Chat: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
