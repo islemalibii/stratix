@@ -14,8 +14,8 @@ import javafx.stage.Stage;
 
 import models.Planning;
 import models.Employe;
-import Services.SERVICEPlanning;
-import Services.EmployeeService;
+import services.SERVICEPlanning;
+import services.EmployeeService;
 import api.WeatherAPI;
 
 import java.io.IOException;

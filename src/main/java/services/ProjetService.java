@@ -1,4 +1,4 @@
-package Services;
+package services;
 
 import interfaces.ProjServices;
 import models.Projet;

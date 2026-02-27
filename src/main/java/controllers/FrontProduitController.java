@@ -16,7 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import models.produit;
-import Services.service_produit;
+import services.service_produit;
 
 import javafx.geometry.Insets;
 import java.io.File;

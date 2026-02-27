@@ -16,8 +16,8 @@ import javafx.stage.Stage;
 import models.Evenement;
 import models.EventFeedback;
 import models.enums.EventStatus;
-import Services.ServiceEvenemnet;
-import Services.ServiceEventFeedback;
+import services.ServiceEvenemnet;
+import services.ServiceEventFeedback;
 
 import java.io.IOException;
 import java.util.List;

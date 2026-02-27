@@ -145,13 +145,21 @@ public class MainController implements Initializable {
 
     @FXML
     private void handleLogout() {
+        // Supprimer la session
+        utils.SessionManager.getInstance().logout();
+        
         try {
             Stage stage = (Stage) contentArea.getScene().getWindow();
             Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
-            Scene scene = new Scene(root, 800, 500);
-            scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+            Scene scene = new Scene(root, 1000, 700);
+            
+            // Charger le CSS si disponible
+            if (getClass().getResource("/css/style.css") != null) {
+                scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
+            }
+            
             stage.setScene(scene);
-            stage.setTitle("stratiX - Accueil");
+            stage.setTitle("Stratix - Connexion");
             stage.centerOnScreen();
         } catch (Exception e) {
             e.printStackTrace();

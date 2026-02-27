@@ -14,7 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import models.Ressource;
-import Services.service_ressource;
+import services.service_ressource;
 
 import javafx.geometry.Insets;
 import java.io.IOException;

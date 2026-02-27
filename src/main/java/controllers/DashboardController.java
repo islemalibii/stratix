@@ -12,10 +12,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-import Services.StatsService;
-import Services.SERVICETache;
-import Services.EmployeeService;
-import Services.SERVICEPlanning;
+import services.StatsService;
+import services.SERVICETache;
+import services.EmployeeService;
+import services.SERVICEPlanning;
 import models.DashboardStats;
 import models.Tache;
 import models.Employe;

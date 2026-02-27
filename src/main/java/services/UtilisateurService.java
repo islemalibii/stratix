@@ -1,4 +1,4 @@
-package Services;
+package services;
 
 import models.Role;
 import models.Utilisateur;
@@ -70,15 +70,25 @@ public class UtilisateurService {
             throw new SQLException("Connexion à la base de données non disponible");
         }
         
+        System.out.println("=== DEBUG getAll() ===");
+        System.out.println("Connexion: " + (connection != null && !connection.isClosed()));
+        
         List<Utilisateur> utilisateurs = new ArrayList<>();
         String query = "SELECT * FROM utilisateur";
         
         Statement st = connection.createStatement();
         ResultSet rs = st.executeQuery(query);
         
+        int count = 0;
         while (rs.next()) {
-            utilisateurs.add(mapResultSetToUtilisateur(rs));
+            Utilisateur u = mapResultSetToUtilisateur(rs);
+            utilisateurs.add(u);
+            count++;
+            System.out.println("Utilisateur " + count + ": " + u.getEmail() + " (Role: " + u.getRole() + ")");
         }
+        
+        System.out.println("Total utilisateurs récupérés: " + count);
+        System.out.println("=== FIN DEBUG getAll() ===");
         
         return utilisateurs;
     }

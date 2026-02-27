@@ -1,6 +1,6 @@
 package controllers;
 
-import Services.UtilisateurService;
+import services.UtilisateurService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -406,7 +406,15 @@ public class DashboardAdminController {
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent() && result.get() == saveButtonType) {
             try {
+                String oldPassword = user.getPassword(); // Sauvegarder l'ancien mot de passe
                 updateUserFromForm(user, grid);
+                
+                // Si le mot de passe a été modifié, le hasher
+                if (!user.getPassword().equals(oldPassword)) {
+                    String hashedPassword = utils.PasswordValidator.hashPassword(user.getPassword());
+                    user.setPassword(hashedPassword);
+                }
+                
                 utilisateurService.modifier(user);
                 refreshCurrentView();
                 showAlert("Succès", "Utilisateur modifié avec succès");
@@ -497,6 +505,13 @@ public class DashboardAdminController {
             try {
                 Utilisateur newUser = createUserFromForm(grid);
                 
+                // DEBUG: Afficher les informations de l'utilisateur créé
+                System.out.println("=== DEBUG AJOUT UTILISATEUR ===");
+                System.out.println("Nom: " + newUser.getNom());
+                System.out.println("Email: " + newUser.getEmail());
+                System.out.println("Rôle récupéré: " + newUser.getRole());
+                System.out.println("Mot de passe (avant hash): " + newUser.getPassword());
+                
                 // Vérifier l'unicité de l'email et du CIN
                 if (utilisateurService.emailExists(newUser.getEmail())) {
                     showAlert("Erreur", "Cet email est déjà utilisé");
@@ -508,11 +523,19 @@ public class DashboardAdminController {
                     return;
                 }
                 
+                // Hasher le mot de passe avant d'ajouter
+                String hashedPassword = utils.PasswordValidator.hashPassword(newUser.getPassword());
+                newUser.setPassword(hashedPassword);
+                
+                System.out.println("Mot de passe (après hash): " + newUser.getPassword());
+                System.out.println("Rôle final: " + newUser.getRole());
+                System.out.println("=== FIN DEBUG ===");
+                
                 utilisateurService.ajouter(newUser);
                 refreshCurrentView();
                 showAlert("Succès", "Utilisateur ajouté avec succès");
             } catch (Exception e) {
-                showAlert("Erreur", "Impossible d'ajouter l'utilisateur");
+                showAlert("Erreur", "Impossible d'ajouter l'utilisateur: " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -756,13 +779,25 @@ public class DashboardAdminController {
     }
 
     private Role getComboValue(GridPane grid, String userData) {
+        System.out.println("=== DEBUG getComboValue ===");
+        System.out.println("Recherche userData: " + userData);
+        
         for (javafx.scene.Node node : grid.getChildren()) {
-            if (node.getUserData() != null && node.getUserData().equals(userData)) {
-                if (node instanceof ComboBox) {
-                    return (Role) ((ComboBox<?>) node).getValue();
+            if (node.getUserData() != null) {
+                System.out.println("Node trouvé avec userData: " + node.getUserData() + " (Type: " + node.getClass().getSimpleName() + ")");
+                
+                if (node.getUserData().equals(userData)) {
+                    System.out.println("Match trouvé!");
+                    if (node instanceof ComboBox) {
+                        Role selectedRole = (Role) ((ComboBox<?>) node).getValue();
+                        System.out.println("Rôle sélectionné dans ComboBox: " + selectedRole);
+                        return selectedRole;
+                    }
                 }
             }
         }
+        
+        System.out.println("ATTENTION: Aucun ComboBox trouvé avec userData '" + userData + "', retour EMPLOYE par défaut");
         return Role.EMPLOYE;
     }
 

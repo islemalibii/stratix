@@ -19,8 +19,8 @@ public class Main {
 
         try {
             // 2. Establishing Connections
-            serviceManager = new ServiceService();
-            evenementManager = new ServiceEvenemnet();
+            serviceManager = new services.ServiceService();
+            evenementManager = new services.ServiceEvenemnet();
             System.out.println("✅ Connexion établie via Singleton");
 
             // --- SECTION 1: ÉVÉNEMENTS ---

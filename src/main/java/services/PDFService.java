@@ -1,4 +1,4 @@
-package Services;
+package services;
 
 import models.Service;
 import org.apache.pdfbox.pdmodel.*;
