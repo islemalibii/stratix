@@ -43,11 +43,8 @@ public class MainController implements Initializable {
         updateUserInfo(user);
         applyRoleBasedVisibility(user);
 
-        if (user.getRole() == Role.EMPLOYE) {
-            loadView("/EventEmployeeDashboard.fxml");
-        } else {
-            loadView("/EventDashboard.fxml");
-        }
+        // 🔥 TOUJOURS LE DASHBOARD D'ABORD
+        loadView("/dashboard-view.fxml");
     }
 
     private void updateUserInfo(Utilisateur user) {
@@ -130,19 +127,14 @@ public class MainController implements Initializable {
         loadView(fxml);
     }
 
-    // ⭐ MÉTHODE D'INSTANCE POUR LE BOUTON DU MENU ⭐
+    // ⭐ MÉTHODE PRINCIPALE - TOUJOURS LE DASHBOARD ⭐
     @FXML
     private void showPlanning() {
-        System.out.println("🔄 Navigation vers Planning depuis le menu");
-
-        Utilisateur user = UserRole.getInstance().getUser();
-        String fxml = (user != null && user.getRole() == Role.EMPLOYE) ?
-                "/EmpPlanningView.fxml" : "/PlanningView.fxml";
-
-        loadView(fxml);
+        System.out.println("🔄 Navigation vers Tâches et Planning - Dashboard");
+        loadView("/dashboard-view.fxml");
     }
 
-    // ⭐ MÉTHODES STATIQUES POUR DASHBOARD (renommées) ⭐
+    // ⭐ MÉTHODES STATIQUES POUR DASHBOARD ⭐
     public static void showTachesFromDashboard() {
         if (staticContentArea != null) {
             try {
