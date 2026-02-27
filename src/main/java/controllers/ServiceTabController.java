@@ -46,6 +46,8 @@ public class ServiceTabController implements Initializable {
     @FXML private TextField txtMontantDT;
     @FXML private TextField txtMontantUSD;
     @FXML private TextField txtMontantEUR;
+    @FXML private Button btnVisio;
+
 
     private ServiceService serviceService;
     private ExchangeRateService exchangeRateService;
@@ -77,23 +79,42 @@ public class ServiceTabController implements Initializable {
                 btnAjouter.setVisible(false);
                 btnAjouter.setManaged(false);
             }
-
             if (btnArchives != null) {
                 btnArchives.setVisible(false);
                 btnArchives.setManaged(false);
             }
-
             if (btnExporterPDF != null) {
                 btnExporterPDF.setVisible(false);
                 btnExporterPDF.setManaged(false);
             }
-
             if (actionButtonsBar != null) {
                 actionButtonsBar.setVisible(false);
                 actionButtonsBar.setManaged(false);
             }
+            // La visio est accessible à tous
+        }}
+    // Ajoute cette méthode
+    @FXML
+    private void openVisio() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/visio-view.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("stratiX - Visioconférence");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(true);
+            stage.setMinWidth(900);
+            stage.setMinHeight(600);
+
+            stage.show();
+
+        } catch (IOException e) {
+            showAlert("Erreur", "Impossible d'ouvrir la visio: " + e.getMessage());
         }
     }
+
 
     @FXML
     private void showServicesList() {
