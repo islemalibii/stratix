@@ -186,4 +186,4 @@ public class EmailComposerDialog {
         dialog.setScene(scene);
         dialog.showAndWait();
     }
-}
+}//

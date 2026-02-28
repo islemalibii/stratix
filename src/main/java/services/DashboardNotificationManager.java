@@ -66,4 +66,4 @@ public class DashboardNotificationManager {
         alert.setContentText(message);
         alert.showAndWait();
     }
-}
+}//
