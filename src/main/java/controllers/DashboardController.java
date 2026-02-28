@@ -70,6 +70,9 @@ public class DashboardController implements Initializable {
     @FXML private VBox chatWidgetContainer;
     @FXML private Label iaMessage;
 
+    // ⭐ Bouton unique pour email
+    @FXML private Button btnComposeEmail;
+
     private StatsService statsService;
     private SERVICETache tacheService;
     private EmployeeService employeService;
@@ -93,6 +96,9 @@ public class DashboardController implements Initializable {
         // ⭐ Vérifier le statut de l'IA
         checkIAStatus();
 
+        // ⭐ Initialiser le bouton email
+        setupEmailButton();
+
         if (btnRefreshQuote != null) {
             btnRefreshQuote.setOnAction(e -> chargerCitation());
         }
@@ -108,6 +114,25 @@ public class DashboardController implements Initializable {
                 }
             });
         }
+    }
+
+    /**
+     * ⭐ Initialise le bouton email
+     */
+    private void setupEmailButton() {
+        if (btnComposeEmail != null) {
+            btnComposeEmail.setOnAction(e -> openEmailComposer());
+        }
+    }
+
+    /**
+     * ⭐ Ouvre le composeur d'email
+     */
+    @FXML
+    private void openEmailComposer() {
+        System.out.println("📧 Ouverture du composeur d'email");
+        Stage stage = (Stage) btnComposeEmail.getScene().getWindow();
+        EmailComposerDialog.show(stage);
     }
 
     /**
@@ -131,35 +156,26 @@ public class DashboardController implements Initializable {
     }
 
     /**
-     * ⭐ Charge le widget IA avec fallback sur plusieurs chemins
+     * ⭐ Charge le widget IA
      */
     private void loadChatWidget() {
         try {
-            // Liste des chemins possibles
             String[] paths = {
-                    "/dashboard-chat-widget.fxml",
                     "/DashboardChatWidget.fxml",
-                    "/fxml/dashboard-chat-widget.fxml",
-                    "/chat/dashboard-chat-widget.fxml",
-                    "/widgets/dashboard-chat-widget.fxml"
+                    "/dashboard-chat-widget.fxml"
             };
 
             FXMLLoader loader = null;
-            String foundPath = null;
-
             for (String path : paths) {
                 if (getClass().getResource(path) != null) {
-                    System.out.println("✅ Widget IA trouvé: " + path);
                     loader = new FXMLLoader(getClass().getResource(path));
-                    foundPath = path;
                     break;
                 }
             }
 
             if (loader == null) {
-                System.err.println("❌ Widget IA non trouvé dans les ressources");
                 if (iaMessage != null) {
-                    iaMessage.setText("❌ Widget IA non disponible - fichier manquant");
+                    iaMessage.setText("❌ Widget IA non disponible");
                 }
                 return;
             }
@@ -169,16 +185,10 @@ public class DashboardController implements Initializable {
                 chatWidgetContainer.getChildren().add(chatWidget);
                 if (iaMessage != null) {
                     iaMessage.setVisible(false);
-                    iaMessage.setManaged(false);
                 }
-                System.out.println("✅ Widget IA chargé avec succès depuis: " + foundPath);
             }
         } catch (IOException e) {
-            System.err.println("❌ Erreur chargement widget IA: " + e.getMessage());
             e.printStackTrace();
-            if (iaMessage != null) {
-                iaMessage.setText("❌ Erreur de chargement: " + e.getMessage());
-            }
         }
     }
 
@@ -186,7 +196,6 @@ public class DashboardController implements Initializable {
         try {
             DashboardStats stats = statsService.getDashboardStats();
 
-            // Labels principaux
             if (lblTotalTaches != null) lblTotalTaches.setText(String.valueOf(stats.getTotalTaches()));
             if (lblEnCours != null) lblEnCours.setText(String.valueOf(stats.getTachesEnCours()));
             if (lblTerminees != null) lblTerminees.setText(String.valueOf(stats.getTachesTerminees()));
@@ -196,7 +205,6 @@ public class DashboardController implements Initializable {
             if (lblAbsents != null) lblAbsents.setText(String.valueOf(stats.getEmployesAbsents()));
             if (lblAFaire != null) lblAFaire.setText(String.valueOf(stats.getTachesAFaire()));
 
-            // Mini indicateurs
             if (lblTotalEmployesMini != null) lblTotalEmployesMini.setText(String.valueOf(stats.getTotalEmployes()));
             if (lblEnRetardMini != null) lblEnRetardMini.setText(String.valueOf(stats.getTachesEnRetard()));
             if (lblProjetsActifs != null) lblProjetsActifs.setText("3");
@@ -206,7 +214,6 @@ public class DashboardController implements Initializable {
             int taux = total > 0 ? (terminees * 100 / total) : 0;
             if (lblTauxCompletion != null) lblTauxCompletion.setText(taux + "%");
 
-            // Graphique
             if (lblAFaireGraph != null) lblAFaireGraph.setText(String.valueOf(stats.getTachesAFaire()));
             if (lblEnCoursGraph != null) lblEnCoursGraph.setText(String.valueOf(stats.getTachesEnCours()));
             if (lblTermineesGraph != null) lblTermineesGraph.setText(String.valueOf(stats.getTachesTerminees()));
@@ -222,7 +229,6 @@ public class DashboardController implements Initializable {
             System.out.println("✅ Dashboard mis à jour!");
 
         } catch (Exception e) {
-            System.err.println("❌ Erreur: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -241,14 +247,12 @@ public class DashboardController implements Initializable {
 
         searchResultsList.getItems().clear();
 
-        // Recherche dans les tâches
         List<Tache> taches = tacheService.getAllTaches();
         List<String> resultats = taches.stream()
                 .filter(t -> t.getTitre().toLowerCase().contains(recherche))
                 .map(t -> "📋 Tâche: " + t.getTitre())
                 .collect(Collectors.toList());
 
-        // Recherche dans les employés
         List<Employe> employes = employeService.getAllEmployes();
         resultats.addAll(employes.stream()
                 .filter(e -> e.getUsername().toLowerCase().contains(recherche))
@@ -272,19 +276,16 @@ public class DashboardController implements Initializable {
 
     @FXML
     private void openTaches() {
-        System.out.println("🔄 Navigation vers Tâches");
         MainController.showTachesFromDashboard();
     }
 
     @FXML
     private void openPlanning() {
-        System.out.println("🔄 Navigation vers Planning");
         MainController.showPlanningFromDashboard();
     }
 
     @FXML
     private void openCalendar() {
-        System.out.println("🔄 Navigation vers Calendrier");
         MainController.showCalendarFromDashboard();
     }
 
@@ -301,33 +302,25 @@ public class DashboardController implements Initializable {
 
     @FXML
     private void showDashboardFromButton() { loadView("/dashboard-view.fxml"); }
-
     @FXML
     private void showPlanningFromButton() { loadView("/PlanningListeView.fxml"); }
-
     @FXML
     private void showTachesFromButton() { loadView("/TacheListeView.fxml"); }
-
     @FXML
     private void showCalendarFromButton() { loadView("/calendar-view.fxml"); }
-
     @FXML
     private void showWhiteboardFromButton() { loadView("/WhiteboardView.fxml"); }
 
     @FXML
     private void logout() {
         try {
-            System.out.println("🔒 Déconnexion...");
             SessionManager.getInstance().logout();
-
             Parent root = FXMLLoader.load(getClass().getResource("/PagePrincipaleView.fxml"));
             Stage stage = (Stage) lblTotalTaches.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setMaximized(true);
             stage.show();
-
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la déconnexion: " + e.getMessage());
             e.printStackTrace();
         }
     }

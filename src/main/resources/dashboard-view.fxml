@@ -159,6 +159,20 @@
                     </HBox>
                 </VBox>
 
+                <!-- ⭐ SECTION NOTIFICATIONS EMAIL - BOUTON UNIQUE ⭐ -->
+                <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);">
+                    <Label text="📧 NOTIFICATIONS EMAIL"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-background-color: #f8fafc; -fx-padding: 10 20; -fx-background-radius: 30;"/>
+
+                    <HBox spacing="20" alignment="CENTER">
+                        <Button fx:id="btnComposeEmail" text="📧 Composer un email"
+                                style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 15 30; -fx-background-radius: 50; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(59,130,246,0.3), 10, 0, 0, 2);"/>
+                    </HBox>
+
+                    <Label text="Cliquez pour envoyer une notification par email"
+                           style="-fx-text-fill: #64748b; -fx-font-size: 13px; -fx-alignment: center; -fx-padding: 5 0 0 0;"/>
+                </VBox>
+
                 <!-- Section 3: Graphique et Citation -->
                 <HBox spacing="20">
                     <!-- Graphique -->
@@ -200,14 +214,14 @@
                         </HBox>
                     </VBox>
 
-                    <!-- Citation du jour -->
+                    <!-- Citation du jour - CORRIGÉ (wrapText supprimé) -->
                     <VBox spacing="15" style="-fx-background-color: linear-gradient(to right, #667eea, #764ba2); -fx-background-radius: 20; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 0);" prefWidth="300">
                         <HBox alignment="CENTER_LEFT" spacing="10">
                             <Label text="💬" style="-fx-font-size: 28px; -fx-text-fill: white;"/>
                             <Label text="CITATION DU JOUR" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"/>
                         </HBox>
 
-                        <Label fx:id="lblCitation" wrapText="true"
+                        <Label fx:id="lblCitation"
                                style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-style: italic; -fx-padding: 10 0;"
                                text="Chargement de la citation..."/>
 

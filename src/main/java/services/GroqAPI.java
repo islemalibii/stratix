@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 public class GroqAPI {
 
     // 🔥 TA NOUVELLE CLÉ API GROQ
-    private static final String API_KEY = "";
+    private static final String API_KEY = "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";
 
     // URL de l'API Groq
     private static final String API_URL = "https://api.groq.com/openai/v1/chat/completions";
