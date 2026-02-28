@@ -104,7 +104,7 @@
                 <HBox alignment="CENTER">
                     <Button onAction="#retourFormulaire"
                             style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 12 30; -fx-background-radius: 30; -fx-cursor: hand;"
-                            text="← Retour au formulaire" />
+                            text="← Retour au Formulaire" />
                 </HBox>
             </VBox>
         </ScrollPane>

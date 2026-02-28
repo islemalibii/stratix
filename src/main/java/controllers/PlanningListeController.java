@@ -138,7 +138,7 @@ public class PlanningListeController implements Initializable {
         });
     }
 
-    // --- NEW METHOD: REDIRECT TO FORM WITH DATA ---
+    // --- NEW METHOD: REDIRECT TO FORM WITH DATAA ---
     private void modifierPlanning(Planning planning) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/PlanningView.fxml"));
