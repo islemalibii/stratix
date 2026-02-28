@@ -37,7 +37,8 @@
                 <Button text="📄 Exporter PDF" onAction="#handleExporterPDF" styleClass="modern-button-pdf"/>
                 <Button fx:id="btnArchives" text="📦 Archives" onAction="#handleVoirArchives" styleClass="modern-button-archive"/>
                 <Button text="+ Nouveau service" onAction="#handleAjouter" styleClass="modern-button-add"/>
-                <Button text="📹 Visio" fx:id="btnVisio" onAction="#openVisio" styleClass="modern-button-visio"/>
+                <Button fx:id="btnVisio" text="▶ Start Meet" onAction="#openVisio"
+                        style="-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 30; -fx-padding: 8 20; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(26,115,232,0.3), 10, 0, 0, 2);"/>
                 <Button fx:id="btnRetour" text="⬅ Retour" onAction="#handleRetour" styleClass="modern-button-retour" visible="false"/>
             </HBox>
 
