@@ -317,7 +317,7 @@ public class PlanningController {
             List<Employe> employes = employeService.getAllEmployes();
             lblTotalEmployes.setText(String.valueOf(employes.size()));
 
-            // Calculer les stats
+            // Calculer les statss
             long enPoste = employes.stream()
                     .filter(e -> e.getStatut() != null && e.getStatut().equals("actif"))
                     .count();
