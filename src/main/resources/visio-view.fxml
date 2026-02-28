@@ -3,37 +3,55 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
-<VBox spacing="20" prefWidth="400" prefHeight="200"
-      xmlns="http://javafx.com/javafx/17"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="controllers.VisioController">
+<BorderPane xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.VisioController"
+            style="-fx-background-color: white;">
 
-    <Label text="📹 VISIOCONFÉRENCE" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+    <top>
+        <VBox style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+            <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-padding: 12 20;">
+                <Label text="stratiX " style="-fx-text-fill: #202124; -fx-font-size: 18px; -fx-font-weight: normal;">
+                    <font>
+                        <Font name="System Regular" size="8"/>
+                    </font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS"/>
 
-    <VBox spacing="10" alignment="CENTER" VBox.vgrow="ALWAYS">
-        <Label text="Cliquez sur 'Démarrer' pour ouvrir Jitsi Meet"/>
-        <Label text="Salle: " style="-fx-font-weight: bold;">
-            <graphic>
-                <Label fx:id="roomIdLabel" text="En attente..."/>
-            </graphic>
-        </Label>
-    </VBox>
+                <HBox spacing="8" alignment="CENTER" style="-fx-background-color: #f1f3f4; -fx-background-radius: 20; -fx-padding: 6 12;">
+                    <Label text="🔗" style="-fx-font-size: 14px;"/>
+                    <Label fx:id="roomIdLabel" text="Chargement..." style="-fx-text-fill: #1a73e8; -fx-font-size: 13px; -fx-font-family: 'Monospaced';"/>
+                </HBox>
+            </HBox>
 
-    <HBox spacing="10" alignment="CENTER">
-        <Button fx:id="btnStartCall" text="🚀 Démarrer"
-                style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-padding: 8 16;"/>
-        <Button fx:id="btnHangup" text="🔴 Raccrocher"
-                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 8 16;"
-                disable="true"/>
-        <Button fx:id="btnCopyLink" text="📋 Copier"
-                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8 16;"/>
-        <Button text="❌ Fermer" onAction="#closeWindow"
-                style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-padding: 8 16;"/>
-    </HBox>
 
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
+            <HBox alignment="CENTER" spacing="20" style="-fx-padding: 8 20 16 20;">
+                <Button fx:id="btnStartCall" text="Démarrer"
+                        onAction="#startCall"
+                        style="-fx-background-color: #1a73e8; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: normal; -fx-background-radius: 20; -fx-padding: 8 24; -fx-cursor: hand;"/>
 
-</VBox>
+                <Button text="Copier le lien" onAction="#copyLink"
+                        style="-fx-background-color: transparent; -fx-text-fill: #1a73e8; -fx-border-color: #dadce0; -fx-border-radius: 20; -fx-font-size: 14px; -fx-padding: 8 24; -fx-cursor: hand;"/>
+
+                <Button text="Quitter" onAction="#closeWindow"
+                        style="-fx-background-color: transparent; -fx-text-fill: #ea4335; -fx-border-color: #dadce0; -fx-border-radius: 20; -fx-font-size: 14px; -fx-padding: 8 24; -fx-cursor: hand;"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <StackPane fx:id="browserContainer" style="-fx-background-color: #f8f9fa;">
+            <VBox fx:id="placeholderContainer" alignment="CENTER" spacing="20">
+                <Label text="📹" style="-fx-font-size: 80px; -fx-opacity: 0.3; -fx-text-fill: #5f6368;"/>
+                <Label text="Prêt à démarrer la visioconférence"
+                       style="-fx-text-fill: #5f6368; -fx-font-size: 16px;"/>
+                <Label text="Cliquez sur 'Démarrer la visio' pour commencer"
+                       style="-fx-text-fill: #80868b; -fx-font-size: 14px;"/>
+            </VBox>
+        </StackPane>
+    </center>
+
+
+</BorderPane>
