@@ -245,7 +245,7 @@
                            style="-fx-text-fill: #64748b; -fx-font-size: 14px; -fx-alignment: center;"/>
                 </VBox>
 
-                <!-- Boutons de navigation -->
+                <!-- Boutons dee navigation -->
                 <HBox spacing="20" alignment="CENTER" style="-fx-padding: 20 0 20 0;">
                     <Button text="📋 GESTION DES TÂCHES" onAction="#openTaches"
                             style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 15 35; -fx-background-radius: 50; -fx-cursor: hand;"/>

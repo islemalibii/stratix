@@ -169,4 +169,4 @@ public class DashboardChatWidget {
         welcomeMessage.setManaged(true);
         addMessage("Bonjour ! Je suis là pour vous aider avec vos projets. Que voulez-vous savoir ?", false);
     }
-}
+}//

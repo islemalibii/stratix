@@ -338,4 +338,4 @@ public class PlanningController implements Initializable {
             System.err.println("Navigation error: " + fxmlPath);
         }
     }
-}
+}//

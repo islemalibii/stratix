@@ -483,4 +483,4 @@ public class WhiteboardController {
             System.err.println("Navigation error: " + e.getMessage());
         }
     }
-}
+}//
