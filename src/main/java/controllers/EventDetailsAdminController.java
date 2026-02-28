@@ -27,6 +27,8 @@ public class EventDetailsAdminController {
     @FXML private ImageView eventImageView;
     @FXML private Label titleLabel, dateLabel, locationLabel, typeLabel, descriptionLabel, statusTextLabel, statusBadge;
     @FXML private VBox feedbackContainer;
+    @FXML private VBox feedbackSection;
+
 
     private Evenement currentEvent;
     private ServiceEvenemnet service = new ServiceEvenemnet();
@@ -52,11 +54,10 @@ public class EventDetailsAdminController {
 
         //load ratings if terminer l event
         if (e.getStatut() == EventStatus.terminer) {
-            System.out.println("Event is TERMINE, loading feedbacks...");
+            feedbackSection.setVisible(true);
             loadFeedbacks(e.getId());
         } else {
-            System.out.println("Event is not TERMINE, hiding feedbacks");
-            feedbackContainer.setVisible(false);
+            feedbackSection.setVisible(false);
         }
 
 
@@ -83,6 +84,7 @@ public class EventDetailsAdminController {
 
         if (feedbacks.isEmpty()) {
             Label empty = new Label("Aucun feedback pour cet événement.");
+            empty.setStyle("-fx-font-size:14px; -fx-padding:5; -fx-text-fill: black;");
             feedbackContainer.getChildren().add(empty);
             return;
         }

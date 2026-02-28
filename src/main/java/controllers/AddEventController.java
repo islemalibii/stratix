@@ -1,5 +1,6 @@
 package controllers;
 
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -9,10 +10,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import models.Evenement;
 import models.Ressource;
 import models.enums.EventStatus;
 import models.enums.EventType;
+import netscape.javascript.JSObject;
 import services.ServiceEvenemnet;
 import javafx.stage.FileChooser;
 import services.ServiceEventRessource;
@@ -31,14 +35,19 @@ public class AddEventController {
     @FXML private TextField lieuField;
     @FXML private DatePicker datePicker;
     @FXML private TextField imageUrlField;
-    @FXML private VBox ressourcesContainer;
+    @FXML private TextField mapSearchField;
+    @FXML private WebView mapPicker;
+
+    private final JavaConnector bridge = new JavaConnector();
+    private double selectedLat = 0;
+    private double selectedLng = 0;
 
 
 
     @FXML private ComboBox<EventType> typeCombo;
     @FXML private ComboBox<EventStatus> statusCombo;
 
-    private List<Ressource> selectedRessources = new ArrayList<>();
+    //private List<Ressource> selectedRessources = new ArrayList<>();
     private ServiceEvenemnet service = new ServiceEvenemnet();
 
     @FXML
@@ -55,24 +64,18 @@ public class AddEventController {
         statusCombo.setDisable(true);
 
 
-        //for the ressources
-        ServiceEventRessource resService = new ServiceEventRessource();
-        List<Ressource> Ressources = resService.getAllRessources();
-        for (Ressource r : Ressources) {
-            CheckBox check = new CheckBox(
-                    r.getNom() + " (Stock: " + r.getQuatite() + ")"
-            );
-            TextField qField = new TextField();
-            qField.setPromptText("Qté");
-            qField.setPrefWidth(60);
-            qField.setDisable(true);
+        WebEngine engine = mapPicker.getEngine();
+        engine.load(getClass().getResource("/select_location.html").toExternalForm());
 
-            check.setOnAction(e -> qField.setDisable(!check.isSelected()));
-            HBox row = new HBox(10, check, qField);
-            row.setUserData(r);
-            ressourcesContainer.getChildren().add(row);
-        }
+        engine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                JSObject window = (JSObject) engine.executeScript("window");
 
+                window.setMember("javaConnector", bridge);
+
+                engine.executeScript("setTimeout(function() { map.invalidateSize(); }, 500);");
+            }
+        });
 
     }
 
@@ -111,6 +114,12 @@ public class AddEventController {
             showError("Veuillez sélectionner une image pour l'événement");
             return false;
         }
+
+        if (selectedLat == 0.0 && selectedLng == 0.0) {
+            showError("Veuillez sélectionner l'emplacement précis sur la carte (cliquez sur la carte ou utilisez la recherche)");
+            return false;
+        }
+
         return true;
     }
     @FXML
@@ -137,10 +146,31 @@ public class AddEventController {
     }
 
     @FXML
+    private void handleMapSearch() {
+        String address = mapSearchField.getText();
+        if (address != null && !address.isEmpty()) {
+            lieuField.setText(address);
+
+            mapPicker.getEngine().executeScript("searchAddress('" + address.replace("'", "\\'") + "')");
+        }
+    }
+
+    // Inside your JavaConnector class (ensure it's PUBLIC)
+    public class JavaConnector {
+        public void setCoordinates(double lat, double lng) {
+            javafx.application.Platform.runLater(() -> {
+                selectedLat = lat;
+                selectedLng = lng;
+                System.out.println("Success! Java received: " + lat + ", " + lng);
+            });
+        }
+    }
+    @FXML
     private void addEvent() {
         if (!validateInputs()) return;
 
         Evenement e = new Evenement();
+
         e.setTitre(titreField.getText());
         e.setDescription(descriptionField.getText());
         e.setLieu(lieuField.getText());
@@ -148,8 +178,9 @@ public class AddEventController {
         e.setType_event(typeCombo.getValue());
         e.setStatut(statusCombo.getValue());
         e.setImageUrl(imageUrlField.getText());
-
-        e.setRessources(selectedRessources);
+        e.setLatitude(selectedLat);
+        e.setLongitude(selectedLng);
+        System.out.println("Controller sending to Service: Lat=" + e.getLatitude() + " Lng=" + e.getLongitude());
 
         service.add(e);
 

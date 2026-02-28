@@ -90,6 +90,18 @@
             <artifactId>sendgrid-java</artifactId>
             <version>4.9.3</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>17.0.10</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>17.0.10</version>
+        </dependency>
     </dependencies>
 
 
