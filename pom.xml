@@ -105,7 +105,33 @@
             <artifactId>javafx-web</artifactId>
             <version>17.0.10</version>
         </dependency>
+        <dependency>
+            <groupId>com.teamdev.jxbrowser</groupId>
+            <artifactId>jxbrowser-javafx</artifactId>
+            <version>8.14.1</version>  <!-- Version stable -->
+        </dependency>
+
+        <!-- Chromium pour Windows (change selon ton OS) -->
+        <dependency>
+            <groupId>com.teamdev.jxbrowser</groupId>
+            <artifactId>jxbrowser-win64</artifactId>
+            <version>8.14.1</version>
+        </dependency>
+
     </dependencies>
+    <repositories>
+        <!-- Ton repo existant -->
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+
+        <!-- NOUVEAU : Repo JxBrowser -->
+        <repository>
+            <id>com.teamdev</id>
+            <url>https://europe-maven.pkg.dev/jxbrowser/releases</url>
+        </repository>
+    </repositories>
 
 
     <build>
