@@ -59,9 +59,6 @@ public class DashboardController implements Initializable {
     @FXML private VBox searchResultsContainer;
     @FXML private ListView<String> searchResultsList;
 
-    // ✅ NOUVEAU : Conteneur pour le widget IA
-    @FXML private VBox chatWidgetContainer;
-
     private StatsService statsService;
     private SERVICETache tacheService;
     private EmployeeService employeService;
@@ -78,7 +75,6 @@ public class DashboardController implements Initializable {
 
         chargerStatistiques();
         chargerCitation();
-        chargerChatWidget(); // ✅ Charger le widget IA
 
         if (btnRefreshQuote != null) {
             btnRefreshQuote.setOnAction(e -> chargerCitation());
@@ -94,19 +90,6 @@ public class DashboardController implements Initializable {
                     effectuerRecherche(newVal.trim().toLowerCase());
                 }
             });
-        }
-    }
-
-    // ✅ NOUVELLE MÉTHODE : Charger le widget IA
-    private void chargerChatWidget() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dashboard-chat-widget.fxml"));
-            Parent chatWidget = loader.load();
-            chatWidgetContainer.getChildren().add(chatWidget);
-            System.out.println("✅ Widget IA chargé avec succès");
-        } catch (IOException e) {
-            System.err.println("❌ Erreur chargement widget IA: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
