@@ -8,10 +8,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.geometry.Pos;
+import javafx.geometry.Point2D;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import models.Service;
 import models.UserRole;
 import services.PDFService;
@@ -47,6 +49,11 @@ public class ServiceTabController implements Initializable {
     @FXML private TextField txtMontantUSD;
     @FXML private TextField txtMontantEUR;
     @FXML private Button btnVisio;
+
+    // 🤖 Bulle flottante
+    @FXML private StackPane assistantBubble;
+    private Stage assistantStage;
+    private boolean assistantVisible = false;
 
     private ServiceService serviceService;
     private ExchangeRateService exchangeRateService;
@@ -94,11 +101,69 @@ public class ServiceTabController implements Initializable {
                 actionButtonsBar.setVisible(false);
                 actionButtonsBar.setManaged(false);
             }
-
-
         }
     }
 
+    @FXML
+    private void toggleAssistant() {
+        if (!assistantVisible) {
+            openAssistantAsPopup();
+        } else {
+            closeAssistant();
+        }
+    }
+
+    private void openAssistantAsPopup() {
+        try {
+            if (assistantStage == null || !assistantStage.isShowing()) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/ai-assistant-view.fxml"));
+                Parent root = loader.load();
+
+                assistantStage = new Stage();
+                assistantStage.initStyle(StageStyle.UTILITY); // Fenêtre sans décoration
+                assistantStage.setTitle("Assistant IA");
+
+                Scene scene = new Scene(root, 350, 500);
+                assistantStage.setScene(scene);
+
+                // Positionner la fenêtre à côté de la bulle
+                positionAssistantWindow();
+
+                // Quand la fenêtre est fermée, mettre à jour l'état
+                assistantStage.setOnCloseRequest(e -> {
+                    assistantVisible = false;
+                });
+
+                assistantStage.show();
+                assistantVisible = true;
+            }
+        } catch (IOException e) {
+            showAlert("Erreur", "Impossible d'ouvrir l'assistant: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void closeAssistant() {
+        if (assistantStage != null && assistantStage.isShowing()) {
+            assistantStage.close();
+            assistantVisible = false;
+        }
+    }
+
+    private void positionAssistantWindow() {
+        if (assistantStage != null && assistantBubble != null) {
+            // Récupérer la position de la bulle par rapport à l'écran
+            Point2D screenPos = assistantBubble.localToScreen(0, 0);
+
+            if (screenPos != null) {
+                // Positionner la fenêtre de l'assistant à gauche de la bulle
+                assistantStage.setX(screenPos.getX() - 370); // 350 + marge
+                assistantStage.setY(screenPos.getY() - 450); // 500 - hauteur bulle
+            }
+        }
+    }
+
+    // ✅ Méthode openVisio existante
     @FXML
     private void openVisio() {
         if (!UserRole.getInstance().isAdmin()) {
@@ -200,7 +265,7 @@ public class ServiceTabController implements Initializable {
             card.setMaxWidth(Double.MAX_VALUE);
             card.setPrefWidth(Region.USE_COMPUTED_SIZE);
 
-
+            // Header
             HBox header = new HBox(10);
             header.getStyleClass().add("card-header");
             header.setAlignment(Pos.CENTER_LEFT);
@@ -269,7 +334,6 @@ public class ServiceTabController implements Initializable {
             actions.setAlignment(Pos.CENTER_RIGHT);
 
             if (UserRole.getInstance().isAdmin()) {
-                // Admin : afficher les boutons d'action
                 if (modeArchive) {
                     Button btnDesarchiver = new Button("Restaurer");
                     btnDesarchiver.getStyleClass().add("card-button-restore");
@@ -287,7 +351,6 @@ public class ServiceTabController implements Initializable {
                     actions.getChildren().addAll(btnArchiver, btnModifier);
                 }
             } else {
-                // Employé : message de consultation seule
                 Label consultationLabel = new Label("🔍 Consultation seule");
                 consultationLabel.setStyle("-fx-text-fill: #95a5a6; -fx-font-size: 11px;");
                 actions.getChildren().add(consultationLabel);
