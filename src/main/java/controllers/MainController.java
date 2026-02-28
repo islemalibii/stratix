@@ -35,20 +35,17 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        staticContentArea = contentArea;    }
+        staticContentArea = contentArea;
+        System.out.println("✅ MainController initialisé");
+    }
 
     public void initData(Utilisateur user) {
         updateUserInfo(user);
-
         applyRoleBasedVisibility(user);
 
-        if (user.getRole() == Role.EMPLOYE) {
-            loadView("/EventEmployeeDashboard.fxml");
-        } else {
-            loadView("/EventDashboard.fxml");
-        }
+        // 🔥 TOUJOURS LE DASHBOARD D'ABORD
+        loadView("/dashboard-view.fxml");
     }
-
 
     private void updateUserInfo(Utilisateur user) {
         if (lblUserName == null) return;
@@ -76,7 +73,6 @@ public class MainController implements Initializable {
         }
     }
 
-
     @FXML
     private void showServices(ActionEvent event) {
         loadView("/service-tab.fxml");
@@ -102,20 +98,18 @@ public class MainController implements Initializable {
                 "/EmployeListeProjets.fxml" : "/ListeProjets.fxml";
         loadView(fxml);
     }
+
     private void loadView(String fxmlPath) {
         try {
-            // Load the FXML (which is now just the VBox content)
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent view = loader.load();
-
-            // Clear the StackPane and inject only the new content
             contentArea.getChildren().setAll(view);
+            System.out.println("✅ Vue chargée: " + fxmlPath);
         } catch (IOException e) {
+            System.err.println("❌ Erreur chargement " + fxmlPath + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
-
-
 
     @FXML
     private void showResources() {
@@ -133,15 +127,55 @@ public class MainController implements Initializable {
         loadView(fxml);
     }
 
+    // ⭐ MÉTHODE PRINCIPALE - TOUJOURS LE DASHBOARD ⭐
     @FXML
     private void showPlanning() {
-        Utilisateur user = UserRole.getInstance().getUser();
-        String fxml = (user != null && user.getRole() == Role.EMPLOYE) ?
-                "/EmpTacheView.fxml" : "/dashboard-view.fxml";
-        loadView(fxml);
+        System.out.println("🔄 Navigation vers Tâches et Planning - Dashboard");
+        loadView("/dashboard-view.fxml");
     }
 
+    // ⭐ MÉTHODES STATIQUES POUR DASHBOARD ⭐
+    public static void showTachesFromDashboard() {
+        if (staticContentArea != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(MainController.class.getResource("/TacheView.fxml"));
+                Parent view = loader.load();
+                staticContentArea.getChildren().setAll(view);
+                System.out.println("✅ Navigation vers Tâches depuis Dashboard");
+            } catch (IOException e) {
+                System.err.println("❌ Erreur chargement Tâches: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
 
+    public static void showPlanningFromDashboard() {
+        if (staticContentArea != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(MainController.class.getResource("/PlanningView.fxml"));
+                Parent view = loader.load();
+                staticContentArea.getChildren().setAll(view);
+                System.out.println("✅ Navigation vers Planning depuis Dashboard");
+            } catch (IOException e) {
+                System.err.println("❌ Erreur chargement Planning: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void showCalendarFromDashboard() {
+        if (staticContentArea != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(MainController.class.getResource("/calendar-view.fxml"));
+                Parent view = loader.load();
+                staticContentArea.getChildren().setAll(view);
+                System.out.println("✅ Navigation vers Calendrier depuis Dashboard");
+            } catch (IOException e) {
+                System.err.println("❌ Erreur chargement Calendrier: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
 
     @FXML
     private void handleLogout() {
@@ -157,8 +191,4 @@ public class MainController implements Initializable {
             e.printStackTrace();
         }
     }
-
-
-
-
 }

@@ -21,7 +21,7 @@ public class MainsController {
     private Parent tacheView;
     private Parent calendarView;
     private Parent whiteboardView;
-    private Parent empMainView;  // ← Pour l'espace employé
+    private Parent empMainView;  // Pour l'espace employé
 
     @FXML
     public void initialize() {
@@ -131,17 +131,42 @@ public class MainsController {
         }
     }
 
+    // ⭐ NOUVELLE MÉTHODE AJOUTÉE ⭐
+    public static void showEmpMain() {
+        if (instance != null && instance.mainPane != null && instance.empMainView != null) {
+            instance.mainPane.getChildren().clear();
+            instance.mainPane.getChildren().add(instance.empMainView);
+            System.out.println("🔄 Navigation vers Espace Employé");
+        } else {
+            System.err.println("❌ Impossible de charger l'espace employé");
+            if (instance == null) {
+                System.err.println("   - instance est null");
+            } else if (instance.mainPane == null) {
+                System.err.println("   - mainPane est null");
+            } else if (instance.empMainView == null) {
+                System.err.println("   - empMainView est null (fichier EmpMainView.fxml non chargé)");
+            }
+        }
+    }
 
     @FXML
     private void showPlanningFromButton() { showPlanning(); }
+
     @FXML
     private void showTachesFromButton() { showTaches(); }
+
     @FXML
     private void showDashboardFromButton() { showDashboard(); }
+
     @FXML
     private void showCalendarFromButton() { showCalendar(); }
+
     @FXML
     private void showWhiteboardFromButton() { showWhiteboard(); }
+
+    // ⭐ BOUTON POUR L'ESPACE EMPLOYÉ (optionnel) ⭐
+    @FXML
+    private void showEmpMainFromButton() { showEmpMain(); }
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

@@ -1,30 +1,33 @@
 package controllers;
 
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
-import models.Employe;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import models.Tache;
-import services.EmployeeService;
+import models.Employe;
 import services.SERVICETache;
+import services.EmployeeService;
 
-import java.sql.Date;
 import java.io.IOException;
+import java.net.URL;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+import java.util.ResourceBundle;
 
-public class TacheController {
+public class TacheController implements Initializable {
 
     @FXML private TextField txtTitre;
     @FXML private TextField txtDescription;
-    @FXML private ComboBox<Employe> cmbEmploye;
-    @FXML private TextField txtProjetId;
     @FXML private ComboBox<String> cbPriorite;
     @FXML private ComboBox<String> cbStatut;
+    @FXML private ComboBox<Employe> cmbEmploye;
+    @FXML private TextField txtProjetId;
     @FXML private DatePicker dpDeadline;
 
     @FXML private Label lblTotalTaches;
@@ -32,19 +35,27 @@ public class TacheController {
     @FXML private Label lblEnCours;
     @FXML private Label lblTerminees;
 
-    private SERVICETache service = new SERVICETache();
-    private EmployeeService employeService = new EmployeeService();
-    private int selectedTacheId = -1;
+    private SERVICETache tacheService;
+    private EmployeeService employeService;
+    private int tacheIdEnModification = -1;
 
-    @FXML
-    public void initialize() {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         System.out.println("=== Initialisation TacheController ===");
 
-        // Charger les employés dans la ComboBox
-        List<Employe> employes = employeService.getAllEmployes();
-        cmbEmploye.setItems(FXCollections.observableArrayList(employes));
+        tacheService = new SERVICETache();
+        employeService = new EmployeeService();
 
-        // Afficher le nom dans la ComboBox
+        // Initialiser les combobox
+        cbPriorite.setItems(FXCollections.observableArrayList("HAUTE", "MOYENNE", "BASSE"));
+        cbStatut.setItems(FXCollections.observableArrayList("A_FAIRE", "EN_COURS", "TERMINEE"));
+
+        // Charger les employés
+        List<Employe> employes = employeService.getAllEmployes();
+        ObservableList<Employe> employeList = FXCollections.observableArrayList(employes);
+        cmbEmploye.setItems(employeList);
+
+        // Configuration de l'affichage des employés
         cmbEmploye.setCellFactory(param -> new ListCell<Employe>() {
             @Override
             protected void updateItem(Employe emp, boolean empty) {
@@ -52,7 +63,7 @@ public class TacheController {
                 if (empty || emp == null) {
                     setText(null);
                 } else {
-                    setText(emp.getDisplayName());
+                    setText(emp.getUsername() + " (ID: " + emp.getId() + ")");
                 }
             }
         });
@@ -64,187 +75,21 @@ public class TacheController {
                 if (empty || emp == null) {
                     setText(null);
                 } else {
-                    setText(emp.getDisplayName());
+                    setText(emp.getUsername());
                 }
             }
         });
 
-        // Initialiser les ComboBox
-        cbPriorite.getItems().addAll("HAUTE", "MOYENNE", "BASSE");
-        cbStatut.getItems().addAll("A_FAIRE", "EN_COURS", "TERMINEE");
-
-        // Vérification des composants
-        System.out.println("   cmbEmploye: " + (cmbEmploye != null ? "✅" : "❌"));
-        System.out.println("   cbPriorite: " + (cbPriorite != null ? "✅" : "❌"));
-        System.out.println("   cbStatut: " + (cbStatut != null ? "✅" : "❌"));
-        System.out.println("   txtTitre: " + (txtTitre != null ? "✅" : "❌"));
-
+        // Mettre à jour les statistiques
         mettreAJourStatistiques();
     }
 
-    public void setTacheToEdit(Tache tache) {
-        this.selectedTacheId = tache.getId();
-        txtTitre.setText(tache.getTitre());
-        txtDescription.setText(tache.getDescription());
-        txtProjetId.setText(String.valueOf(tache.getProjetId()));
-        cbPriorite.setValue(tache.getPriorite());
-        cbStatut.setValue(tache.getStatut());
-
-        if (tache.getDeadline() != null) {
-            dpDeadline.setValue(tache.getDeadline().toLocalDate());
-        }
-
-        // Auto-select the employee in the ComboBox
-        for (Employe emp : cmbEmploye.getItems()) {
-            if (emp.getId() == tache.getEmployeId()) {
-                cmbEmploye.setValue(emp);
-                break;
-            }
-        }
-    }
-
-    @FXML
-    private void openTacheListe() {
-        loadView("/TacheListeView.fxml");
-    }
-
-    private void loadView(String fxmlPath) {
-        try {
-            Parent view = FXMLLoader.load(getClass().getResource(fxmlPath));
-            if (MainController.staticContentArea != null) {
-                MainController.staticContentArea.getChildren().setAll(view);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            showAlert("Erreur", "Impossible de charger la vue : " + fxmlPath);
-        }
-    }
-
-    @FXML
-    void ajouterTache() {
-        try {
-            if (!validerChamps()) return;
-
-            Tache t = new Tache();
-            t.setTitre(txtTitre.getText());
-            t.setDescription(txtDescription.getText());
-            t.setDeadline(Date.valueOf(dpDeadline.getValue()));
-            t.setStatut(cbStatut.getValue());
-            t.setPriorite(cbPriorite.getValue());
-
-            Employe selectedEmploye = cmbEmploye.getValue();
-            t.setEmployeId(selectedEmploye.getId());
-            t.setProjetId(Integer.parseInt(txtProjetId.getText()));
-
-            service.addTache(t);
-            showAlert("Succès", "✅ Tâche ajoutée avec succès !");
-            mettreAJourStatistiques();
-            viderFormulaire();
-
-        } catch (NumberFormatException e) {
-            showAlert("Erreur", "L'ID Projet doit être un nombre !");
-        } catch (Exception e) {
-            showAlert("Erreur", "Erreur : " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-//
-    @FXML
-    void modifierTache() {
-        if (selectedTacheId == -1) {
-            showAlert("Erreur", "Sélectionnez d'abord une tâche dans la liste !");
-            return;
-        }
-
-        try {
-            if (!validerChamps()) return;
-
-            Tache t = new Tache();
-            t.setId(selectedTacheId);
-            t.setTitre(txtTitre.getText());
-            t.setDescription(txtDescription.getText());
-            t.setDeadline(Date.valueOf(dpDeadline.getValue()));
-            t.setStatut(cbStatut.getValue());
-            t.setPriorite(cbPriorite.getValue());
-
-            Employe selectedEmploye = cmbEmploye.getValue();
-            t.setEmployeId(selectedEmploye.getId());
-            t.setProjetId(Integer.parseInt(txtProjetId.getText()));
-
-            service.updateTache(t);
-            showAlert("Succès", "✅ Tâche modifiée avec succès !");
-            mettreAJourStatistiques();
-            viderFormulaire();
-
-        } catch (Exception e) {
-            showAlert("Erreur", "Erreur lors de la modification : " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    void supprimerTache() {
-        if (selectedTacheId == -1) {
-            showAlert("Erreur", "Sélectionnez d'abord une tâche dans la liste !");
-            return;
-        }
-
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Confirmation");
-        confirm.setHeaderText(null);
-        confirm.setContentText("Voulez-vous vraiment supprimer cette tâche ?");
-
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            service.deleteTache(selectedTacheId);
-            showAlert("Succès", "✅ Tâche supprimée avec succès !");
-            mettreAJourStatistiques();
-            viderFormulaire();
-        }
-    }
-
-
-
-    private boolean validerChamps() {
-        if (txtTitre.getText().trim().isEmpty()) {
-            showAlert("Erreur", "❌ Le titre est requis !");
-            return false;
-        }
-        if (txtDescription.getText().trim().isEmpty()) {
-            showAlert("Erreur", "❌ La description est requise !");
-            return false;
-        }
-        if (dpDeadline.getValue() == null) {
-            showAlert("Erreur", "❌ La deadline est requise !");
-            return false;
-        }
-        if (cbStatut.getValue() == null) {
-            showAlert("Erreur", "❌ Le statut est requis !");
-            return false;
-        }
-        if (cbPriorite.getValue() == null) {
-            showAlert("Erreur", "❌ La priorité est requise !");
-            return false;
-        }
-        if (cmbEmploye.getValue() == null) {
-            showAlert("Erreur", "❌ Sélectionnez un employé !");
-            return false;
-        }
-        if (txtProjetId.getText().trim().isEmpty()) {
-            showAlert("Erreur", "❌ L'ID Projet est requis !");
-            return false;
-        }
-        return true;
-    }
-
     private void mettreAJourStatistiques() {
-        List<Tache> taches = service.getAllTaches();
-        int total = taches.size();
-        int aFaire = 0;
-        int enCours = 0;
-        int terminees = 0;
+        List<Tache> toutesTaches = tacheService.getAllTaches();
+        int total = toutesTaches.size();
+        int aFaire = 0, enCours = 0, terminees = 0;
 
-        for (Tache t : taches) {
+        for (Tache t : toutesTaches) {
             switch(t.getStatut()) {
                 case "A_FAIRE": aFaire++; break;
                 case "EN_COURS": enCours++; break;
@@ -252,21 +97,162 @@ public class TacheController {
             }
         }
 
-        if (lblTotalTaches != null) lblTotalTaches.setText(String.valueOf(total));
-        if (lblAFaire != null) lblAFaire.setText(String.valueOf(aFaire));
-        if (lblEnCours != null) lblEnCours.setText(String.valueOf(enCours));
-        if (lblTerminees != null) lblTerminees.setText(String.valueOf(terminees));
+        lblTotalTaches.setText(String.valueOf(total));
+        lblAFaire.setText(String.valueOf(aFaire));
+        lblEnCours.setText(String.valueOf(enCours));
+        lblTerminees.setText(String.valueOf(terminees));
+    }
+
+    @FXML
+    private void ajouterTache() {
+        if (!validerChamps()) return;
+
+        try {
+            Tache nouvelleTache = new Tache();
+            nouvelleTache.setTitre(txtTitre.getText().trim());
+            nouvelleTache.setDescription(txtDescription.getText().trim());
+            nouvelleTache.setPriorite(cbPriorite.getValue());
+            nouvelleTache.setStatut(cbStatut.getValue());
+
+            Employe selectedEmp = cmbEmploye.getValue();
+            nouvelleTache.setEmployeId(selectedEmp.getId());
+
+            nouvelleTache.setProjetId(Integer.parseInt(txtProjetId.getText().trim()));
+            nouvelleTache.setDeadline(Date.valueOf(dpDeadline.getValue()));
+
+            tacheService.addTache(nouvelleTache);
+            showAlert("Succès", "✅ Tâche ajoutée avec succès !");
+            viderFormulaire();
+            mettreAJourStatistiques();
+
+        } catch (Exception e) {
+            showAlert("Erreur", "❌ Erreur : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void modifierTache() {
+        if (tacheIdEnModification == -1) {
+            showAlert("Erreur", "❌ Aucune tâche sélectionnée pour modification");
+            return;
+        }
+
+        if (!validerChamps()) return;
+
+        try {
+            Tache tache = new Tache();
+            tache.setId(tacheIdEnModification);
+            tache.setTitre(txtTitre.getText().trim());
+            tache.setDescription(txtDescription.getText().trim());
+            tache.setPriorite(cbPriorite.getValue());
+            tache.setStatut(cbStatut.getValue());
+
+            Employe selectedEmp = cmbEmploye.getValue();
+            tache.setEmployeId(selectedEmp.getId());
+
+            tache.setProjetId(Integer.parseInt(txtProjetId.getText().trim()));
+            tache.setDeadline(Date.valueOf(dpDeadline.getValue()));
+
+            tacheService.updateTache(tache);
+            showAlert("Succès", "✏️ Tâche modifiée avec succès !");
+            viderFormulaire();
+            tacheIdEnModification = -1;
+            mettreAJourStatistiques();
+
+        } catch (Exception e) {
+            showAlert("Erreur", "❌ Erreur : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void supprimerTache() {
+        if (tacheIdEnModification == -1) {
+            showAlert("Erreur", "❌ Aucune tâche sélectionnée pour suppression");
+            return;
+        }
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmation");
+        confirm.setHeaderText("Supprimer la tâche");
+        confirm.setContentText("Voulez-vous vraiment supprimer cette tâche ?");
+
+        if (confirm.showAndWait().get() == ButtonType.OK) {
+            tacheService.deleteTache(tacheIdEnModification);
+            showAlert("Succès", "🗑️ Tâche supprimée !");
+            viderFormulaire();
+            tacheIdEnModification = -1;
+            mettreAJourStatistiques();
+        }
+    }
+
+    public void setTacheToEdit(Tache tache) {
+        if (tache != null) {
+            this.tacheIdEnModification = tache.getId();
+            txtTitre.setText(tache.getTitre());
+            txtDescription.setText(tache.getDescription());
+            cbPriorite.setValue(tache.getPriorite());
+            cbStatut.setValue(tache.getStatut());
+
+            Employe emp = employeService.getEmployeById(tache.getEmployeId());
+            if (emp != null) {
+                cmbEmploye.setValue(emp);
+            }
+
+            txtProjetId.setText(String.valueOf(tache.getProjetId()));
+            dpDeadline.setValue(tache.getDeadline().toLocalDate());
+        }
+    }
+
+    private boolean validerChamps() {
+        if (txtTitre.getText().trim().isEmpty()) {
+            showAlert("Erreur", "❌ Le titre est obligatoire");
+            return false;
+        }
+        if (cbPriorite.getValue() == null) {
+            showAlert("Erreur", "❌ La priorité est obligatoire");
+            return false;
+        }
+        if (cbStatut.getValue() == null) {
+            showAlert("Erreur", "❌ Le statut est obligatoire");
+            return false;
+        }
+        if (cmbEmploye.getValue() == null) {
+            showAlert("Erreur", "❌ L'employé est obligatoire");
+            return false;
+        }
+        if (txtProjetId.getText().trim().isEmpty()) {
+            showAlert("Erreur", "❌ L'ID du projet est obligatoire");
+            return false;
+        }
+        if (dpDeadline.getValue() == null) {
+            showAlert("Erreur", "❌ La deadline est obligatoire");
+            return false;
+        }
+        return true;
     }
 
     private void viderFormulaire() {
         txtTitre.clear();
         txtDescription.clear();
-        dpDeadline.setValue(null);
-        cbStatut.setValue(null);
         cbPriorite.setValue(null);
+        cbStatut.setValue(null);
         cmbEmploye.setValue(null);
         txtProjetId.clear();
-        selectedTacheId = -1;
+        dpDeadline.setValue(null);
+    }
+
+    @FXML
+    private void openTacheListe() {
+        try {
+            Parent view = FXMLLoader.load(getClass().getResource("/TacheListeView.fxml"));
+            if (MainController.staticContentArea != null) {
+                MainController.staticContentArea.getChildren().setAll(view);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void showAlert(String title, String message) {
