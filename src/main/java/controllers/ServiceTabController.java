@@ -48,7 +48,6 @@ public class ServiceTabController implements Initializable {
     @FXML private TextField txtMontantEUR;
     @FXML private Button btnVisio;
 
-
     private ServiceService serviceService;
     private ExchangeRateService exchangeRateService;
     private List<Service> allServices;
@@ -87,34 +86,51 @@ public class ServiceTabController implements Initializable {
                 btnExporterPDF.setVisible(false);
                 btnExporterPDF.setManaged(false);
             }
+            if (btnVisio != null) {
+                btnVisio.setVisible(false);
+                btnVisio.setManaged(false);
+            }
             if (actionButtonsBar != null) {
                 actionButtonsBar.setVisible(false);
                 actionButtonsBar.setManaged(false);
             }
-            // La visio est accessible à tous
-        }}
-    // Ajoute cette méthode
+
+
+        }
+    }
+
     @FXML
     private void openVisio() {
+        if (!UserRole.getInstance().isAdmin()) {
+            showAlert("Accès refusé", "Seuls les administrateurs peuvent accéder à la visioconférence.");
+            return;
+        }
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/visio-view.fxml"));
             Parent root = loader.load();
 
             Stage stage = new Stage();
             stage.setTitle("stratiX - Visioconférence");
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
+
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+
+            stage.centerOnScreen();
+
             stage.setResizable(true);
             stage.setMinWidth(900);
             stage.setMinHeight(600);
+
+            stage.initModality(Modality.APPLICATION_MODAL);
 
             stage.show();
 
         } catch (IOException e) {
             showAlert("Erreur", "Impossible d'ouvrir la visio: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-
 
     @FXML
     private void showServicesList() {
@@ -184,7 +200,7 @@ public class ServiceTabController implements Initializable {
             card.setMaxWidth(Double.MAX_VALUE);
             card.setPrefWidth(Region.USE_COMPUTED_SIZE);
 
-            // Header
+
             HBox header = new HBox(10);
             header.getStyleClass().add("card-header");
             header.setAlignment(Pos.CENTER_LEFT);
