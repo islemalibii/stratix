@@ -4,12 +4,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
-
 import services.StatsService;
 import services.SERVICETache;
 import services.EmployeeService;
@@ -18,8 +15,8 @@ import models.DashboardStats;
 import models.Tache;
 import models.Employe;
 import api.QuoteAPI;
-import utils.SessionManager;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -62,6 +59,9 @@ public class DashboardController implements Initializable {
     @FXML private VBox searchResultsContainer;
     @FXML private ListView<String> searchResultsList;
 
+    // ✅ NOUVEAU : Conteneur pour le widget IA
+    @FXML private VBox chatWidgetContainer;
+
     private StatsService statsService;
     private SERVICETache tacheService;
     private EmployeeService employeService;
@@ -78,6 +78,7 @@ public class DashboardController implements Initializable {
 
         chargerStatistiques();
         chargerCitation();
+        chargerChatWidget(); // ✅ Charger le widget IA
 
         if (btnRefreshQuote != null) {
             btnRefreshQuote.setOnAction(e -> chargerCitation());
@@ -96,44 +97,54 @@ public class DashboardController implements Initializable {
         }
     }
 
+    // ✅ NOUVELLE MÉTHODE : Charger le widget IA
+    private void chargerChatWidget() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/dashboard-chat-widget.fxml"));
+            Parent chatWidget = loader.load();
+            chatWidgetContainer.getChildren().add(chatWidget);
+            System.out.println("✅ Widget IA chargé avec succès");
+        } catch (IOException e) {
+            System.err.println("❌ Erreur chargement widget IA: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     private void chargerStatistiques() {
         try {
             DashboardStats stats = statsService.getDashboardStats();
 
             // Labels principaux
-            lblTotalTaches.setText(String.valueOf(stats.getTotalTaches()));
-            lblEnCours.setText(String.valueOf(stats.getTachesEnCours()));
-            lblTerminees.setText(String.valueOf(stats.getTachesTerminees()));
-            lblEnRetard.setText(String.valueOf(stats.getTachesEnRetard()));
-            lblTotalEmployes.setText(String.valueOf(stats.getTotalEmployes()));
-            lblEnPoste.setText(String.valueOf(stats.getEmployesEnPoste()));
-            lblAbsents.setText(String.valueOf(stats.getEmployesAbsents()));
-            lblAFaire.setText(String.valueOf(stats.getTachesAFaire()));
+            if (lblTotalTaches != null) lblTotalTaches.setText(String.valueOf(stats.getTotalTaches()));
+            if (lblEnCours != null) lblEnCours.setText(String.valueOf(stats.getTachesEnCours()));
+            if (lblTerminees != null) lblTerminees.setText(String.valueOf(stats.getTachesTerminees()));
+            if (lblEnRetard != null) lblEnRetard.setText(String.valueOf(stats.getTachesEnRetard()));
+            if (lblTotalEmployes != null) lblTotalEmployes.setText(String.valueOf(stats.getTotalEmployes()));
+            if (lblEnPoste != null) lblEnPoste.setText(String.valueOf(stats.getEmployesEnPoste()));
+            if (lblAbsents != null) lblAbsents.setText(String.valueOf(stats.getEmployesAbsents()));
+            if (lblAFaire != null) lblAFaire.setText(String.valueOf(stats.getTachesAFaire()));
 
             // Mini indicateurs
-            lblTotalEmployesMini.setText(String.valueOf(stats.getTotalEmployes()));
-            lblEnRetardMini.setText(String.valueOf(stats.getTachesEnRetard()));
+            if (lblTotalEmployesMini != null) lblTotalEmployesMini.setText(String.valueOf(stats.getTotalEmployes()));
+            if (lblEnRetardMini != null) lblEnRetardMini.setText(String.valueOf(stats.getTachesEnRetard()));
+            if (lblProjetsActifs != null) lblProjetsActifs.setText("3");
 
-            // Projets actifs (valeur par défaut)
-            lblProjetsActifs.setText("3");
-
-            // Taux de complétion
             int total = stats.getTotalTaches();
             int terminees = stats.getTachesTerminees();
             int taux = total > 0 ? (terminees * 100 / total) : 0;
-            lblTauxCompletion.setText(taux + "%");
+            if (lblTauxCompletion != null) lblTauxCompletion.setText(taux + "%");
 
             // Graphique
-            lblAFaireGraph.setText(String.valueOf(stats.getTachesAFaire()));
-            lblEnCoursGraph.setText(String.valueOf(stats.getTachesEnCours()));
-            lblTermineesGraph.setText(String.valueOf(stats.getTachesTerminees()));
+            if (lblAFaireGraph != null) lblAFaireGraph.setText(String.valueOf(stats.getTachesAFaire()));
+            if (lblEnCoursGraph != null) lblEnCoursGraph.setText(String.valueOf(stats.getTachesEnCours()));
+            if (lblTermineesGraph != null) lblTermineesGraph.setText(String.valueOf(stats.getTachesTerminees()));
 
             int max = Math.max(stats.getTachesAFaire(),
                     Math.max(stats.getTachesEnCours(), stats.getTachesTerminees()));
             if (max > 0) {
-                barAFaire.setHeight((stats.getTachesAFaire() * 100.0) / max);
-                barEnCours.setHeight((stats.getTachesEnCours() * 100.0) / max);
-                barTerminees.setHeight((stats.getTachesTerminees() * 100.0) / max);
+                if (barAFaire != null) barAFaire.setHeight((stats.getTachesAFaire() * 100.0) / max);
+                if (barEnCours != null) barEnCours.setHeight((stats.getTachesEnCours() * 100.0) / max);
+                if (barTerminees != null) barTerminees.setHeight((stats.getTachesTerminees() * 100.0) / max);
             }
 
             System.out.println("✅ Dashboard mis à jour!");
@@ -147,13 +158,15 @@ public class DashboardController implements Initializable {
     private void chargerCitation() {
         try {
             String citation = QuoteAPI.getRandomQuote();
-            lblCitation.setText(citation);
+            if (lblCitation != null) lblCitation.setText(citation);
         } catch (Exception e) {
-            lblCitation.setText("“Le succès c'est d'aller d'échec en échec sans perdre son enthousiasme.” — Winston Churchill");
+            if (lblCitation != null) lblCitation.setText("“Le succès c'est d'aller d'échec en échec sans perdre son enthousiasme.” — Winston Churchill");
         }
     }
 
     private void effectuerRecherche(String recherche) {
+        if (searchResultsList == null) return;
+
         searchResultsList.getItems().clear();
 
         // Recherche dans les tâches
@@ -172,48 +185,76 @@ public class DashboardController implements Initializable {
 
         if (!resultats.isEmpty()) {
             searchResultsList.getItems().addAll(resultats);
-            searchResultsContainer.setVisible(true);
-            searchResultsContainer.setManaged(true);
+            if (searchResultsContainer != null) {
+                searchResultsContainer.setVisible(true);
+                searchResultsContainer.setManaged(true);
+            }
         } else {
             searchResultsList.getItems().add("🔍 Aucun résultat");
-            searchResultsContainer.setVisible(true);
-            searchResultsContainer.setManaged(true);
+            if (searchResultsContainer != null) {
+                searchResultsContainer.setVisible(true);
+                searchResultsContainer.setManaged(true);
+            }
         }
     }
 
     @FXML
     private void openTaches() {
         System.out.println("🔄 Navigation vers Tâches");
-        MainController.showTachesFromDashboard();  // ✅ CORRIGÉ
+        MainsController.showTaches();
     }
 
     @FXML
     private void openPlanning() {
         System.out.println("🔄 Navigation vers Planning");
-        MainController.showPlanningFromDashboard();  // ✅ CORRIGÉ
+        MainsController.showPlanning();
     }
 
     @FXML
     private void openCalendar() {
         System.out.println("🔄 Navigation vers Calendrier");
-        MainController.showCalendarFromDashboard();  // ✅ CORRIGÉ
+        MainsController.showCalendar();
+    }
+
+    private void loadView(String fxmlPath) {
+        try {
+            Parent view = FXMLLoader.load(getClass().getResource(fxmlPath));
+            if (MainController.staticContentArea != null) {
+                MainController.staticContentArea.getChildren().setAll(view);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ⭐ MÉTHODES POUR LES BOUTONS DU DASHBOARD ⭐
+    @FXML
+    private void showDashboardFromButton() {
+        System.out.println("🔄 Déjà sur le dashboard");
+        // Ne fait rien
     }
 
     @FXML
-    private void logout() {
-        try {
-            System.out.println("🔒 Déconnexion...");
-            SessionManager.getInstance().logout();
+    private void showPlanningFromButton() {
+        System.out.println("🔄 Navigation vers Planning depuis dashboard");
+        loadView("/PlanningListeView.fxml");
+    }
 
-            Parent root = FXMLLoader.load(getClass().getResource("/PagePrincipaleView.fxml"));
-            Stage stage = (Stage) lblTotalTaches.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setMaximized(true);
-            stage.show();
+    @FXML
+    private void showTachesFromButton() {
+        System.out.println("🔄 Navigation vers Tâches depuis dashboard");
+        loadView("/TacheListeView.fxml");
+    }
 
-        } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la déconnexion: " + e.getMessage());
-            e.printStackTrace();
-        }
+    @FXML
+    private void showCalendarFromButton() {
+        System.out.println("🔄 Navigation vers Calendrier depuis dashboard");
+        loadView("/calendar-view.fxml");
+    }
+
+    @FXML
+    private void showWhiteboardFromButton() {
+        System.out.println("🔄 Navigation vers Whiteboard depuis dashboard");
+        loadView("/WhiteboardView.fxml");
     }
 }

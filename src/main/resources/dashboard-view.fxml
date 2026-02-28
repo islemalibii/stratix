@@ -203,6 +203,13 @@
                     </VBox>
                 </HBox>
 
+                <!-- ✅ NOUVEAU : Widget IA (placé entre les stats et les boutons) -->
+                <VBox spacing="15">
+                    <Label text="🤖 ASSISTANT IA"
+                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-background-color: white; -fx-padding: 10 20; -fx-background-radius: 50; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 0);"/>
+                    <VBox fx:id="chatWidgetContainer" spacing="10" />
+                </VBox>
+
                 <!-- Boutons de navigation -->
                 <HBox spacing="20" alignment="CENTER" style="-fx-padding: 20 0 20 0;">
                     <Button text="📋 GESTION DES TÂCHES" onAction="#openTaches"
