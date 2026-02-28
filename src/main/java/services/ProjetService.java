@@ -1,161 +1,230 @@
 package services;
 
-import interfaces.ProjServices;
 import models.Projet;
-import utils.MyDataBase; // Mise à jour de l'import
+import utils.MyDataBase;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class ProjetService implements ProjServices {
-    private Connection connection;
+public class ProjetService {
 
-    public ProjetService() {
-        this.connection = MyDataBase.getInstance().getCnx();
-    }
+    /**
+     * Récupère tous les projets non archivés
+     */
+    public List<Projet> getAllProjets() {
+        List<Projet> list = new ArrayList<>();
+        String sql = "SELECT * FROM projet WHERE is_archived = 0 ORDER BY id DESC";
 
-    @Override
-    public void ajouterProjet(Projet p) {
-        String sql = "INSERT INTO projet (nom, description, date_debut, date_fin, budget, statut, responsable_id, equipe_membres, progression, is_archived) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, p.getNom());
-            ps.setString(2, p.getDescription());
-            ps.setDate(3, new java.sql.Date(p.getDateDebut().getTime()));
-            ps.setDate(4, new java.sql.Date(p.getDateFin().getTime()));
-            ps.setDouble(5, p.getBudget());
-            ps.setString(6, p.getStatut());
-            ps.setInt(7, p.getResponsableId());
-            ps.setString(8, p.getEquipeMembres());
-            ps.setInt(9, p.getProgression());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+        try (Connection conn = MyDataBase.getInstance().getCnx();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
 
-    @Override
-    public List<Projet> listerTousLesProjets() {
-        return recupererParEtat(0); // 0 = Non archivés
-    }
-
-    @Override
-    public List<Projet> listerArchives() {
-        return recupererParEtat(1); // 1 = Archivés
-    }
-
-    private List<Projet> recupererParEtat(int etat) {
-        List<Projet> projets = new ArrayList<>();
-        String sql = "SELECT * FROM projet WHERE is_archived = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, etat);
-            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                projets.add(new Projet(
-                        rs.getInt("id"),
-                        rs.getString("nom"),
-                        rs.getString("description"),
-                        rs.getDate("date_debut"),
-                        rs.getDate("date_fin"),
-                        rs.getDouble("budget"),
-                        rs.getString("statut"),
-                        rs.getInt("progression"),
-                        rs.getBoolean("is_archived"),
-                        rs.getInt("responsable_id"),
-                        rs.getString("equipe_membres")
-                ));
+                list.add(extractProjetFromResultSet(rs));
             }
+            System.out.println("✅ " + list.size() + " projets chargés");
+
         } catch (SQLException e) {
+            System.err.println("❌ Erreur getAllProjets: " + e.getMessage());
             e.printStackTrace();
         }
-        return projets;
+        return list;
     }
 
-    @Override
-    public void archiverUnProjet(int id) {
-        String sql = "UPDATE projet SET is_archived = 1 WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void desarchiverUnProjet(int id) {
-        String sql = "UPDATE projet SET is_archived = 0 WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void mettreAJourProjet(Projet p) {
-        String sql = "UPDATE projet SET nom=?, description=?, date_debut=?, date_fin=?, budget=?, statut=?, responsable_id=?, equipe_membres=?, progression=? WHERE id=?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, p.getNom());
-            ps.setString(2, p.getDescription());
-            ps.setDate(3, new java.sql.Date(p.getDateDebut().getTime()));
-            ps.setDate(4, new java.sql.Date(p.getDateFin().getTime()));
-            ps.setDouble(5, p.getBudget());
-            ps.setString(6, p.getStatut());
-            ps.setInt(7, p.getResponsableId());
-            ps.setString(8, p.getEquipeMembres());
-            ps.setInt(9, p.getProgression());
-            ps.setInt(10, p.getId());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void supprimerUnProjet(int id) {
-        String sql = "DELETE FROM projet WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Projet chercherProjetParId(int idProjet) {
+    /**
+     * Récupère un projet par son ID
+     */
+    public Projet getProjetById(int id) {
         String sql = "SELECT * FROM projet WHERE id = ?";
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, idProjet);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return new Projet(
-                            rs.getInt("id"),
-                            rs.getString("nom"),
-                            rs.getString("description"),
-                            rs.getDate("date_debut"),
-                            rs.getDate("date_fin"),
-                            rs.getDouble("budget"),
-                            rs.getString("statut"),
-                            rs.getInt("progression"),
-                            rs.getBoolean("is_archived"),
-                            rs.getInt("responsable_id"),
-                            rs.getString("equipe_membres")
-                    );
-                }
+        try (Connection conn = MyDataBase.getInstance().getCnx();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return extractProjetFromResultSet(rs);
             }
+
         } catch (SQLException e) {
-            System.err.println("Erreur lors de la recherche du projet (ID: " + idProjet + ") : " + e.getMessage());
+            System.err.println("❌ Erreur getProjetById: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
 
-    public List<Projet> rechercherProjets(String query, String statut) {
-        List<Projet> tous = listerTousLesProjets();
-        return tous.stream()
-                .filter(p -> (statut.equals("Tous les projets") || p.getStatut().equals(statut)))
-                .filter(p -> p.getNom().toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toList());
+    /**
+     * Ajouter un nouveau projet
+     */
+    public void ajouterProjet(Projet projet) {
+        String sql = "INSERT INTO projet (nom, description, date_debut, date_fin, budget, statut, responsable_id, equipe_membres, progression, is_archived) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
+
+        try (Connection conn = MyDataBase.getInstance().getCnx();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, projet.getNom());
+            ps.setString(2, projet.getDescription());
+            ps.setDate(3, new java.sql.Date(projet.getDateDebut().getTime()));
+            ps.setDate(4, new java.sql.Date(projet.getDateFin().getTime()));
+            ps.setDouble(5, projet.getBudget());
+            ps.setString(6, projet.getStatut());
+            ps.setInt(7, projet.getResponsableId());
+            ps.setString(8, projet.getEquipeMembres());
+            ps.setInt(9, projet.getProgression());
+
+            ps.executeUpdate();
+            System.out.println("✅ Projet ajouté: " + projet.getNom());
+
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur ajout projet: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Modifier un projet existant
+     */
+    public void modifierProjet(Projet projet) {
+        String sql = "UPDATE projet SET nom=?, description=?, date_debut=?, date_fin=?, budget=?, statut=?, " +
+                "responsable_id=?, equipe_membres=?, progression=? WHERE id=?";
+
+        try (Connection conn = MyDataBase.getInstance().getCnx();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, projet.getNom());
+            ps.setString(2, projet.getDescription());
+            ps.setDate(3, new java.sql.Date(projet.getDateDebut().getTime()));
+            ps.setDate(4, new java.sql.Date(projet.getDateFin().getTime()));
+            ps.setDouble(5, projet.getBudget());
+            ps.setString(6, projet.getStatut());
+            ps.setInt(7, projet.getResponsableId());
+            ps.setString(8, projet.getEquipeMembres());
+            ps.setInt(9, projet.getProgression());
+            ps.setInt(10, projet.getId());
+
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("✅ Projet modifié: " + projet.getNom());
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur modification projet: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Supprimer un projet définitivement
+     */
+    public void supprimerProjet(int projetId) {
+        String sql = "DELETE FROM projet WHERE id=?";
+
+        try (Connection conn = MyDataBase.getInstance().getCnx();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, projetId);
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("✅ Projet supprimé (ID: " + projetId + ")");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur suppression projet: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * ⭐ Archiver un projet (soft delete)
+     */
+    public void archiverUnProjet(int projetId) {
+        String sql = "UPDATE projet SET is_archived = 1 WHERE id = ?";
+
+        try (Connection conn = MyDataBase.getInstance().getCnx();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, projetId);
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("✅ Projet archivé (ID: " + projetId + ")");
+            } else {
+                System.out.println("⚠️ Aucun projet trouvé avec ID: " + projetId);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur archivage projet: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * ⭐ Désarchiver un projet
+     */
+    public void desarchiverProjet(int projetId) {
+        String sql = "UPDATE projet SET is_archived = 0 WHERE id = ?";
+
+        try (Connection conn = MyDataBase.getInstance().getCnx();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, projetId);
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("✅ Projet désarchivé (ID: " + projetId + ")");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur désarchivage: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Récupère tous les projets archivés
+     */
+    public List<Projet> getProjetsArchives() {
+        List<Projet> list = new ArrayList<>();
+        String sql = "SELECT * FROM projet WHERE is_archived = 1 ORDER BY id DESC";
+
+        try (Connection conn = MyDataBase.getInstance().getCnx();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+                list.add(extractProjetFromResultSet(rs));
+            }
+            System.out.println("✅ " + list.size() + " projets archivés chargés");
+
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur getProjetsArchives: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /**
+     * Extrait un projet depuis un ResultSet
+     */
+    private Projet extractProjetFromResultSet(ResultSet rs) throws SQLException {
+        Projet p = new Projet();
+        p.setId(rs.getInt("id"));
+        p.setNom(rs.getString("nom"));
+        p.setDescription(rs.getString("description"));
+        p.setDateDebut(rs.getDate("date_debut"));
+        p.setDateFin(rs.getDate("date_fin"));
+        p.setBudget(rs.getDouble("budget"));
+        p.setStatut(rs.getString("statut"));
+        p.setProgression(rs.getInt("progression"));
+        p.setArchived(rs.getBoolean("is_archived"));
+
+        // Champs supplémentaires (peuvent ne pas exister)
+        try { p.setResponsableId(rs.getInt("responsable_id")); } catch (SQLException e) { p.setResponsableId(0); }
+        try { p.setEquipeMembres(rs.getString("equipe_membres")); } catch (SQLException e) { p.setEquipeMembres(""); }
+
+        return p;
     }
 }
