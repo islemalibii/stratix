@@ -56,7 +56,6 @@ public class AjoutProjetController {
 
     private void chargerUtilisateurs() {
         String sql = "SELECT id, nom, prenom FROM utilisateur";
-        // ⚠️ IMPORTANT: On ne met PAS 'conn' dans le try-with-resources pour ne pas la fermer !
         Connection conn = MyDataBase.getInstance().getCnx();
         try (Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {

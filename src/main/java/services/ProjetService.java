@@ -17,9 +17,6 @@ public class ProjetService implements ProjServices {
         this.connection = MyDataBase.getInstance().getCnx();
     }
 
-    // ==============================
-    // AJOUTER PROJET
-    // ==============================
     @Override
     public void ajouterProjet(Projet p) {
         String sql = "INSERT INTO projet (nom, description, date_debut, date_fin, budget, statut, responsable_id, equipe_membres, progression, is_archived) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
@@ -39,9 +36,6 @@ public class ProjetService implements ProjServices {
         }
     }
 
-    // ==============================
-    // LISTER PROJETS
-    // ==============================
     @Override
     public List<Projet> listerTousLesProjets() {
         return recupererParEtat(0);
@@ -90,9 +84,6 @@ public class ProjetService implements ProjServices {
         return projets;
     }
 
-    // ==============================
-    // CHERCHER PAR ID
-    // ==============================
     @Override
     public Projet chercherProjetParId(int idProjet) {
         String sql = "SELECT p.*, u.nom AS nom_chef FROM projet p " +
@@ -128,9 +119,6 @@ public class ProjetService implements ProjServices {
         return null;
     }
 
-    // ==============================
-    // MISE À JOUR PROGRESSION AUTO
-    // ==============================
     public void mettreAJourProgression(int projetId) {
 
         String sqlCount = "SELECT COUNT(*) as total, " +
@@ -160,9 +148,7 @@ public class ProjetService implements ProjServices {
         }
     }
 
-    // ==============================
-    // MODIFIER
-    // ==============================
+
     @Override
     public void mettreAJourProjet(Projet p) {
         String sql = "UPDATE projet SET nom=?, description=?, date_debut=?, date_fin=?, budget=?, statut=?, responsable_id=?, equipe_membres=?, progression=? WHERE id=?";
@@ -183,9 +169,6 @@ public class ProjetService implements ProjServices {
         }
     }
 
-    // ==============================
-    // ARCHIVER / SUPPRIMER
-    // ==============================
     @Override
     public void archiverUnProjet(int id) {
         changerEtatArchive(id, 1);
@@ -218,9 +201,6 @@ public class ProjetService implements ProjServices {
         }
     }
 
-    // ==============================
-    // RECHERCHE
-    // ==============================
     public List<Projet> rechercherProjets(String query, String statut) {
         return listerTousLesProjets().stream()
                 .filter(p -> statut.equals("Tous les projets") || p.getStatut().equals(statut))
@@ -228,9 +208,6 @@ public class ProjetService implements ProjServices {
                 .collect(Collectors.toList());
     }
 
-    // ==============================
-    // UTILITAIRE
-    // ==============================
     private String nettoyerNomsEquipe(String bruts) {
         if (bruts == null || bruts.isEmpty()) return "Aucun membre";
         return bruts.replaceAll("\\d+\\s*-\\s*", "");

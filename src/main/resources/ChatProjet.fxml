@@ -13,7 +13,7 @@
         <HBox spacing="10">
             <children>
                 <TextField fx:id="msgInput" HBox.hgrow="ALWAYS" promptText="Écrivez votre message..." />
-                <Button onAction="#handleSend" style="-fx-background-color: #3b82f6; -fx-text-fill: white;" text="Envoyer" />
+                <Button onAction="#handleSend" style="-fx-background-color: #3b82f6; -fx-text-fill: #656464;" text="Envoyer" />
             </children>
         </HBox>
     </children>

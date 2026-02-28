@@ -9,10 +9,8 @@ import java.util.List;
 
 public class SERVICETache {
 
-    // ⭐ AJOUT DU SERVICE PROJET
     private ProjetService projetService = new ProjetService();
 
-    // CREATE
     public void addTache(Tache t) {
         String sql = """
             INSERT INTO tache (titre, description, deadline, statut, employe_id, projet_id, priorite)
@@ -33,7 +31,6 @@ public class SERVICETache {
             ps.executeUpdate();
             System.out.println("✅ Tâche ajoutée: " + t.getTitre());
 
-            // ⭐ MISE À JOUR AUTOMATIQUE DE LA PROGRESSION
             System.out.println("🔔 Appel de mettreAJourProgression pour projet " + t.getProjetId());
             projetService.mettreAJourProgression(t.getProjetId());
 
@@ -43,7 +40,6 @@ public class SERVICETache {
         }
     }
 
-    // READ
     public List<Tache> getAllTaches() {
         List<Tache> list = new ArrayList<>();
         String sql = "SELECT * FROM tache";
@@ -72,7 +68,6 @@ public class SERVICETache {
         return list;
     }
 
-    // UPDATE
     public void updateTache(Tache t) {
         String sql = """
             UPDATE tache
@@ -105,9 +100,7 @@ public class SERVICETache {
         }
     }
 
-    // DELETE
     public void deleteTache(int id) {
-        // ⭐ RÉCUPÉRER LE PROJET_ID AVANT SUPPRESSION
         int projetId = -1;
         Tache t = getTacheById(id);
         if (t != null) {
@@ -126,7 +119,6 @@ public class SERVICETache {
             if (rowsAffected > 0) {
                 System.out.println("✅ Tâche supprimée (ID: " + id + ")");
 
-                // ⭐ MISE À JOUR DE LA PROGRESSION SI ON AVAIT LE PROJET_ID
                 if (projetId != -1) {
                     System.out.println("🔔 Appel de mettreAJourProgression pour projet " + projetId);
                     projetService.mettreAJourProgression(projetId);
@@ -139,7 +131,6 @@ public class SERVICETache {
         }
     }
 
-    // GET BY ID
     public Tache getTacheById(int id) {
         String sql = "SELECT * FROM tache WHERE id = ?";
 

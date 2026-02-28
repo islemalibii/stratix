@@ -40,9 +40,6 @@ public class EmployeListeProjetController {
         }
     }
 
-    /**
-     * Charge les projets où l'utilisateur connecté est membre
-     */
     public void rafraichirListe(Utilisateur user) {
         String nomComplet = (user.getNom() + " " + user.getPrenom()).toLowerCase().trim();
         List<Projet> mesProjets = projetService.listerTousLesProjets().stream()
@@ -65,9 +62,6 @@ public class EmployeListeProjetController {
         }
     }
 
-    /**
-     * Construction visuelle d'une carte projet
-     */
     private VBox creerCarteSimple(Projet p) {
         VBox card = new VBox(15);
         card.setPrefWidth(320);
@@ -105,9 +99,6 @@ public class EmployeListeProjetController {
         return card;
     }
 
-    /**
-     * Logique pour le bouton Chat de la Sidebar
-     */
     @FXML
     private void ouvrirChat() {
         Utilisateur user = UserRole.getInstance().getUser();
@@ -129,17 +120,14 @@ public class EmployeListeProjetController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ChatProjet.fxml"));
             Parent root = loader.load();
 
-            // Récupération du contrôleur du Chat
             ChatProjetController chatCtrl = loader.getController();
 
-            // INITIALISATION PUSHER : On passe l'ID et le Nom
             chatCtrl.initChat(p.getId(), p.getNom());
 
             Stage stage = new Stage();
             stage.setTitle("Chat d'équipe - " + p.getNom());
             stage.setScene(new Scene(root));
 
-            // ✅ CRUCIAL : On coupe la connexion Pusher si l'employé ferme la fenêtre
             stage.setOnCloseRequest(e -> {
                 chatCtrl.stopChat();
                 System.out.println("Déconnexion Pusher pour le projet : " + p.getNom());
@@ -152,9 +140,6 @@ public class EmployeListeProjetController {
         }
     }
 
-    /**
-     * Affiche les informations complètes SANS le budget
-     */
     private void afficherPopupDetails(Projet p) {
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);

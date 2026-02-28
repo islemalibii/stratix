@@ -2,8 +2,10 @@ package controllers;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import models.UserRole;
 import models.Utilisateur;
@@ -32,10 +34,7 @@ public class ChatProjetController {
     private String myName;
     private ScheduledExecutorService scheduler;
 
-    // Set pour mémoriser les IDs uniques (clés Firebase) déjà affichés
     private final Set<String> displayedMessageIds = new HashSet<>();
-
-    // TON URL API FIREBASE
     private final String FIREBASE_URL = "https://stratixchat-default-rtdb.firebaseio.com/";
 
     public void initChat(int idProjet, String nomProjet) {
@@ -48,12 +47,11 @@ public class ChatProjetController {
         chatContainer.getChildren().clear();
         displayedMessageIds.clear();
 
-        // Auto-scroll vers le bas
+        // Auto-scroll vers le bas lors de l'ajout de messages
         chatContainer.heightProperty().addListener((obs, oldVal, newVal) -> {
             if (scrollPane != null) scrollPane.setVvalue(1.0);
         });
 
-        // Démarrer la synchronisation temps réel
         startRealTimeSync();
     }
 
@@ -62,10 +60,7 @@ public class ChatProjetController {
         String text = msgInput.getText().trim();
         if (text.isEmpty()) return;
 
-        // On envoie seulement à l'API.
-        // Le message s'affichera dès que fetchMessages le récupérera (Source de vérité unique)
         envoyerVersFirebase(text);
-
         msgInput.clear();
     }
 
@@ -89,7 +84,6 @@ public class ChatProjetController {
 
     private void startRealTimeSync() {
         scheduler = Executors.newSingleThreadScheduledExecutor();
-        // Vérification toutes les 2 secondes
         scheduler.scheduleAtFixedRate(this::fetchMessages, 0, 2, TimeUnit.SECONDS);
     }
 
@@ -105,7 +99,6 @@ public class ChatProjetController {
                         JSONObject allMsgs = new JSONObject(body);
 
                         Platform.runLater(() -> {
-                            // On filtre pour ne prendre que les nouveaux messages par leur ID unique
                             allMsgs.keySet().stream()
                                     .filter(key -> !displayedMessageIds.contains(key))
                                     .sorted((k1, k2) -> Long.compare(
@@ -113,11 +106,7 @@ public class ChatProjetController {
                                             allMsgs.getJSONObject(k2).getLong("timestamp")))
                                     .forEach(key -> {
                                         JSONObject m = allMsgs.getJSONObject(key);
-
-                                        // On affiche TOUT (les nôtres et ceux des autres)
                                         displayMessage(m.getString("sender"), m.getString("text"), m.getLong("timestamp"));
-
-                                        // On marque cet ID comme "affiché"
                                         displayedMessageIds.add(key);
                                     });
                         });
@@ -126,30 +115,47 @@ public class ChatProjetController {
     }
 
     private void displayMessage(String sender, String content, long timestamp) {
-        VBox msgBox = new VBox(2);
+        // Conteneur global du message (Header + Bulle)
+        VBox msgWrapper = new VBox(3);
+        boolean isMe = sender.equals(myName);
 
-        // Formatage de l'heure à partir du timestamp Cloud
+        // --- 1. Header (Nom + Heure) ---
         String heure = new SimpleDateFormat("HH:mm").format(new Date(timestamp));
-        Label nameLbl = new Label(sender + " • " + heure);
-        nameLbl.setStyle("-fx-font-size: 10px; -fx-text-fill: #64748b; -fx-font-weight: bold;");
+        Label headerLbl = new Label(isMe ? "Moi • " + heure : sender + " • " + heure);
+        headerLbl.setStyle("-fx-font-size: 10px; -fx-text-fill: #94a3b8; -fx-font-weight: bold;");
 
+        // --- 2. Bulle de texte ---
         Label contentLbl = new Label(content);
         contentLbl.setWrapText(true);
         contentLbl.setMaxWidth(280);
+        contentLbl.setMinHeight(Region.USE_PREF_SIZE);
 
-        // Si c'est moi, à droite en bleu. Sinon, à gauche en gris.
-        if (sender.equals(myName)) {
-            msgBox.setAlignment(Pos.TOP_RIGHT);
-            contentLbl.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; " +
-                    "-fx-padding: 8 12; -fx-background-radius: 15 15 0 15;");
+        // --- 3. Style et Alignement ---
+        if (isMe) {
+            msgWrapper.setAlignment(Pos.TOP_RIGHT);
+            // Bulle BLEUE moderne
+            contentLbl.setStyle(
+                    "-fx-background-color: #3b82f6; " +
+                            "-fx-text-fill: white; " +
+                            "-fx-padding: 8 12; " +
+                            "-fx-background-radius: 15 15 0 15;"
+            );
         } else {
-            msgBox.setAlignment(Pos.TOP_LEFT);
-            contentLbl.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #1e293b; " +
-                    "-fx-padding: 8 12; -fx-background-radius: 15 15 15 0;");
+            msgWrapper.setAlignment(Pos.TOP_LEFT);
+            // Bulle GRISE douce
+            contentLbl.setStyle(
+                    "-fx-background-color: #b3b3b3; " +
+                            "-fx-text-fill: #1e293b; " +
+                            "-fx-padding: 8 12; " +
+                            "-fx-background-radius: 15 15 15 0;"
+            );
         }
 
-        msgBox.getChildren().addAll(nameLbl, contentLbl);
-        chatContainer.getChildren().add(msgBox);
+        // Ajout d'une petite marge pour que les bulles ne se touchent pas
+        VBox.setMargin(msgWrapper, new Insets(5, 0, 5, 0));
+
+        msgWrapper.getChildren().addAll(headerLbl, contentLbl);
+        chatContainer.getChildren().add(msgWrapper);
     }
 
     public void stopChat() {
