@@ -17,7 +17,7 @@ public class SendGridService {
     private static final String SENDGRID_API_KEY = "SG.xxxxx"; // Remplace par ta clé API
 
     // 📧 NOUVEAU TEMPLATE ID
-    private static final String TEMPLATE_ID = "";
+    private static final String TEMPLATE_ID = "d-499e7b2342134d4bb07c7cfe7e51b543";
 
     // 📧 Email expéditeur par défaut
     private static final String FROM_EMAIL = "noreply@stratix.com";
