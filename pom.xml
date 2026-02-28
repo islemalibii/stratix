@@ -93,12 +93,34 @@
             <version>4.9.3</version>
         </dependency>
 
-        <!-- ⭐ NOUVELLES DÉPENDANCES POUR GEMINI API ⭐ -->
-        <!-- OkHttp pour les requêtes HTTP -->
+        <!-- ⭐ DÉPENDANCES POUR GROQ API ⭐ -->
+        <!-- OkHttp pour les requêtes HTTP (nécessaire pour Groq) -->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>4.12.0</version>
+        </dependency>
+
+        <!-- Okio (dépendance transitive d'OkHttp) -->
+        <dependency>
+            <groupId>com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+            <version>3.6.0</version>
+        </dependency>
+
+        <!-- Kotlin stdlib (requis par OkHttp) -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>1.8.21</version>
+        </dependency>
+
+        <!-- ⭐ AUTRES API UTILES ⭐ -->
+        <!-- API Météo (si tu utilises OpenWeatherMap) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.2</version>
         </dependency>
     </dependencies>
 
@@ -129,6 +151,25 @@
                 <configuration>
                     <mainClass>MainApp</mainClass>
                 </configuration>
+            </plugin>
+
+            <!-- Plugin pour copier les dépendances -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

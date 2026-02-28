@@ -4,17 +4,23 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+
 import services.StatsService;
 import services.SERVICETache;
 import services.EmployeeService;
 import services.SERVICEPlanning;
+import services.GroqAPI;
 import models.DashboardStats;
 import models.Tache;
 import models.Employe;
 import api.QuoteAPI;
+import utils.SessionManager;
 
 import java.io.IOException;
 import java.net.URL;
@@ -59,6 +65,11 @@ public class DashboardController implements Initializable {
     @FXML private VBox searchResultsContainer;
     @FXML private ListView<String> searchResultsList;
 
+    // ⭐ Widget IA
+    @FXML private Label iaStatusLabel;
+    @FXML private VBox chatWidgetContainer;
+    @FXML private Label iaMessage;
+
     private StatsService statsService;
     private SERVICETache tacheService;
     private EmployeeService employeService;
@@ -76,6 +87,12 @@ public class DashboardController implements Initializable {
         chargerStatistiques();
         chargerCitation();
 
+        // ⭐ Charger le widget IA
+        loadChatWidget();
+
+        // ⭐ Vérifier le statut de l'IA
+        checkIAStatus();
+
         if (btnRefreshQuote != null) {
             btnRefreshQuote.setOnAction(e -> chargerCitation());
         }
@@ -90,6 +107,78 @@ public class DashboardController implements Initializable {
                     effectuerRecherche(newVal.trim().toLowerCase());
                 }
             });
+        }
+    }
+
+    /**
+     * ⭐ Vérifie le statut de l'IA Groq
+     */
+    private void checkIAStatus() {
+        new Thread(() -> {
+            boolean isConnected = GroqAPI.testConnection();
+            javafx.application.Platform.runLater(() -> {
+                if (iaStatusLabel != null) {
+                    if (isConnected) {
+                        iaStatusLabel.setText("En ligne");
+                        iaStatusLabel.setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold;");
+                    } else {
+                        iaStatusLabel.setText("Hors ligne");
+                        iaStatusLabel.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold;");
+                    }
+                }
+            });
+        }).start();
+    }
+
+    /**
+     * ⭐ Charge le widget IA avec fallback sur plusieurs chemins
+     */
+    private void loadChatWidget() {
+        try {
+            // Liste des chemins possibles
+            String[] paths = {
+                    "/dashboard-chat-widget.fxml",
+                    "/DashboardChatWidget.fxml",
+                    "/fxml/dashboard-chat-widget.fxml",
+                    "/chat/dashboard-chat-widget.fxml",
+                    "/widgets/dashboard-chat-widget.fxml"
+            };
+
+            FXMLLoader loader = null;
+            String foundPath = null;
+
+            for (String path : paths) {
+                if (getClass().getResource(path) != null) {
+                    System.out.println("✅ Widget IA trouvé: " + path);
+                    loader = new FXMLLoader(getClass().getResource(path));
+                    foundPath = path;
+                    break;
+                }
+            }
+
+            if (loader == null) {
+                System.err.println("❌ Widget IA non trouvé dans les ressources");
+                if (iaMessage != null) {
+                    iaMessage.setText("❌ Widget IA non disponible - fichier manquant");
+                }
+                return;
+            }
+
+            VBox chatWidget = loader.load();
+            if (chatWidgetContainer != null) {
+                chatWidgetContainer.getChildren().add(chatWidget);
+                if (iaMessage != null) {
+                    iaMessage.setVisible(false);
+                    iaMessage.setManaged(false);
+                }
+                System.out.println("✅ Widget IA chargé avec succès depuis: " + foundPath);
+            }
+        } catch (IOException e) {
+            System.err.println("❌ Erreur chargement widget IA: " + e.getMessage());
+            e.printStackTrace();
+            if (iaMessage != null) {
+                iaMessage.setText("❌ Erreur de chargement: " + e.getMessage());
+            }
         }
     }
 
@@ -184,19 +273,19 @@ public class DashboardController implements Initializable {
     @FXML
     private void openTaches() {
         System.out.println("🔄 Navigation vers Tâches");
-        MainsController.showTaches();
+        MainController.showTachesFromDashboard();
     }
 
     @FXML
     private void openPlanning() {
         System.out.println("🔄 Navigation vers Planning");
-        MainsController.showPlanning();
+        MainController.showPlanningFromDashboard();
     }
 
     @FXML
     private void openCalendar() {
         System.out.println("🔄 Navigation vers Calendrier");
-        MainsController.showCalendar();
+        MainController.showCalendarFromDashboard();
     }
 
     private void loadView(String fxmlPath) {
@@ -210,34 +299,36 @@ public class DashboardController implements Initializable {
         }
     }
 
-    // ⭐ MÉTHODES POUR LES BOUTONS DU DASHBOARD ⭐
     @FXML
-    private void showDashboardFromButton() {
-        System.out.println("🔄 Déjà sur le dashboard");
-        // Ne fait rien
-    }
+    private void showDashboardFromButton() { loadView("/dashboard-view.fxml"); }
 
     @FXML
-    private void showPlanningFromButton() {
-        System.out.println("🔄 Navigation vers Planning depuis dashboard");
-        loadView("/PlanningListeView.fxml");
-    }
+    private void showPlanningFromButton() { loadView("/PlanningListeView.fxml"); }
 
     @FXML
-    private void showTachesFromButton() {
-        System.out.println("🔄 Navigation vers Tâches depuis dashboard");
-        loadView("/TacheListeView.fxml");
-    }
+    private void showTachesFromButton() { loadView("/TacheListeView.fxml"); }
 
     @FXML
-    private void showCalendarFromButton() {
-        System.out.println("🔄 Navigation vers Calendrier depuis dashboard");
-        loadView("/calendar-view.fxml");
-    }
+    private void showCalendarFromButton() { loadView("/calendar-view.fxml"); }
 
     @FXML
-    private void showWhiteboardFromButton() {
-        System.out.println("🔄 Navigation vers Whiteboard depuis dashboard");
-        loadView("/WhiteboardView.fxml");
+    private void showWhiteboardFromButton() { loadView("/WhiteboardView.fxml"); }
+
+    @FXML
+    private void logout() {
+        try {
+            System.out.println("🔒 Déconnexion...");
+            SessionManager.getInstance().logout();
+
+            Parent root = FXMLLoader.load(getClass().getResource("/PagePrincipaleView.fxml"));
+            Stage stage = (Stage) lblTotalTaches.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setMaximized(true);
+            stage.show();
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur lors de la déconnexion: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
