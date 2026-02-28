@@ -268,4 +268,4 @@ public class SendGridService {
         if (email == null || !email.contains("@")) return "Utilisateur";
         return email.substring(0, email.indexOf('@'));
     }
-}
+}//

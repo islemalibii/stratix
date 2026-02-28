@@ -17,7 +17,7 @@ public class DashboardNotificationManager {
             instance = new DashboardNotificationManager();
         }
         return instance;
-    }
+    }//
 
     public void notifyNewTask(String recipientEmail, String taskTitle, String taskDescription, Runnable onSuccess) {
         emailService.sendEmailAsync(recipientEmail,
@@ -66,4 +66,4 @@ public class DashboardNotificationManager {
         alert.setContentText(message);
         alert.showAndWait();
     }
-}//
+}
