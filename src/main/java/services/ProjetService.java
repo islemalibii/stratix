@@ -55,6 +55,94 @@ public class ProjetService {
         return null;
     }
 
+    // ⭐ MÉTHODE CORRIGÉE - Utilise 'TERMINEE' au lieu de 'Terminé'
+    public void mettreAJourProgression(int projetId) {
+        System.out.println("\n🔄 ===== MISE À JOUR PROGRESSION =====");
+        System.out.println("🔄 Projet ID: " + projetId);
+
+        // Vérifier d'abord si le projet existe
+        Projet projet = getProjetById(projetId);
+        if (projet == null) {
+            System.out.println("❌ ERREUR: Projet ID " + projetId + " n'existe pas!");
+            return;
+        }
+        System.out.println("✅ Projet trouvé: " + projet.getNom());
+
+        // Afficher toutes les tâches du projet
+        String sqlTaches = "SELECT id, titre, statut FROM tache WHERE projet_id = ?";
+        try (Connection conn = MyDataBase.getInstance().getCnx();
+             PreparedStatement ps = conn.prepareStatement(sqlTaches)) {
+
+            ps.setInt(1, projetId);
+            ResultSet rs = ps.executeQuery();
+
+            System.out.println("📋 Tâches du projet:");
+            boolean hasTasks = false;
+            while (rs.next()) {
+                hasTasks = true;
+                System.out.println("   - ID: " + rs.getInt("id") +
+                        " | Titre: " + rs.getString("titre") +
+                        " | Statut: '" + rs.getString("statut") + "'");
+            }
+            if (!hasTasks) {
+                System.out.println("   ⚠️ Aucune tâche trouvée pour ce projet");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur affichage tâches: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // ⭐ CORRECTION ICI - Utilisation de 'TERMINEE' au lieu de 'Terminé'
+        String sqlCount = "SELECT " +
+                "COUNT(*) as total, " +
+                "SUM(CASE WHEN statut = 'TERMINEE' THEN 1 ELSE 0 END) as terminees " +
+                "FROM tache WHERE projet_id = ?";
+
+        try (Connection conn = MyDataBase.getInstance().getCnx();
+             PreparedStatement ps = conn.prepareStatement(sqlCount)) {
+
+            ps.setInt(1, projetId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                int total = rs.getInt("total");
+                int terminees = rs.getInt("terminees");
+
+                System.out.println("📊 RÉSULTATS DU CALCUL:");
+                System.out.println("   - Total tâches: " + total);
+                System.out.println("   - Tâches terminées (TERMINEE): " + terminees);
+
+                int progression = 0;
+                if (total > 0) {
+                    progression = (terminees * 100) / total;
+                }
+
+                System.out.println("   📈 Progression calculée: " + progression + "%");
+
+                // Mettre à jour la table projet
+                String sqlUpdate = "UPDATE projet SET progression = ? WHERE id = ?";
+                try (PreparedStatement psUpdate = conn.prepareStatement(sqlUpdate)) {
+                    psUpdate.setInt(1, progression);
+                    psUpdate.setInt(2, projetId);
+                    int rowsAffected = psUpdate.executeUpdate();
+
+                    if (rowsAffected > 0) {
+                        System.out.println("✅ SUCCÈS: Progression mise à jour à " + progression + "%");
+                    } else {
+                        System.out.println("⚠️ Aucune ligne mise à jour - Vérifie l'ID du projet");
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur mise à jour progression: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        System.out.println("🔄 ===== FIN MISE À JOUR =====\n");
+    }
+
     /**
      * Ajouter un nouveau projet
      */
@@ -138,7 +226,7 @@ public class ProjetService {
     }
 
     /**
-     * ⭐ Archiver un projet (soft delete)
+     * Archiver un projet (soft delete)
      */
     public void archiverUnProjet(int projetId) {
         String sql = "UPDATE projet SET is_archived = 1 WHERE id = ?";
@@ -162,7 +250,7 @@ public class ProjetService {
     }
 
     /**
-     * ⭐ Désarchiver un projet
+     * Désarchiver un projet
      */
     public void desarchiverProjet(int projetId) {
         String sql = "UPDATE projet SET is_archived = 0 WHERE id = ?";
@@ -221,7 +309,6 @@ public class ProjetService {
         p.setProgression(rs.getInt("progression"));
         p.setArchived(rs.getBoolean("is_archived"));
 
-        // Champs supplémentaires (peuvent ne pas exister)
         try { p.setResponsableId(rs.getInt("responsable_id")); } catch (SQLException e) { p.setResponsableId(0); }
         try { p.setEquipeMembres(rs.getString("equipe_membres")); } catch (SQLException e) { p.setEquipeMembres(""); }
 
