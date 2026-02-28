@@ -260,6 +260,7 @@ public class AIAssistantController implements Initializable {
             scrollToBottom();
         });
     }
+    //
 
     private void scrollToBottom() {
         if (scrollPane != null) {
