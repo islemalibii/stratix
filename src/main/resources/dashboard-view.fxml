@@ -24,7 +24,7 @@
 
             <!-- Barre de navigation avec statut IA -->
             <HBox spacing="10" alignment="CENTER_LEFT">
-                <Button onAction="#showDashboardFromButton" text="🏠 Dashboard"
+                <Button onAction="#showDashboardFromButton" text="🏠 Accueil"
                         style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-padding: 8 15; -fx-background-radius: 5; -fx-font-weight: bold; -fx-cursor: hand;" />
                 <Button onAction="#showPlanningFromButton" text="📅 Planning"
                         style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-padding: 8 15; -fx-background-radius: 5; -fx-font-weight: bold; -fx-cursor: hand;" />
