@@ -39,6 +39,7 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         staticContentArea = contentArea;
+        System.out.println("✅ MainController initialisé");
     }
 
     public void initData(Utilisateur user) {
@@ -75,8 +76,10 @@ public class MainController implements Initializable {
 
         if (user.getRole() == Role.EMPLOYE) {
             lblUserRole.setText("Session Employé");
+            if (lblUserAvatar != null) lblUserAvatar.setText("👤");
         } else {
             lblUserRole.setText(user.getRole().name());
+            if (lblUserAvatar != null) lblUserAvatar.setText("👑");
         }
     }
 
@@ -124,7 +127,9 @@ public class MainController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent view = loader.load();
             contentArea.getChildren().setAll(view);
+            System.out.println("✅ Vue chargée: " + fxmlPath);
         } catch (IOException e) {
+            System.err.println("❌ Erreur chargement " + fxmlPath + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -145,12 +150,56 @@ public class MainController implements Initializable {
         loadView(fxml);
     }
 
+
     @FXML
     private void showPlanning() {
         Utilisateur user = UserRole.getInstance().getUser();
         String fxml = (user != null && user.getRole() == Role.EMPLOYE) ?
                 "/EmpTacheView.fxml" : "/dashboard-view.fxml";
         loadView(fxml);
+    }
+
+    // ⭐ MÉTHODES STATIQUES POUR DASHBOARD ⭐
+    public static void showTachesFromDashboard() {
+        if (staticContentArea != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(MainController.class.getResource("/TacheView.fxml"));
+                Parent view = loader.load();
+                staticContentArea.getChildren().setAll(view);
+                System.out.println("✅ Navigation vers Tâches depuis Dashboard");
+            } catch (IOException e) {
+                System.err.println("❌ Erreur chargement Tâches: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void showPlanningFromDashboard() {
+        if (staticContentArea != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(MainController.class.getResource("/PlanningView.fxml"));
+                Parent view = loader.load();
+                staticContentArea.getChildren().setAll(view);
+                System.out.println("✅ Navigation vers Planning depuis Dashboard");
+            } catch (IOException e) {
+                System.err.println("❌ Erreur chargement Planning: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void showCalendarFromDashboard() {
+        if (staticContentArea != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(MainController.class.getResource("/calendar-view.fxml"));
+                Parent view = loader.load();
+                staticContentArea.getChildren().setAll(view);
+                System.out.println("✅ Navigation vers Calendrier depuis Dashboard");
+            } catch (IOException e) {
+                System.err.println("❌ Erreur chargement Calendrier: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
@@ -167,12 +216,14 @@ public class MainController implements Initializable {
             }
 
             stage.setScene(scene);
-            stage.setTitle("Stratix - Connexion");
+            stage.setTitle("stratiX - Accueil");
             stage.centerOnScreen();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 
     @FXML
     private void handleProfileClick() {

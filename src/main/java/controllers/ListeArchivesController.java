@@ -29,7 +29,9 @@ public class ListeArchivesController {
         if (containerArchives == null) return;
 
         containerArchives.getChildren().clear();
-        List<Projet> archives = projetService.listerArchives();
+
+        // ✅ CORRIGÉ: getProjetsArchives() au lieu de listerArchives()
+        List<Projet> archives = projetService.getProjetsArchives();
 
         if (lblNbArchives != null) {
             lblNbArchives.setText(archives.size() + " projet(s) archivé(s)");
@@ -65,14 +67,16 @@ public class ListeArchivesController {
         Button btnRestaurer = new Button("Désarchiver");
         btnRestaurer.setStyle("-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
         btnRestaurer.setOnAction(e -> {
-            projetService.desarchiverUnProjet(p.getId());
+            // ✅ CORRIGÉ: desarchiverProjet() au lieu de desarchiverUnProjet()
+            projetService.desarchiverProjet(p.getId());
             chargerArchives(); // On rafraîchit la liste des archives
         });
 
         Button btnSupp = new Button("Supprimer");
         btnSupp.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-cursor: hand;");
         btnSupp.setOnAction(e -> {
-            projetService.supprimerUnProjet(p.getId());
+            // ✅ CORRIGÉ: supprimerProjet() au lieu de supprimerUnProjet()
+            projetService.supprimerProjet(p.getId());
             chargerArchives();
         });
 

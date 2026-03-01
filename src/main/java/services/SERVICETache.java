@@ -1,13 +1,16 @@
 package services;
 
 import models.Tache;
-import utils.MyDataBase; // Corrected import to match your Singleton
+import utils.MyDataBase;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SERVICETache {
+
+    // ⭐ AJOUT DU SERVICE PROJET
+    private ProjetService projetService = new ProjetService();
 
     // CREATE
     public void addTache(Tache t) {
@@ -28,9 +31,14 @@ public class SERVICETache {
             ps.setString(7, t.getPriorite());
 
             ps.executeUpdate();
-            System.out.println("✅ Tâche ajoutée");
+            System.out.println("✅ Tâche ajoutée: " + t.getTitre());
+
+            // ⭐ MISE À JOUR AUTOMATIQUE DE LA PROGRESSION
+            System.out.println("🔔 Appel de mettreAJourProgression pour projet " + t.getProjetId());
+            projetService.mettreAJourProgression(t.getProjetId());
 
         } catch (SQLException e) {
+            System.err.println("❌ Erreur addTache: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -85,25 +93,48 @@ public class SERVICETache {
             ps.setInt(8, t.getId());
 
             ps.executeUpdate();
-            System.out.println("✅ Tâche mise à jour");
+            System.out.println("✅ Tâche mise à jour: " + t.getTitre());
+
+            // ⭐ MISE À JOUR AUTOMATIQUE DE LA PROGRESSION
+            System.out.println("🔔 Appel de mettreAJourProgression pour projet " + t.getProjetId());
+            projetService.mettreAJourProgression(t.getProjetId());
 
         } catch (SQLException e) {
+            System.err.println("❌ Erreur updateTache: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     // DELETE
     public void deleteTache(int id) {
+        // ⭐ RÉCUPÉRER LE PROJET_ID AVANT SUPPRESSION
+        int projetId = -1;
+        Tache t = getTacheById(id);
+        if (t != null) {
+            projetId = t.getProjetId();
+            System.out.println("🔍 Tâche trouvée - Projet ID: " + projetId);
+        }
+
         String sql = "DELETE FROM tache WHERE id=?";
 
         Connection c = MyDataBase.getInstance().getCnx();
         try (PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ps.executeUpdate();
-            System.out.println("✅ Tâche supprimée");
+            int rowsAffected = ps.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("✅ Tâche supprimée (ID: " + id + ")");
+
+                // ⭐ MISE À JOUR DE LA PROGRESSION SI ON AVAIT LE PROJET_ID
+                if (projetId != -1) {
+                    System.out.println("🔔 Appel de mettreAJourProgression pour projet " + projetId);
+                    projetService.mettreAJourProgression(projetId);
+                }
+            }
 
         } catch (SQLException e) {
+            System.err.println("❌ Erreur deleteTache: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -132,8 +163,9 @@ public class SERVICETache {
             }
 
         } catch (SQLException e) {
+            System.err.println("❌ Erreur getTacheById: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
     }
-}
+}//

@@ -2,37 +2,75 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.*?>
 
-<VBox spacing="20" style="-fx-padding: 30; -fx-background-color: #f8fafc;"
-      xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+<VBox spacing="25" style="-fx-padding: 30; -fx-background-color: linear-gradient(to bottom, #f8fafc, #f1f5f9);"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="controllers.EmpTacheController">
 
-    <HBox spacing="15">
-        <Button text="📋 Mes Tâches" onAction="#showMesTaches"
-                style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 10; -fx-cursor: hand;"/>
-        <Button text="📅 Mon Planning" onAction="#showMonPlanning"
-                style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 10; -fx-cursor: hand;"/>
+    <!-- Header avec boutons de navigation -->
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <HBox style="-fx-background-color: white; -fx-background-radius: 50; -fx-padding: 5; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+            <Button text="📋 Mes Tâches" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 50; -fx-cursor: hand;"/>
+            <Button text="📅 Mon Planning" onAction="#showMonPlanning" style="-fx-background-color: transparent; -fx-text-fill: #64748b; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 50; -fx-cursor: hand;"/>
+        </HBox>
+        <Region HBox.hgrow="ALWAYS" />
+        <Label fx:id="lblDateDuJour" style="-fx-font-size: 14px; -fx-background-color: #e2e8f0; -fx-padding: 8 15; -fx-background-radius: 20; -fx-text-fill: #334155;" text="📅 Aujourd'hui, 27/02/2026" />
     </HBox>
 
-    <Separator />
+    <!-- Section de bienvenue avec stats -->
+    <HBox spacing="20" alignment="CENTER">
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label style="-fx-font-size: 14px; -fx-text-fill: #64748b;" text="Bonjour," />
+            <Label fx:id="lblWelcomeName" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="Ryhab Soltani" />
+        </VBox>
 
+        <!-- Cartes statistiques -->
+        <HBox spacing="15">
+            <VBox alignment="CENTER" spacing="5" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3b82f6;" fx:id="lblTotalTaches" text="0" />
+                <Label style="-fx-font-size: 12px; -fx-text-fill: #64748b;" text="Total" />
+            </VBox>
+            <VBox alignment="CENTER" spacing="5" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;" fx:id="lblEnCours" text="0" />
+                <Label style="-fx-font-size: 12px; -fx-text-fill: #64748b;" text="En cours" />
+            </VBox>
+            <VBox alignment="CENTER" spacing="5" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #10b981;" fx:id="lblTerminees" text="0" />
+                <Label style="-fx-font-size: 12px; -fx-text-fill: #64748b;" text="Terminées" />
+            </VBox>
+        </HBox>
+    </HBox>
+
+    <!-- Barre de recherche et filtres -->
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="Rechercher une tâche..." HBox.hgrow="ALWAYS"
+                   style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 25; -fx-background-radius: 25; -fx-padding: 12 20; -fx-font-size: 14px;">
+            <HBox.margin>
+                <Insets right="10" />
+            </HBox.margin>
+        </TextField>
+        <ComboBox fx:id="filterStatutCombo" promptText="Filtrer par statut" prefWidth="180"
+                  style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 25; -fx-background-radius: 25; -fx-padding: 5;"/>
+        <ComboBox fx:id="filterPrioriteCombo" promptText="Filtrer par priorité" prefWidth="180"
+                  style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 25; -fx-background-radius: 25; -fx-padding: 5;"/>
+    </HBox>
+
+    <!-- Titre de la section -->
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Label style="-fx-font-size: 32px;" text="📋" />
-        <Label style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="MES MISSIONS" />
+        <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="Mes missions" />
+        <Label fx:id="lblTachesCount" style="-fx-font-size: 14px; -fx-background-color: #e2e8f0; -fx-padding: 5 12; -fx-background-radius: 20; -fx-text-fill: #475569;" text="0 tâche" />
         <Region HBox.hgrow="ALWAYS" />
+        <Button text="🔄 Actualiser" onAction="#refreshTaches" style="-fx-background-color: transparent; -fx-text-fill: #3b82f6; -fx-font-size: 13px; -fx-cursor: hand;"/>
     </HBox>
 
-    <TableView fx:id="tableTaches" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #e2e8f0;" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="colTitre" prefWidth="180" text="Titre" />
-            <TableColumn fx:id="colDescription" prefWidth="250" text="Description" />
-            <TableColumn fx:id="colDeadline" prefWidth="120" text="Deadline" />
-            <TableColumn fx:id="colStatut" prefWidth="100" text="Statut" />
-            <TableColumn fx:id="colPriorite" prefWidth="100" text="Priorité" />
-        </columns>
-        <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-        </columnResizePolicy>
-    </TableView>
+    <!-- Liste des tâches en cartes -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background: transparent; -fx-background-color: transparent;">
+        <VBox fx:id="cardsContainer" spacing="10" style="-fx-padding: 0 0 20 0;">
+            <!-- Les cartes seront générées dynamiquement -->
+        </VBox>
+    </ScrollPane>
 
 </VBox>

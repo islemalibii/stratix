@@ -61,7 +61,8 @@ public class ModifierProjetController {
     }
 
     public void chargerDonnees(int idProjet) {
-        this.projetEnModification = service.chercherProjetParId(idProjet);
+        // ✅ CORRIGÉ: getProjetById au lieu de chercherProjetParId
+        this.projetEnModification = service.getProjetById(idProjet);
 
         if (projetEnModification != null) {
             txtNom.setText(projetEnModification.getNom());
@@ -125,14 +126,15 @@ public class ModifierProjetController {
                     .collect(Collectors.joining(", "));
             projetEnModification.setEquipeMembres(nouveauxMembres);
 
-            // Sauvegarde
-            service.mettreAJourProjet(projetEnModification);
+            // ✅ CORRIGÉ: modifierProjet au lieu de mettreAJourProjet
+            service.modifierProjet(projetEnModification);
 
             afficherAlerte(Alert.AlertType.INFORMATION, "Succès", "Projet mis à jour avec succès !");
             fermerFenetre();
 
         } catch (Exception e) {
             afficherAlerte(Alert.AlertType.ERROR, "Erreur", "Erreur lors de la mise à jour : " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -149,10 +151,31 @@ public class ModifierProjetController {
             return false;
         }
 
+        try {
+            Double.parseDouble(txtBudget.getText());
+        } catch (NumberFormatException e) {
+            afficherAlerte(Alert.AlertType.WARNING, "Budget invalide", "Le budget doit être un nombre valide.");
+            return false;
+        }
+
+        try {
+            Integer.parseInt(txtProgression.getText());
+        } catch (NumberFormatException e) {
+            afficherAlerte(Alert.AlertType.WARNING, "Progression invalide", "La progression doit être un nombre entier.");
+            return false;
+        }
+
         if (dateFin.getValue().isBefore(dateDebut.getValue())) {
             afficherAlerte(Alert.AlertType.WARNING, "Dates invalides", "La date de fin doit être après la date de début.");
             return false;
         }
+
+        int progression = Integer.parseInt(txtProgression.getText());
+        if (progression < 0 || progression > 100) {
+            afficherAlerte(Alert.AlertType.WARNING, "Progression invalide", "La progression doit être entre 0 et 100.");
+            return false;
+        }
+
         return true;
     }
 

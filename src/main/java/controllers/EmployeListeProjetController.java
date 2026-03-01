@@ -31,7 +31,8 @@ public class EmployeListeProjetController {
     }
 
     private void chargerProjetsEmploye() {
-        List<Projet> projetsActifs = projetService.listerTousLesProjets().stream()
+        // ✅ CORRIGÉ: getAllProjets() au lieu de listerTousLesProjets()
+        List<Projet> projetsActifs = projetService.getAllProjets().stream()
                 .filter(p -> "En cours".equals(p.getStatut()) || "Planifié".equals(p.getStatut()))
                 .collect(Collectors.toList());
 
@@ -46,7 +47,6 @@ public class EmployeListeProjetController {
             }
         }
     }
-
 
     private VBox creerCarteSimple(Projet p) {
         VBox card = new VBox(15);
@@ -86,13 +86,13 @@ public class EmployeListeProjetController {
     @FXML
     private void rechercherProjet() {
         String search = searchField.getText().toLowerCase();
-        List<Projet> filtrés = projetService.listerTousLesProjets().stream()
+        // ✅ CORRIGÉ: getAllProjets() au lieu de listerTousLesProjets()
+        List<Projet> filtrés = projetService.getAllProjets().stream()
                 .filter(p -> "En cours".equals(p.getStatut()) || "Planifié".equals(p.getStatut()))
                 .filter(p -> p.getNom().toLowerCase().contains(search))
                 .collect(Collectors.toList());
         afficherLesCartes(filtrés);
     }
-
 
     @FXML
     private void versBackOffice() {

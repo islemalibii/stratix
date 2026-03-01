@@ -2,37 +2,70 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.*?>
 
-<VBox spacing="20" style="-fx-padding: 30; -fx-background-color: #f8fafc;"
-      xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+<VBox spacing="25" style="-fx-padding: 30; -fx-background-color: linear-gradient(to bottom, #f8fafc, #f1f5f9);"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="controllers.EmpPlanningController">
 
-    <HBox spacing="15">
-        <Button text="📋 Mes Tâches" onAction="#showMesTaches"
-                style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 10; -fx-cursor: hand;"/>
-        <Button text="📅 Mon Planning" onAction="#showMonPlanning"
-                style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 10; -fx-cursor: hand;"/>
+    <!-- Header avec boutons de navigation -->
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <HBox style="-fx-background-color: white; -fx-background-radius: 50; -fx-padding: 5; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+            <Button text="📋 Mes Tâches" onAction="#showMesTaches" style="-fx-background-color: transparent; -fx-text-fill: #64748b; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 50; -fx-cursor: hand;"/>
+            <Button text="📅 Mon Planning" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 50; -fx-cursor: hand;"/>
+        </HBox>
+        <Region HBox.hgrow="ALWAYS" />
+        <Label fx:id="lbWelcomeName" style="-fx-font-size: 14px; -fx-background-color: #e2e8f0; -fx-padding: 8 15; -fx-background-radius: 20; -fx-text-fill: #334155;"  />
     </HBox>
 
-    <Separator />
+    <!-- Section de bienvenue avec statistiques -->
+    <HBox spacing="20" alignment="CENTER">
 
+
+        <!-- Cartes statistiques rapides -->
+        <HBox spacing="15">
+            <VBox alignment="CENTER" spacing="5" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #3b82f6;" fx:id="lblTotalShifts" text="0" />
+                <Label style="-fx-font-size: 12px; -fx-text-fill: #64748b;" text="Total shifts" />
+            </VBox>
+            <VBox alignment="CENTER" spacing="5" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #10b981;" fx:id="lblJoursTravailles" text="0" />
+                <Label style="-fx-font-size: 12px; -fx-text-fill: #64748b;" text="Travaillés" />
+            </VBox>
+            <VBox alignment="CENTER" spacing="5" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 15 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);">
+                <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #f59e0b;" fx:id="lblConges" text="0" />
+                <Label style="-fx-font-size: 12px; -fx-text-fill: #64748b;" text="Congés" />
+            </VBox>
+        </HBox>
+    </HBox>
+
+    <!-- Filtres par mois/année -->
+    <HBox spacing="15" alignment="CENTER_LEFT">
+        <Label text="Filtrer par :" style="-fx-font-weight: bold; -fx-text-fill: #475569;" />
+        <ComboBox fx:id="filterMoisCombo" prefWidth="120" promptText="Mois"
+                  style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 25; -fx-background-radius: 25; -fx-padding: 5;"/>
+        <ComboBox fx:id="filterAnneeCombo" prefWidth="100" promptText="Année"
+                  style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 25; -fx-background-radius: 25; -fx-padding: 5;"/>
+        <Button text="Appliquer" onAction="#appliquerFiltres"
+                style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 13px; -fx-background-radius: 25; -fx-padding: 8 20; -fx-cursor: hand;"/>
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="🔄 Actualiser" onAction="#refreshPlanning"
+                style="-fx-background-color: transparent; -fx-text-fill: #3b82f6; -fx-font-size: 13px; -fx-cursor: hand;"/>
+    </HBox>
+
+    <!-- Titre de la section -->
     <HBox alignment="CENTER_LEFT" spacing="10">
         <Label style="-fx-font-size: 32px;" text="📅" />
-        <Label style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="TOUS LES PLANNINGS" />
-        <Region HBox.hgrow="ALWAYS" />
+        <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="Mon planning" />
+        <Label fx:id="lblPlanningCount" style="-fx-font-size: 14px; -fx-background-color: #e2e8f0; -fx-padding: 5 12; -fx-background-radius: 20; -fx-text-fill: #475569;" text="0 jour(s)" />
     </HBox>
 
-    <TableView fx:id="tablePlannings" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #e2e8f0;" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="colDate" prefWidth="120" text="Date" />
-            <TableColumn fx:id="colHeureDebut" prefWidth="100" text="Début" />
-            <TableColumn fx:id="colHeureFin" prefWidth="100" text="Fin" />
-            <TableColumn fx:id="colTypeShift" prefWidth="120" text="Type" />
-            <TableColumn fx:id="colEmployeId" prefWidth="100" text="Employé ID" />
-        </columns>
-        <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-        </columnResizePolicy>
-    </TableView>
+    <!-- Liste des plannings en cartes groupées par date -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background: transparent; -fx-background-color: transparent;">
+        <VBox fx:id="cardsContainer" spacing="15" style="-fx-padding: 0 0 20 0;">
+            <!-- Les cartes seront générées dynamiquement -->
+        </VBox>
+    </ScrollPane>
 
 </VBox>

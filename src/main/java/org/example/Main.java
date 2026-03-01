@@ -64,10 +64,14 @@ public class Main {
             // --- SECTION 3: PROJETS ---
             System.out.println("\n--- 🏗️ Tests Projets ---");
             System.out.println("Liste des projets disponibles:");
-            projetService.listerTousLesProjets().forEach(System.out::println);
+
+            // ✅ CORRECTION 1: getAllProjets() au lieu de listerTousLesProjets()
+            projetService.getAllProjets().forEach(System.out::println);
 
             System.out.println("\nListe des projets archivés:");
-            List<Projet> archives = projetService.listerArchives();
+
+            // ✅ CORRECTION 2: getProjetsArchives() au lieu de listerArchives()
+            List<Projet> archives = projetService.getProjetsArchives();
             if (archives.isEmpty()) {
                 System.out.println("Aucun projet dans les archives.");
             } else {

@@ -1,5 +1,6 @@
 package controllers;
 
+import javafx.geometry.Insets;
 import models.Role;
 import models.UserRole;
 import services.AuthenticationService;
@@ -12,7 +13,6 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -34,13 +34,13 @@ public class LoginController {
 
     @FXML
     private Button googleLoginButton;
-    
+
     @FXML
     private StackPane captchaContainer;
-    
+
     @FXML
     private TextField captchaField;
-    
+
     @FXML
     private Button refreshCaptchaButton;
 
@@ -77,7 +77,7 @@ public class LoginController {
         
         // Générer le CAPTCHA initial
         refreshCaptcha();
-        
+
         // Contrôle de saisie pour l'email
         emailField.textProperty().addListener((observable, oldValue, newValue) -> {
             errorLabel.setVisible(false);
@@ -110,7 +110,7 @@ public class LoginController {
             showError("Veuillez remplir tous les champs");
             return;
         }
-        
+
         // Vérifier le CAPTCHA
         CaptchaService captchaService = CaptchaService.getInstance();
         if (!captchaService.verifyCaptcha(captchaInput)) {
@@ -123,7 +123,7 @@ public class LoginController {
             System.out.println("=== DEBUG LOGIN ===");
             System.out.println("Email saisi: " + email);
             System.out.println("Mot de passe saisi: " + password);
-            
+
             // Vérifier si le compte est verrouillé
             AuthenticationService.LockStatus lockStatus = authService.isAccountLocked(email);
             if (lockStatus.isLocked()) {
@@ -138,13 +138,13 @@ public class LoginController {
             // Vérifier les credentials
             List<Utilisateur> utilisateurs = utilisateurService.getAll();
             System.out.println("Nombre d'utilisateurs dans la base: " + utilisateurs.size());
-            
+
             // Chercher l'utilisateur par email
             Utilisateur userByEmail = utilisateurs.stream()
                     .filter(u -> u.getEmail().equals(email))
                     .findFirst()
                     .orElse(null);
-            
+
             if (userByEmail != null) {
                 System.out.println("Utilisateur trouvé: " + userByEmail.getNom() + " " + userByEmail.getPrenom());
                 System.out.println("Mot de passe dans la base: " + userByEmail.getPassword());
@@ -153,7 +153,7 @@ public class LoginController {
             } else {
                 System.out.println("AUCUN utilisateur trouvé avec cet email!");
             }
-            
+
             Utilisateur user = utilisateurs.stream()
                     .filter(u -> u.getEmail().equals(email) && u.getPassword().equals(hashedPassword))
                     .findFirst()
@@ -165,7 +165,7 @@ public class LoginController {
                     showError("Votre compte a été désactivé. Contactez l'administrateur.");
                     return;
                 }
-                
+
                 // Réinitialiser les tentatives échouées
                 authService.resetFailedAttempts(email);
 
@@ -259,7 +259,7 @@ public class LoginController {
         
         // Appliquer le CSS
         dialog.getDialogPane().getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
-        
+
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(email -> {
             try {
@@ -311,7 +311,7 @@ public class LoginController {
         
         // Appliquer le CSS
         dialog.getDialogPane().getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
-        
+
         ButtonType resetButtonType = new ButtonType("Réinitialiser", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(resetButtonType, ButtonType.CANCEL);
         
@@ -478,7 +478,7 @@ public class LoginController {
             }
 
             stage.setScene(scene);
-            stage.setTitle("stratiX - " + user.getNom() + " " + user.getPrenom() + " [" + user.getRole() + "]");
+            stage.setTitle("Stratix - " + user.getNom() + " " + user.getPrenom());
             stage.centerOnScreen();
 
         } catch (IOException e) {
@@ -565,54 +565,54 @@ public class LoginController {
         countdownTimeline.setCycleCount(Animation.INDEFINITE);
         countdownTimeline.play();
     }
-    
+
     @FXML
     void handleRefreshCaptcha() {
         refreshCaptcha();
     }
-    
+
     private void refreshCaptcha() {
         try {
             CaptchaService captchaService = CaptchaService.getInstance();
             javafx.scene.canvas.Canvas captchaCanvas = captchaService.generateCaptchaCanvas();
-            
+
             // Effacer le contenu précédent
             captchaContainer.getChildren().clear();
-            
+
             // Ajouter le nouveau canvas
             captchaContainer.getChildren().add(captchaCanvas);
-            
+
             // Effacer le champ de saisie
             if (captchaField != null) {
                 captchaField.clear();
             }
-            
+
             System.out.println("CAPTCHA généré: " + captchaService.getCurrentCaptchaText());
         } catch (Exception e) {
             System.err.println("Erreur lors de la génération du CAPTCHA: " + e.getMessage());
             e.printStackTrace();
         }
     }
-    
+
     @FXML
     void handleGoogleLogin() {
         showError("La connexion Google sera disponible prochainement.\nVeuillez configurer les identifiants OAuth dans GoogleAuthService.java");
-        
+
 
         try {
             System.out.println("=== CONNEXION GOOGLE ===");
             googleLoginButton.setDisable(true);
             googleLoginButton.setText("Connexion en cours...");
-            
+
             new Thread(() -> {
                 try {
                     services.GoogleAuthService googleAuth = services.GoogleAuthService.getInstance();
                     services.GoogleAuthService.GoogleUserInfo googleUser = googleAuth.authenticateWithGoogle();
-                    
+
                     javafx.application.Platform.runLater(() -> {
                         try {
                             Utilisateur user = utilisateurService.getByEmail(googleUser.getEmail());
-                            
+
                             if (user == null) {
                                 user = new Utilisateur(
                                     googleUser.getLastName() != null ? googleUser.getLastName() : "Google",
@@ -627,7 +627,7 @@ public class LoginController {
                                 utilisateurService.ajouter(user);
                                 user = utilisateurService.getByEmail(googleUser.getEmail());
                             }
-                            
+
                             if (user != null) {
                                 if (user.isInactif()) {
                                     showError("Votre compte a été désactivé. Contactez l'administrateur.");
@@ -637,7 +637,7 @@ public class LoginController {
                             } else {
                                 showError("Erreur lors de la création du compte");
                             }
-                            
+
                         } catch (Exception e) {
                             showError("Erreur lors de la connexion Google");
                             e.printStackTrace();
@@ -646,7 +646,7 @@ public class LoginController {
                             googleLoginButton.setText("Se connecter avec Google");
                         }
                     });
-                    
+
                 } catch (Exception e) {
                     javafx.application.Platform.runLater(() -> {
                         showError("Erreur d'authentification Google");
@@ -656,7 +656,7 @@ public class LoginController {
                     e.printStackTrace();
                 }
             }).start();
-            
+
         } catch (Exception e) {
             showError("Erreur lors de la connexion Google");
             googleLoginButton.setDisable(false);

@@ -10,6 +10,11 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.paint.Color;
 
 import models.Employe;
 import models.Tache;
@@ -36,12 +41,23 @@ public class WhiteboardController {
     private Tache selectedTache;
     private ContextMenu contextMenu;
 
+    // Pour le drag and drop
+    private VBox dragPlaceholder;
+    private boolean isDragging = false;
+
     @FXML
     public void initialize() {
-        System.out.println("=== Initialisation WhiteboardController ===");
+        System.out.println("=== Initialisation WhiteboardController avec Drag & Drop ===");
 
         tacheService = new SERVICETache();
         employeService = new EmployeeService();
+
+        // Créer un placeholder pour le drag
+        dragPlaceholder = new VBox();
+        dragPlaceholder.setPrefHeight(10);
+        dragPlaceholder.setStyle("-fx-background-color: #3498db; -fx-background-radius: 5;");
+        dragPlaceholder.setVisible(false);
+        dragPlaceholder.setManaged(false);
 
         // Vérifier que les composants ne sont pas null
         System.out.println("   columnAFaire: " + (columnAFaire != null ? "✅" : "❌"));
@@ -52,6 +68,9 @@ public class WhiteboardController {
         columnAFaire.getChildren().clear();
         columnEnCours.getChildren().clear();
         columnTerminee.getChildren().clear();
+
+        // ⭐ CONFIGURER LE DRAG AND DROP ⭐
+        setupDragAndDrop();
 
         // Charger les tâches
         chargerTaches();
@@ -73,6 +92,115 @@ public class WhiteboardController {
         contextMenu.getItems().addAll(editItem, deleteItem,
                 new SeparatorMenuItem(),
                 moveAFaire, moveEnCours, moveTerminee);
+    }
+
+    /**
+     * ⭐ CONFIGURATION DU DRAG AND DROP ⭐
+     */
+    private void setupDragAndDrop() {
+        // Configurer chaque colonne
+        setupColumn(columnAFaire, "A_FAIRE");
+        setupColumn(columnEnCours, "EN_COURS");
+        setupColumn(columnTerminee, "TERMINEE");
+    }
+
+    /**
+     * Configure une colonne pour le drag and drop
+     */
+    private void setupColumn(VBox column, String targetStatut) {
+        // Quand on passe sur la colonne pendant un drag
+        column.setOnDragOver(event -> {
+            if (event.getGestureSource() != column && event.getDragboard().hasString()) {
+                event.acceptTransferModes(TransferMode.MOVE);
+
+                // Calculer la position pour le placeholder
+                double mouseY = event.getY();
+                int insertIndex = 0;
+
+                // Trouver où insérer le placeholder
+                for (int i = 0; i < column.getChildren().size(); i++) {
+                    if (column.getChildren().get(i) instanceof VBox) {
+                        VBox child = (VBox) column.getChildren().get(i);
+                        double childY = child.getLayoutY();
+                        double childHeight = child.getHeight();
+
+                        if (mouseY > childY && mouseY < childY + childHeight) {
+                            insertIndex = i + 1;
+                        }
+                    }
+                }
+
+                // Retirer le placeholder s'il existe déjà
+                if (column.getChildren().contains(dragPlaceholder)) {
+                    column.getChildren().remove(dragPlaceholder);
+                }
+
+                // Ajouter le placeholder à la bonne position
+                if (insertIndex < column.getChildren().size()) {
+                    column.getChildren().add(insertIndex, dragPlaceholder);
+                } else {
+                    column.getChildren().add(dragPlaceholder);
+                }
+
+                dragPlaceholder.setVisible(true);
+                dragPlaceholder.setManaged(true);
+            }
+            event.consume();
+        });
+
+        // Quand on quitte la colonne
+        column.setOnDragExited(event -> {
+            if (!isDragging) {
+                dragPlaceholder.setVisible(false);
+                dragPlaceholder.setManaged(false);
+                if (column.getChildren().contains(dragPlaceholder)) {
+                    column.getChildren().remove(dragPlaceholder);
+                }
+            }
+            event.consume();
+        });
+
+        // ⭐ QUAND ON DÉPOSE DANS LA COLONNE - CHANGEMENT DE STATUT ET COULEUR ⭐
+        column.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+
+            if (db.hasString()) {
+                try {
+                    int taskId = Integer.parseInt(db.getString());
+                    Tache taskToMove = findTacheById(taskId);
+
+                    if (taskToMove != null && !taskToMove.getStatut().equals(targetStatut)) {
+                        // Afficher le changement
+                        System.out.println("🔄 Déplacement de la tâche: " + taskToMove.getTitre());
+                        System.out.println("   Ancien statut: " + taskToMove.getStatut() + " (" + getStatusColor(taskToMove.getStatut()) + ")");
+                        System.out.println("   Nouveau statut: " + targetStatut + " (" + getStatusColor(targetStatut) + ")");
+
+                        // Changer le statut dans la base de données
+                        taskToMove.setStatut(targetStatut);
+                        tacheService.updateTache(taskToMove);
+
+                        // ⭐ RECHARGER LES CARTES POUR METTRE À JOUR LES COULEURS ⭐
+                        chargerTaches();
+                        success = true;
+
+                        System.out.println("✅ Tâche déplacée avec succès - Nouvelle couleur: " + getStatusColor(targetStatut));
+                    }
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // Cacher le placeholder
+            dragPlaceholder.setVisible(false);
+            dragPlaceholder.setManaged(false);
+            if (column.getChildren().contains(dragPlaceholder)) {
+                column.getChildren().remove(dragPlaceholder);
+            }
+
+            event.setDropCompleted(success);
+            event.consume();
+        });
     }
 
     private void chargerTaches() {
@@ -112,72 +240,117 @@ public class WhiteboardController {
         lblCountEnCours.setText(String.valueOf(countEnCours));
         lblCountTerminee.setText(String.valueOf(countTerminee));
 
-        System.out.println("   À faire: " + countAFaire + ", En cours: " + countEnCours + ", Terminées: " + countTerminee);
+        System.out.println("   À faire: " + countAFaire + " (🔴), En cours: " + countEnCours + " (🟠), Terminées: " + countTerminee + " (🟢)");
+    }
+
+    /**
+     * ⭐ RETOURNE LA COULEUR DE FOND SELON LE STATUT ⭐
+     * 🔴 ROUGE = À FAIRE
+     * 🟠 ORANGE = EN COURS
+     * 🟢 VERT = TERMINÉE
+     */
+    private String getStatusColor(String statut) {
+        switch(statut) {
+            case "A_FAIRE":
+                return "#ffebee"; // Rouge très clair
+            case "EN_COURS":
+                return "#fff3e0"; // Orange très clair
+            case "TERMINEE":
+                return "#e8f5e8"; // Vert très clair
+            default:
+                return "white";
+        }
+    }
+
+    /**
+     * ⭐ RETOURNE LA COULEUR DE BORDURE SELON LE STATUT ⭐
+     */
+    private String getStatusBorderColor(String statut) {
+        switch(statut) {
+            case "A_FAIRE":
+                return "#ef4444"; // Rouge
+            case "EN_COURS":
+                return "#f59e0b"; // Orange
+            case "TERMINEE":
+                return "#10b981"; // Vert
+            default:
+                return "#e0e0e0";
+        }
     }
 
     private VBox createTaskCard(Tache t) {
         VBox card = new VBox(8);
         card.setPadding(new Insets(12));
         card.setPrefWidth(250);
-        card.setStyle("-fx-background-color: white; -fx-background-radius: 8; " +
+
+        // ⭐ COULEUR DE FOND SELON LE STATUT ⭐
+        String backgroundColor = getStatusColor(t.getStatut());
+        String borderColor = getStatusBorderColor(t.getStatut());
+
+        card.setStyle("-fx-background-color: " + backgroundColor + "; -fx-background-radius: 8; " +
                 "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0); " +
-                "-fx-border-color: #e0e0e0; -fx-border-radius: 8;");
+                "-fx-border-color: " + borderColor + "; -fx-border-width: 2; -fx-border-radius: 8;");
 
-        // Effet hover
-        card.setOnMouseEntered(e ->
-                card.setStyle("-fx-background-color: #f8f9fa; -fx-background-radius: 8; " +
-                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 8, 0, 0, 0); " +
-                        "-fx-border-color: #3498db; -fx-border-radius: 8;")
-        );
-        card.setOnMouseExited(e ->
-                card.setStyle("-fx-background-color: white; -fx-background-radius: 8; " +
-                        "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0); " +
-                        "-fx-border-color: #e0e0e0; -fx-border-radius: 8;")
-        );
+        // ⭐ RENDRE LA CARTE DRAGGABLE ⭐
+        card.setOnDragDetected(event -> {
+            Dragboard db = card.startDragAndDrop(TransferMode.MOVE);
+            ClipboardContent content = new ClipboardContent();
 
-        // Priorité (bandeau coloré en haut)
-        String prioriteColor = "";
-        String prioriteEmoji = "";
-        switch(t.getPriorite()) {
-            case "HAUTE":
-                prioriteColor = "#ef4444";
-                prioriteEmoji = "🔴";
-                break;
-            case "MOYENNE":
-                prioriteColor = "#f59e0b";
-                prioriteEmoji = "🟡";
-                break;
-            case "BASSE":
-                prioriteColor = "#10b981";
-                prioriteEmoji = "🟢";
-                break;
-            default:
-                prioriteColor = "#6b7280";
-                prioriteEmoji = "⚪";
-        }
+            // Stocker l'ID de la tâche
+            content.putString(String.valueOf(t.getId()));
+            db.setContent(content);
 
-        HBox prioriteBar = new HBox();
-        prioriteBar.setPrefHeight(4);
-        prioriteBar.setStyle("-fx-background-color:4 " + prioriteColor + "; -fx-background-radius: 4;");
+            // Rendre la carte translucide pendant le drag
+            card.setOpacity(0.5);
 
-        // Titre avec priorité
-        HBox titleBox = new HBox(5);
-        titleBox.setAlignment(Pos.CENTER_LEFT);
+            // Prendre un snapshot de la carte pour l'affichage pendant le drag
+            db.setDragView(card.snapshot(null, null));
 
-        Label lblPrioriteEmoji = new Label(prioriteEmoji);
-        lblPrioriteEmoji.setFont(Font.font("Arial", 16));
+            isDragging = true;
 
+            event.consume();
+        });
+
+        card.setOnDragDone(event -> {
+            // Remettre l'opacité normale
+            card.setOpacity(1.0);
+            isDragging = false;
+
+            // Cacher le placeholder
+            dragPlaceholder.setVisible(false);
+            dragPlaceholder.setManaged(false);
+
+            event.consume();
+        });
+
+        // Effet hover avec ombre
+        DropShadow hoverShadow = new DropShadow();
+        hoverShadow.setColor(Color.rgb(0, 0, 0, 0.2));
+        hoverShadow.setRadius(8);
+        hoverShadow.setOffsetY(2);
+
+        card.setOnMouseEntered(e -> {
+            if (!isDragging) {
+                card.setEffect(hoverShadow);
+            }
+        });
+
+        card.setOnMouseExited(e -> {
+            if (!isDragging) {
+                card.setEffect(null);
+            }
+        });
+
+        // Titre
         Label lblTitre = new Label(t.getTitre());
         lblTitre.setFont(Font.font("Arial", FontWeight.BOLD, 14));
         lblTitre.setWrapText(true);
-
-        titleBox.getChildren().addAll(lblPrioriteEmoji, lblTitre);
 
         // Description (tronquée)
         Label lblDescription = new Label(t.getDescription() != null ? t.getDescription() : "");
         lblDescription.setFont(Font.font("Arial", 12));
         lblDescription.setWrapText(true);
-        lblDescription.setStyle("-fx-text-fill: #6b7280;");
+        lblDescription.setStyle("-fx-text-fill: #4b5563;");
         if (t.getDescription() != null && t.getDescription().length() > 50) {
             lblDescription.setText(t.getDescription().substring(0, 50) + "...");
         }
@@ -186,8 +359,7 @@ public class WhiteboardController {
         Employe emp = employeService.getEmployeById(t.getEmployeId());
         String empInfo;
         if (emp != null) {
-            String poste = (emp.getPoste() != null && !emp.getPoste().isEmpty()) ? " - " + emp.getPoste() : "";
-            empInfo = emp.getUsername() + poste;
+            empInfo = emp.getUsername() + " (ID: " + t.getEmployeId() + ")";
         } else {
             empInfo = "Employé " + t.getEmployeId();
         }
@@ -207,16 +379,6 @@ public class WhiteboardController {
         Label lblDateIcon = new Label("📅");
         Label lblDate = new Label(t.getDeadline().toLocalDate().format(formatter));
         lblDate.setFont(Font.font("Arial", 11));
-
-        // Colorer si deadline est proche ou dépassée
-        if (t.getDeadline().toLocalDate().isBefore(java.time.LocalDate.now())
-                && !"TERMINEE".equals(t.getStatut())) {
-            lblDate.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold;");
-        } else if (t.getDeadline().toLocalDate().minusDays(2).isBefore(java.time.LocalDate.now())
-                && !"TERMINEE".equals(t.getStatut())) {
-            lblDate.setStyle("-fx-text-fill: #f59e0b;");
-        }
-
         dateBox.getChildren().addAll(lblDateIcon, lblDate);
 
         // Séparateur
@@ -244,7 +406,7 @@ public class WhiteboardController {
         actionBox.getChildren().addAll(btnEdit, btnDelete);
 
         // Assembler la carte
-        card.getChildren().addAll(prioriteBar, titleBox, lblDescription, empBox, dateBox, separator, actionBox);
+        card.getChildren().addAll(lblTitre, lblDescription, empBox, dateBox, separator, actionBox);
 
         // Rendre la carte cliquable pour le menu contextuel
         card.setOnContextMenuRequested(e -> {
@@ -255,16 +417,20 @@ public class WhiteboardController {
         return card;
     }
 
+    private Tache findTacheById(int id) {
+        return tacheService.getAllTaches().stream()
+                .filter(t -> t.getId() == id)
+                .findFirst()
+                .orElse(null);
+    }
+
     private void editSelectedTache() {
         if (selectedTache != null) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Modifier");
             alert.setHeaderText("Modifier la tâche: " + selectedTache.getTitre());
-            alert.setContentText("Redirection vers l'interface de modification...");
+            alert.setContentText("Fonctionnalité de modification à implémenter");
             alert.showAndWait();
-
-            // Ici tu peux appeler TacheController avec la tâche sélectionnée
-            // Par exemple: MainController.showTachesWithTache(selectedTache);
         }
     }
 
@@ -317,4 +483,4 @@ public class WhiteboardController {
             System.err.println("Navigation error: " + e.getMessage());
         }
     }
-}
+}//

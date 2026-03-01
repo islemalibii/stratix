@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ListeProjetsController {
 
@@ -68,7 +69,8 @@ public class ListeProjetsController {
     }
 
     public void rafraichirDonnees() {
-        listeCompleteProjets = projetService.listerTousLesProjets();
+        // ✅ CORRECTION ICI
+        listeCompleteProjets = projetService.getAllProjets();
         updateStatistics(listeCompleteProjets);
         filtrerEtAfficher();
     }
@@ -83,9 +85,25 @@ public class ListeProjetsController {
     private void filtrerEtAfficher() {
         if (containerProjets == null) return;
         containerProjets.getChildren().clear();
+
         String statut = (comboFiltre != null) ? comboFiltre.getValue() : "Tous les projets";
-        String recherche = (searchField != null) ? searchField.getText() : "";
-        List<Projet> filtree = projetService.rechercherProjets(recherche, statut);
+        String recherche = (searchField != null) ? searchField.getText().toLowerCase() : "";
+
+        List<Projet> filtree = listeCompleteProjets.stream()
+                .filter(p -> {
+                    // Filtre par statut
+                    if (!"Tous les projets".equals(statut) && !statut.equals(p.getStatut())) {
+                        return false;
+                    }
+                    // Filtre par recherche
+                    if (!recherche.isEmpty()) {
+                        return p.getNom().toLowerCase().contains(recherche) ||
+                                p.getDescription().toLowerCase().contains(recherche);
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+
         for (Projet p : filtree) {
             containerProjets.getChildren().add(creerCardProjet(p));
         }
@@ -140,7 +158,7 @@ public class ListeProjetsController {
         pb.setPrefWidth(Double.MAX_VALUE);
         progBox.getChildren().addAll(lblProg, pb);
 
-        // 6. Actions (AJOUT DU BOUTON PDF ICI)
+        // 6. Actions
         HBox actions = new HBox(10);
         actions.setAlignment(Pos.CENTER);
 
@@ -150,7 +168,7 @@ public class ListeProjetsController {
 
         Button btnPdf = new Button("PDF");
         btnPdf.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-font-weight: bold;");
-        btnPdf.setOnAction(e -> exporterEnPDF(p, qrUrl)); // On passe l'URL du QR Code
+        btnPdf.setOnAction(e -> exporterEnPDF(p, qrUrl));
 
         Button btnArch = new Button("Archiver");
         btnArch.getStyleClass().add("btn-primary");
@@ -234,13 +252,17 @@ public class ListeProjetsController {
             Parent root = loader.load();
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
-
             stage.showAndWait();
-
+            rafraichirDonnees(); // Rafraîchir après ajout
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }    @FXML private void voirArchives() { chargerFenetre("/ListeArchives.fxml", "Archives"); }
+    }
+
+    @FXML
+    private void voirArchives() {
+        chargerFenetre("/ListeArchives.fxml", "Archives");
+    }
 
     private void ouvrirFenetreModification(Projet p) {
         try {
@@ -255,6 +277,7 @@ public class ListeProjetsController {
             rafraichirDonnees();
         } catch (IOException e) {
             afficherErreur("Erreur", "Impossible de modifier.");
+            e.printStackTrace();
         }
     }
 
@@ -271,6 +294,7 @@ public class ListeProjetsController {
             rafraichirDonnees();
         } catch (IOException e) {
             afficherErreur("Erreur", "Fichier FXML non trouvé : " + fxmlPath);
+            e.printStackTrace();
         }
     }
 
@@ -281,9 +305,9 @@ public class ListeProjetsController {
         alert.showAndWait();
     }
 
-    @FXML private void allerAuFront() {
+    @FXML
+    private void allerAuFront() {
         try {
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/EmployeListeProjets.fxml"));
             Parent root = loader.load();
             Scene scene = containerProjets.getScene();
@@ -292,6 +316,7 @@ public class ListeProjetsController {
             e.printStackTrace();
         }
     }
+
     private void changerEspace(String fxmlPath, String titre) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
