@@ -1,5 +1,6 @@
 package controllers;
 
+import controllers.FormulaireProduitController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -13,10 +14,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.produit;
+import service.export.ExportExcelService;
 import services.service_produit;
+
+import service.export.ExportPDFService;
 
 import javafx.geometry.Insets;
 import java.io.File;
@@ -405,8 +410,8 @@ public class ProduitController {
     @FXML
     private void ouvrirAjoutProduit() {
         try {
-            URL fxmlUrl = getClass().getResource("/fxml/ajouterProduits.fxml");
-            if (fxmlUrl == null) fxmlUrl = getClass().getResource("/ajouterProduits.fxml");
+            URL fxmlUrl = getClass().getResource("/fxml/ajouterProduit.fxml");
+            if (fxmlUrl == null) fxmlUrl = getClass().getResource("/ajouterProduit.fxml");
             if (fxmlUrl == null) {
                 showAlert(Alert.AlertType.ERROR, "Erreur", "Fichier ajouterProduit.fxml introuvable!");
                 return;
@@ -434,8 +439,8 @@ public class ProduitController {
             return;
         }
         try {
-            URL fxmlUrl = getClass().getResource("/fxml/ajouterProduits.fxml");
-            if (fxmlUrl == null) fxmlUrl = getClass().getResource("/ajouterProduits.fxml");
+            URL fxmlUrl = getClass().getResource("/fxml/ajouterProduit.fxml");
+            if (fxmlUrl == null) fxmlUrl = getClass().getResource("/ajouterProduit.fxml");
             if (fxmlUrl == null) {
                 showAlert(Alert.AlertType.ERROR, "Erreur", "Fichier ajouterProduit.fxml introuvable!");
                 return;
@@ -522,5 +527,93 @@ public class ProduitController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    // ==================== FONCTIONS D'EXPORT ====================
+
+    @FXML
+    private void exporterProduitsExcel() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Enregistrer le fichier Excel");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Fichiers Excel", "*.xlsx")
+            );
+            fileChooser.setInitialFileName("produits.xlsx");
+
+            File file = fileChooser.showSaveDialog(listViewProduits.getScene().getWindow());
+
+            if (file != null) {
+                ExportExcelService.exporterProduitsVersExcel(produitsList, file.getAbsolutePath());
+                showAlert(Alert.AlertType.INFORMATION, "Succès",
+                        "Export Excel réussi !\nFichier : " + file.getName());
+            }
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Erreur lors de l'export Excel : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void exporterProduitsPDF() {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Enregistrer le fichier PDF");
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf")
+            );
+            fileChooser.setInitialFileName("produits.pdf");
+
+            File file = fileChooser.showSaveDialog(listViewProduits.getScene().getWindow());
+
+            if (file != null) {
+                ExportPDFService.exporterProduitsVersPDF(produitsList, file.getAbsolutePath());
+                showAlert(Alert.AlertType.INFORMATION, "Succès",
+                        "Export PDF réussi !\nFichier : " + file.getName());
+            }
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Erreur lors de l'export PDF : " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    private void ouvrirFrontOffice() {
+        try {
+            // Charger la vue Front Office des produits
+            URL fxmlUrl = getClass().getResource("/fxml/front/frontProduits.fxml");
+            if (fxmlUrl == null) {
+                // Essayer d'autres chemins possibles
+                fxmlUrl = getClass().getResource("/front/frontProduits.fxml");
+            }
+
+            if (fxmlUrl == null) {
+                showAlert(Alert.AlertType.ERROR, "Erreur",
+                        "Fichier frontProduits.fxml introuvable!\n" +
+                                "Vérifiez qu'il est dans src/main/resources/fxml/front/");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent root = loader.load();
+
+            // Créer une nouvelle fenêtre pour le Front Office
+            Stage frontStage = new Stage();
+            frontStage.setTitle("Front Office - Consultation");
+            frontStage.setScene(new Scene(root));
+            frontStage.setMaximized(true); // Ouvrir en plein écran
+
+            // Optionnel : rendre la fenêtre modale (bloque la fenêtre principale)
+            // frontStage.initModality(Modality.WINDOW_MODAL);
+            // frontStage.initOwner(listViewProduits.getScene().getWindow());
+
+            frontStage.show();
+
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Impossible d'ouvrir le Front Office: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

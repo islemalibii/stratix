@@ -35,10 +35,7 @@
                         style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 8 15;"/>
                 <Region HBox.hgrow="ALWAYS"/>
 
-                <!-- Bouton pour voir les produits -->
-                <Button text=" Voir les produits"
-                        style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 8 15;"
-                        onAction="#voirProduits"/>
+
             </HBox>
 
             <!-- Liste des Ressources -->

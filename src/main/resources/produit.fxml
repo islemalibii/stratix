@@ -8,6 +8,8 @@
             fx:controller="controllers.ProduitController"
             prefHeight="600" prefWidth="1000">
 
+
+
     <!-- Centre avec ListView -->
     <center>
         <VBox spacing="15" style="-fx-padding: 20;">
@@ -24,10 +26,18 @@
                 <Region HBox.hgrow="ALWAYS"/>
             </HBox>
 
-            <!-- Boutons d'action -->
+            <!-- Boutons d'action avec exports -->
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Gestion des Produits" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
                 <Region HBox.hgrow="ALWAYS"/>
+
+                <!-- Boutons d'export -->
+                <Button text="📊 Excel" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;"
+                        onAction="#exporterProduitsExcel"/>
+                <Button text="📄 PDF" style="-fx-background-color: #e67e22; -fx-text-fill: white; -fx-cursor: hand;"
+                        onAction="#exporterProduitsPDF"/>
+
+                <!-- Boutons de gestion -->
                 <Button text=" Ajouter" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;"
                         onAction="#ouvrirAjoutProduit"/>
                 <Button text="✏ Modifier" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-cursor: hand;"
