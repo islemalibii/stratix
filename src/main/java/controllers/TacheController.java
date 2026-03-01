@@ -108,7 +108,7 @@ public class TacheController implements Initializable {
                     if (empty || projet == null) {
                         setText(null);
                     } else {
-                        setText(projet.getNom() + " (ID: " + projet.getId() + ")");
+                        setText(projet.getNom());
                     }
                 }
             });
