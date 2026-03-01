@@ -10,10 +10,7 @@ import javafx.collections.ObservableList;
 
 import models.Tache;
 import models.Employe;
-import models.Projet;
 import services.SERVICETache;
-import services.EmployeeService;
-import services.ProjetService; // ← NOUVEAU service pour les projets
 import services.EmployeeService;
 
 import java.io.IOException;

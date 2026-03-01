@@ -51,7 +51,6 @@ public class PlanningController implements Initializable {
         List<Employe> employes = employeService.getAllEmployes();
         cmbEmploye.setItems(FXCollections.observableArrayList(employes));
 
-        // Configuration de l'affichage des employés dans le ComboBox
         // Configuration de l'affichage des employés
         cmbEmploye.setCellFactory(param -> new ListCell<Employe>() {
             @Override
@@ -339,4 +338,4 @@ public class PlanningController implements Initializable {
             System.err.println("Navigation error: " + fxmlPath);
         }
     }
-}//
+}

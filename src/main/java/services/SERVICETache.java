@@ -1,7 +1,7 @@
 package services;
 
 import models.Tache;
-import utils.MyDataBase; // Corrected import to match your Singleton
+import utils.MyDataBase;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -35,11 +35,11 @@ public class SERVICETache {
             projetService.mettreAJourProgression(t.getProjetId());
 
         } catch (SQLException e) {
+            System.err.println("❌ Erreur addTache: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // READ
     public List<Tache> getAllTaches() {
         List<Tache> list = new ArrayList<>();
         String sql = "SELECT * FROM tache";
