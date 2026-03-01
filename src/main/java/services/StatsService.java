@@ -104,14 +104,14 @@ public class StatsService {
 
             // 10. Dernières tâches
             List<String> dernieresTaches = new ArrayList<>();
-            String sqlDernieresTaches = "SELECT t.*, u.username FROM tache t " +
+            String sqlDernieresTaches = "SELECT t.*, u.email FROM tache t " +
                     "LEFT JOIN utilisateur u ON t.employe_id = u.id " +
                     "ORDER BY t.id DESC LIMIT 5";
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlDernieresTaches)) {
                 while (rs.next()) {
                     String info = rs.getString("titre") + " - " +
-                            (rs.getString("username") != null ? rs.getString("username") : "ID " + rs.getInt("employe_id"));
+                            (rs.getString("email") != null ? rs.getString("email") : "ID " + rs.getInt("employe_id"));
                     dernieresTaches.add(info);
                 }
             }
@@ -119,14 +119,14 @@ public class StatsService {
 
             // 11. Prochains plannings
             List<String> prochainsPlannings = new ArrayList<>();
-            String sqlProchainsPlannings = "SELECT p.*, u.username FROM planning p " +
+            String sqlProchainsPlannings = "SELECT p.*, u.email FROM planning p " +
                     "LEFT JOIN utilisateur u ON p.employe_id = u.id " +
                     "WHERE p.date >= CURDATE() " +
                     "ORDER BY p.date ASC LIMIT 5";
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlProchainsPlannings)) {
                 while (rs.next()) {
-                    String info = rs.getString("username") + " - " + rs.getDate("date");
+                    String info = rs.getString("email") + " - " + rs.getDate("date");
                     prochainsPlannings.add(info);
                 }
             }
@@ -134,26 +134,26 @@ public class StatsService {
 
             // 12. Tâches par employé (Map)
             Map<String, Integer> tachesParEmploye = new HashMap<>();
-            String sqlTachesParEmp = "SELECT u.username, COUNT(t.id) as nb_taches " +
+            String sqlTachesParEmp = "SELECT u.email, COUNT(t.id) as nb_taches " +
                     "FROM utilisateur u LEFT JOIN tache t ON u.id = t.employe_id " +
-                    "WHERE u.role IN ('employe', 'EMPLOYE') GROUP BY u.id, u.username";
+                    "WHERE u.role IN ('employe', 'EMPLOYE') GROUP BY u.id, u.email";
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlTachesParEmp)) {
                 while (rs.next()) {
-                    tachesParEmploye.put(rs.getString("username"), rs.getInt("nb_taches"));
+                    tachesParEmploye.put(rs.getString("email"), rs.getInt("nb_taches"));
                 }
             }
             stats.setTachesParEmploye(tachesParEmploye);
 
             // 13. Plannings par employé (Map)
             Map<String, Integer> planningsParEmploye = new HashMap<>();
-            String sqlPlanningsParEmp = "SELECT u.username, COUNT(p.id) as nb_plannings " +
+            String sqlPlanningsParEmp = "SELECT u.email, COUNT(p.id) as nb_plannings " +
                     "FROM utilisateur u LEFT JOIN planning p ON u.id = p.employe_id " +
-                    "WHERE u.role IN ('employe', 'EMPLOYE') GROUP BY u.id, u.username";
+                    "WHERE u.role IN ('employe', 'EMPLOYE') GROUP BY u.id, u.email";
             try (Statement st = conn.createStatement();
                  ResultSet rs = st.executeQuery(sqlPlanningsParEmp)) {
                 while (rs.next()) {
-                    planningsParEmploye.put(rs.getString("username"), rs.getInt("nb_plannings"));
+                    planningsParEmploye.put(rs.getString("email"), rs.getInt("nb_plannings"));
                 }
             }
             stats.setPlanningsParEmploye(planningsParEmploye);

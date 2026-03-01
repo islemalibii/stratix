@@ -6,7 +6,8 @@
 
 <StackPane xmlns="http://javafx.com/javafx/17"
            xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="controllers.ServiceTabController">
+           fx:controller="controllers.ServiceTabController"
+           stylesheets="/css/style.css">
 
     <VBox spacing="20" styleClass="modern-container">
         <HBox styleClass="sub-nav-bar" spacing="5" alignment="CENTER_LEFT">
