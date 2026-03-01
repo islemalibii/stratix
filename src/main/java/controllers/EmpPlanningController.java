@@ -407,7 +407,6 @@ public class EmpPlanningController {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            showAlert("Erreur", "Impossible de charger la vue des tâches");
         }
     }
 
@@ -417,4 +416,4 @@ public class EmpPlanningController {
         filterMoisCombo.setValue("Tous");
         filterAnneeCombo.setValue("Tous");
     }
-}//
+}

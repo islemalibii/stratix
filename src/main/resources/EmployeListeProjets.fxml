@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
 <VBox spacing="25" styleClass="root-container" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.EmployeListeProjetController">
-
     <stylesheets>
         <URL value="@style.css" />
     </stylesheets>
@@ -20,22 +14,20 @@
         <Insets bottom="30" left="40" right="40" top="30" />
     </padding>
 
-    <VBox spacing="5">
-        <Label style="-fx-text-fill: #64748b; -fx-font-size: 16px;" text="Bonjour," textAlignment="CENTER">
-            <font>
-                <Font name="System Bold" size="27.0" />
-            </font>
-        </Label>
-        <Label text="Espace Collaborateur - Mes Projets" style="-fx-font-size: 14px; -fx-text-fill: #94a3b8;" />
-    </VBox>
+    <HBox alignment="CENTER_LEFT">
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label fx:id="lblBienvenue" style="-fx-text-fill: #64748b; -fx-font-size: 24px; -fx-font-weight: bold;" text="Bonjour," />
+            <Label text="Espace Collaborateur - Mes Projets" style="-fx-font-size: 14px; -fx-text-fill: #94a3b8;" />
+        </VBox>
+    </HBox>
 
     <HBox alignment="CENTER_LEFT" spacing="15">
         <TextField fx:id="searchField" onKeyReleased="#rechercherProjet"
-                   promptText="🔍 Rechercher un projet actif..."
+                   promptText="🔍 Rechercher parmi mes projets..."
                    styleClass="modern-input" HBox.hgrow="ALWAYS" />
     </HBox>
 
-    <ScrollPane fitToWidth="true" styleClass="modern-scroll" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+    <ScrollPane fitToWidth="true" styleClass="modern-scroll" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: transparent;">
         <content>
             <FlowPane fx:id="flowPaneProjets" hgap="30" vgap="30">
                 <padding>

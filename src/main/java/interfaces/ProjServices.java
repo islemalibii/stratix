@@ -19,4 +19,7 @@ public interface ProjServices {
     void supprimerUnProjet(int id);
 
     Projet chercherProjetParId(int idProjet);
+
+    void desarchiverUnProjet(int id);
+
 }

@@ -14,6 +14,7 @@ import models.Projet;
 import services.SERVICETache;
 import services.EmployeeService;
 import services.ProjetService; // ← NOUVEAU service pour les projets
+import services.EmployeeService;
 
 import java.io.IOException;
 import java.net.URL;
@@ -29,7 +30,7 @@ public class TacheController implements Initializable {
     @FXML private ComboBox<String> cbPriorite;
     @FXML private ComboBox<String> cbStatut;
     @FXML private ComboBox<Employe> cmbEmploye;
-    @FXML private ComboBox<Projet> cmbProjet; // ← Changé de TextField à ComboBox
+    @FXML private TextField txtProjetId;
     @FXML private DatePicker dpDeadline;
 
     @FXML private Label lblTotalTaches;
@@ -39,7 +40,6 @@ public class TacheController implements Initializable {
 
     private SERVICETache tacheService;
     private EmployeeService employeService;
-    private ProjetService projetService; // ← NOUVEAU
     private int tacheIdEnModification = -1;
 
     @Override
@@ -48,10 +48,9 @@ public class TacheController implements Initializable {
 
         tacheService = new SERVICETache();
         employeService = new EmployeeService();
-        projetService = new ProjetService(); // ← Initialisation
 
         // Initialiser les combobox
-        cbPriorite.setItems(FXCollections.observableArrayList("10", "20", "30"));
+        cbPriorite.setItems(FXCollections.observableArrayList("HAUTE", "MOYENNE", "BASSE"));
         cbStatut.setItems(FXCollections.observableArrayList("A_FAIRE", "EN_COURS", "TERMINEE"));
 
         // Charger les employés
@@ -67,7 +66,7 @@ public class TacheController implements Initializable {
                 if (empty || emp == null) {
                     setText(null);
                 } else {
-                    setText(emp.getUsername() + " (" + emp.getEmail() + ")");
+                    setText(emp.getUsername() + " (ID: " + emp.getId() + ")");
                 }
             }
         });
@@ -84,52 +83,8 @@ public class TacheController implements Initializable {
             }
         });
 
-        // ⭐ CHARGER LES PROJETS ⭐
-        chargerProjets();
-
         // Mettre à jour les statistiques
         mettreAJourStatistiques();
-    }
-
-    /**
-     * ⭐ Charge la liste des projets dans le ComboBox
-     */
-    private void chargerProjets() {
-        try {
-            List<Projet> projets = projetService.getAllProjets(); // À implémenter dans ProjetService
-            ObservableList<Projet> projetList = FXCollections.observableArrayList(projets);
-            cmbProjet.setItems(projetList);
-
-            // Configuration de l'affichage des projets
-            cmbProjet.setCellFactory(param -> new ListCell<Projet>() {
-                @Override
-                protected void updateItem(Projet projet, boolean empty) {
-                    super.updateItem(projet, empty);
-                    if (empty || projet == null) {
-                        setText(null);
-                    } else {
-                        setText(projet.getNom() + " (ID: " + projet.getId() + ")");
-                    }
-                }
-            });
-
-            cmbProjet.setButtonCell(new ListCell<Projet>() {
-                @Override
-                protected void updateItem(Projet projet, boolean empty) {
-                    super.updateItem(projet, empty);
-                    if (empty || projet == null) {
-                        setText(null);
-                    } else {
-                        setText(projet.getNom());
-                    }
-                }
-            });
-
-            System.out.println("✅ " + projets.size() + " projets chargés");
-        } catch (Exception e) {
-            System.err.println("❌ Erreur chargement projets: " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     private void mettreAJourStatistiques() {
@@ -165,10 +120,7 @@ public class TacheController implements Initializable {
             Employe selectedEmp = cmbEmploye.getValue();
             nouvelleTache.setEmployeId(selectedEmp.getId());
 
-            // ⭐ Récupérer l'ID du projet sélectionné
-            Projet selectedProjet = cmbProjet.getValue();
-            nouvelleTache.setProjetId(selectedProjet.getId());
-
+            nouvelleTache.setProjetId(Integer.parseInt(txtProjetId.getText().trim()));
             nouvelleTache.setDeadline(Date.valueOf(dpDeadline.getValue()));
 
             tacheService.addTache(nouvelleTache);
@@ -202,10 +154,7 @@ public class TacheController implements Initializable {
             Employe selectedEmp = cmbEmploye.getValue();
             tache.setEmployeId(selectedEmp.getId());
 
-            // ⭐ Récupérer l'ID du projet sélectionné
-            Projet selectedProjet = cmbProjet.getValue();
-            tache.setProjetId(selectedProjet.getId());
-
+            tache.setProjetId(Integer.parseInt(txtProjetId.getText().trim()));
             tache.setDeadline(Date.valueOf(dpDeadline.getValue()));
 
             tacheService.updateTache(tache);
@@ -254,12 +203,7 @@ public class TacheController implements Initializable {
                 cmbEmploye.setValue(emp);
             }
 
-            // ⭐ Sélectionner le projet correspondant
-            Projet projet = projetService.getProjetById(tache.getProjetId());
-            if (projet != null) {
-                cmbProjet.setValue(projet);
-            }
-
+            txtProjetId.setText(String.valueOf(tache.getProjetId()));
             dpDeadline.setValue(tache.getDeadline().toLocalDate());
         }
     }
@@ -281,8 +225,8 @@ public class TacheController implements Initializable {
             showAlert("Erreur", "❌ L'employé est obligatoire");
             return false;
         }
-        if (cmbProjet.getValue() == null) { // ← Changé
-            showAlert("Erreur", "❌ Le projet est obligatoire");
+        if (txtProjetId.getText().trim().isEmpty()) {
+            showAlert("Erreur", "❌ L'ID du projet est obligatoire");
             return false;
         }
         if (dpDeadline.getValue() == null) {
@@ -298,7 +242,7 @@ public class TacheController implements Initializable {
         cbPriorite.setValue(null);
         cbStatut.setValue(null);
         cmbEmploye.setValue(null);
-        cmbProjet.setValue(null); // ← Changé
+        txtProjetId.clear();
         dpDeadline.setValue(null);
     }
 
@@ -321,4 +265,4 @@ public class TacheController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
-}//
+}

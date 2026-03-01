@@ -66,17 +66,7 @@ public class Main {
             System.out.println("Liste des projets disponibles:");
 
             // ✅ CORRECTION 1: getAllProjets() au lieu de listerTousLesProjets()
-            projetService.getAllProjets().forEach(System.out::println);
 
-            System.out.println("\nListe des projets archivés:");
-
-            // ✅ CORRECTION 2: getProjetsArchives() au lieu de listerArchives()
-            List<Projet> archives = projetService.getProjetsArchives();
-            if (archives.isEmpty()) {
-                System.out.println("Aucun projet dans les archives.");
-            } else {
-                archives.forEach(System.out::println);
-            }
 
             // --- SECTION 4: SERVICES ---
             System.out.println("\n--- 🛠️ Tests Services ---");

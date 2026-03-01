@@ -1,3 +1,4 @@
+
 package controllers;
 
 import javafx.fxml.FXML;
@@ -13,12 +14,9 @@ import services.ProjetService;
 import java.util.List;
 
 public class ListeArchivesController {
-
     @FXML private VBox containerArchives;
     @FXML private Label lblNbArchives;
-
     private ProjetService projetService;
-
     @FXML
     public void initialize() {
         projetService = new ProjetService();
@@ -29,9 +27,7 @@ public class ListeArchivesController {
         if (containerArchives == null) return;
 
         containerArchives.getChildren().clear();
-
-        // ✅ CORRIGÉ: getProjetsArchives() au lieu de listerArchives()
-        List<Projet> archives = projetService.getProjetsArchives();
+        List<Projet> archives = projetService.listerArchives();
 
         if (lblNbArchives != null) {
             lblNbArchives.setText(archives.size() + " projet(s) archivé(s)");
@@ -67,16 +63,14 @@ public class ListeArchivesController {
         Button btnRestaurer = new Button("Désarchiver");
         btnRestaurer.setStyle("-fx-background-color: #48bb78; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
         btnRestaurer.setOnAction(e -> {
-            // ✅ CORRIGÉ: desarchiverProjet() au lieu de desarchiverUnProjet()
-            projetService.desarchiverProjet(p.getId());
+            projetService.desarchiverUnProjet(p.getId());
             chargerArchives(); // On rafraîchit la liste des archives
         });
 
         Button btnSupp = new Button("Supprimer");
         btnSupp.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-cursor: hand;");
         btnSupp.setOnAction(e -> {
-            // ✅ CORRIGÉ: supprimerProjet() au lieu de supprimerUnProjet()
-            projetService.supprimerProjet(p.getId());
+            projetService.supprimerUnProjet(p.getId());
             chargerArchives();
         });
 

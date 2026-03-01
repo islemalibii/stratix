@@ -13,9 +13,9 @@ public class Projet {
     private int progression;
     private boolean isArchived;
 
-    // Nouveaux champs pour la gestion d'équipe
-    private int responsableId;    // L'ID du chef de projet (utilisateur)
-    private String equipeMembres; // Les noms ou IDs des membres (ex: "Sophie, Julie, Antoine")
+    private int responsableId;
+    private String equipeMembres;
+    private String nomResponsable;
 
     public Projet() {}
 
@@ -35,7 +35,18 @@ public class Projet {
         this.equipeMembres = equipeMembres;
     }
 
-    // --- Getters et Setters ---
+    public String getChefProjet() {
+        return (nomResponsable != null && !nomResponsable.isEmpty())
+                ? nomResponsable
+                : "ID: " + responsableId;
+    }
+
+    public String getEquipe() {
+        return (equipeMembres != null && !equipeMembres.isEmpty())
+                ? equipeMembres
+                : "Aucun membre";
+    }
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -69,8 +80,11 @@ public class Projet {
     public String getEquipeMembres() { return equipeMembres; }
     public void setEquipeMembres(String equipeMembres) { this.equipeMembres = equipeMembres; }
 
+    public String getNomResponsable() { return nomResponsable; }
+    public void setNomResponsable(String nomResponsable) { this.nomResponsable = nomResponsable; }
+
     @Override
     public String toString() {
-        return "Projet: " + nom + " | Chef ID: " + responsableId + " (" + progression + "%)";
+        return "Projet: " + nom + " | Chef: " + getChefProjet() + " (" + progression + "%)";
     }
 }

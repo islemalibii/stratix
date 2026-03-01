@@ -11,7 +11,10 @@
         <Insets top="30" right="40" bottom="30" left="40"/>
     </padding>
 
-    <Label text="Gestion des Projets" styleClass="page-title" style="-fx-font-size: 28; -fx-font-weight: bold;"/>
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Label text="Gestion des Projets" styleClass="page-title" style="-fx-font-size: 28; -fx-font-weight: bold;"/>
+        <Region HBox.hgrow="ALWAYS" />
+    </HBox>
 
     <HBox spacing="20">
         <VBox styleClass="summary-card" HBox.hgrow="ALWAYS" alignment="CENTER" prefHeight="110">
@@ -35,11 +38,15 @@
     <HBox spacing="15" alignment="CENTER_LEFT">
         <TextField fx:id="searchField" promptText="🔍 Rechercher un projet..." styleClass="modern-input" HBox.hgrow="ALWAYS"/>
         <ComboBox fx:id="comboFiltre" styleClass="modern-input" prefWidth="180" promptText="Filtrer par..." />
+
+        <Separator orientation="VERTICAL" prefHeight="30" />
+
         <Button text="➕ Nouveau" onAction="#allerAjouterProjet" styleClass="btn-primary"/>
         <Button text="📁 Archives" onAction="#voirArchives" styleClass="btn-secondary"/>
+
     </HBox>
 
-    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="modern-scroll" style="-fx-background-color: transparent;">
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="modern-scroll" style="-fx-background-color: transparent; -fx-background: transparent;">
         <content>
             <FlowPane fx:id="containerProjets" hgap="25" vgap="25">
                 <padding>

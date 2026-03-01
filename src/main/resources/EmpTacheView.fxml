@@ -24,6 +24,7 @@
         <VBox spacing="5" HBox.hgrow="ALWAYS">
             <Label style="-fx-font-size: 14px; -fx-text-fill: #64748b;" text="Bonjour," />
             <Label fx:id="lblWelcomeName" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="Ryhab Soltani" />
+            <Label fx:id="lblWelcomeRole" style="-fx-font-size: 14px; -fx-text-fill: #3b82f6;" text="👤 Employé" />
         </VBox>
 
         <!-- Cartes statistiques -->

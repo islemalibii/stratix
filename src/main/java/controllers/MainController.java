@@ -150,7 +150,6 @@ public class MainController implements Initializable {
         loadView(fxml);
     }
 
-
     @FXML
     private void showPlanning() {
         Utilisateur user = UserRole.getInstance().getUser();
