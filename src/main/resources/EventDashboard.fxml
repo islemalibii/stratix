@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+
+<VBox spacing="25.0" styleClass="main-bg" stylesheets="@/style/global.css"
+      xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.EventDashboardController">
+
+    <padding>
+        <Insets bottom="25.0" left="30.0" right="30.0" top="25.0" />
+    </padding>
+
+    <children>
+        <HBox alignment="CENTER" spacing="20.0">
+            <children>
+                <VBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" styleClass="stat-card">
+                    <children>
+                        <Label styleClass="stat-label" text="Total Événements" />
+                        <Label fx:id="totalLabel" styleClass="stat-value" text="0" />
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" styleClass="stat-card">
+                    <children>
+                        <Label styleClass="stat-label, stat-planned" text="Planifiés" />
+                        <Label fx:id="plannedLabel" styleClass="stat-value, stat-planned" text="0" />
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" styleClass="stat-card">
+                    <children>
+                        <Label styleClass="stat-label, stat-finished" text="Terminés" />
+                        <Label fx:id="finishedLabel" styleClass="stat-value, stat-finished" text="0" />
+                    </children>
+                </VBox>
+                <VBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" styleClass="stat-card">
+                    <children>
+                        <Label styleClass="stat-label, stat-cancelled" text="Annulés" />
+                        <Label fx:id="cancelledLabel" styleClass="stat-value, stat-cancelled" text="0" />
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <children>
+                <TextField fx:id="searchField" onKeyReleased="#search"
+                           promptText="Rechercher un événement..."
+                           styleClass="text-field" HBox.hgrow="ALWAYS" />
+
+                <ComboBox fx:id="filterStatusCombo" onAction="#handleFilter"
+                          prefWidth="180.0" promptText="Filtrer par statut" />
+
+                <Button onAction="#goToAddEvent" styleClass="btn-primary" text="Ajouter" />
+                <Button onAction="#goToArchived" styleClass="btn-secondary" text="Archives" />
+                <Button onAction="#syncWithGoogle" styleClass="btn-secondary" text="Synchroniser" />
+            </children>
+        </HBox>
+
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
+            <content>
+                <FlowPane fx:id="eventContainer" hgap="25.0" vgap="25.0">
+                    <padding>
+                        <Insets bottom="30.0" left="10.0" right="10.0" top="10.0" />
+                    </padding>
+                </FlowPane>
+            </content>
+        </ScrollPane>
+    </children>
+</VBox>

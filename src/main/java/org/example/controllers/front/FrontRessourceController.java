@@ -13,8 +13,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import models.ressource;
-import service.service_ressource;
+import models.Ressource;
+import services.service_ressource;
 
 import javafx.geometry.Insets;
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
 public class FrontRessourceController implements Initializable {
 
     @FXML
-    private ListView<ressource> listViewRessources;
+    private ListView<Ressource> listViewRessources;
     @FXML
     private Label statsTotal;
     @FXML
@@ -38,8 +38,8 @@ public class FrontRessourceController implements Initializable {
     private Button btnClearSearch;
 
     private service_ressource serviceRessource = new service_ressource();
-    private ObservableList<ressource> ressourcesList = FXCollections.observableArrayList();
-    private FilteredList<ressource> filteredData;
+    private ObservableList<Ressource> ressourcesList = FXCollections.observableArrayList();
+    private FilteredList<Ressource> filteredData;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -100,7 +100,7 @@ public class FrontRessourceController implements Initializable {
     }
 
     private void configurerAffichageRessources() {
-        listViewRessources.setCellFactory(param -> new ListCell<ressource>() {
+        listViewRessources.setCellFactory(param -> new ListCell<Ressource>() {
             private final GridPane gridPane = new GridPane();
             private final VBox contentBox = new VBox(5);
             private final HBox cellBox = new HBox(15);
@@ -145,7 +145,7 @@ public class FrontRessourceController implements Initializable {
             }
 
             @Override
-            protected void updateItem(ressource ressource, boolean empty) {
+            protected void updateItem(Ressource ressource, boolean empty) {
                 super.updateItem(ressource, empty);
                 if (empty || ressource == null) {
                     setText(null);
@@ -189,7 +189,7 @@ public class FrontRessourceController implements Initializable {
 
     private void chargerRessources() {
         try {
-            List<ressource> ressources = serviceRessource.getAll();
+            List<Ressource> ressources = serviceRessource.getAll();
             ressourcesList.clear();
             ressourcesList.addAll(ressources);
             System.out.println(ressources.size() + " ressources chargées");
@@ -201,7 +201,7 @@ public class FrontRessourceController implements Initializable {
     private void mettreAJourStatistiques() {
         int total = ressourcesList.size();
         int quantiteTotale = ressourcesList.stream()
-                .mapToInt(ressource::getQuatite)
+                .mapToInt(Ressource::getQuatite)
                 .sum();
 
         statsTotal.setText("Total ressources: " + total);

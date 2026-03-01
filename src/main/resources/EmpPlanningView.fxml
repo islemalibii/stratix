@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="20" style="-fx-padding: 30; -fx-background-color: #f8fafc;"
+      xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controllers.EmpPlanningController">
+
+    <HBox spacing="15">
+        <Button text="📋 Mes Tâches" onAction="#showMesTaches"
+                style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 10; -fx-cursor: hand;"/>
+        <Button text="📅 Mon Planning" onAction="#showMonPlanning"
+                style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 10; -fx-cursor: hand;"/>
+    </HBox>
+
+    <Separator />
+
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label style="-fx-font-size: 32px;" text="📅" />
+        <Label style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="TOUS LES PLANNINGS" />
+        <Region HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <TableView fx:id="tablePlannings" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-border-color: #e2e8f0;" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colDate" prefWidth="120" text="Date" />
+            <TableColumn fx:id="colHeureDebut" prefWidth="100" text="Début" />
+            <TableColumn fx:id="colHeureFin" prefWidth="100" text="Fin" />
+            <TableColumn fx:id="colTypeShift" prefWidth="120" text="Type" />
+            <TableColumn fx:id="colEmployeId" prefWidth="100" text="Employé ID" />
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
+
+</VBox>

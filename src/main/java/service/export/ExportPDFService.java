@@ -4,7 +4,7 @@ import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.pdf.*;
 import models.produit;
-import models.ressource;
+import models.Ressource;
 
 import java.awt.*;
 import java.io.FileOutputStream;
@@ -110,7 +110,7 @@ public class ExportPDFService {
 
     // ==================== POUR LES RESSOURCES ====================
 
-    public static void exporterRessourcesVersPDF(List<ressource> ressources, String cheminFichier) {
+    public static void exporterRessourcesVersPDF(List<Ressource> ressources, String cheminFichier) {
         try {
             Document document = new Document(PageSize.A4);
             PdfWriter.getInstance(document, new FileOutputStream(cheminFichier));
@@ -134,12 +134,12 @@ public class ExportPDFService {
             document.add(new Paragraph("Total ressources : " + ressources.size(), normalFont));
 
             int quantiteTotale = ressources.stream()
-                    .mapToInt(ressource::getQuatite)
+                    .mapToInt(Ressource::getQuatite)
                     .sum();
             document.add(new Paragraph("Quantité totale : " + quantiteTotale, normalFont));
 
             long typesUniques = ressources.stream()
-                    .map(ressource::getType_ressource)
+                    .map(Ressource::getType_ressource)
                     .distinct()
                     .count();
             document.add(new Paragraph("Types de ressources : " + typesUniques, normalFont));
@@ -159,7 +159,7 @@ public class ExportPDFService {
                 table.addCell(cell);
             }
 
-            for (ressource r : ressources) {
+            for (Ressource r : ressources) {
                 table.addCell(String.valueOf(r.getid()));
                 table.addCell(r.getNom() != null ? r.getNom() : "-");
                 table.addCell(r.getType_ressource() != null ? r.getType_ressource() : "-");

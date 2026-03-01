@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+
+<StackPane prefHeight="700.0" prefWidth="1000.0" styleClass="signup-container" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.SignupController">
+   
+   <HBox prefHeight="700.0" prefWidth="1000.0" alignment="CENTER" spacing="40.0">
+      <padding>
+         <Insets left="60.0" right="60.0" />
+      </padding>
+      
+      <!-- Logo à gauche -->
+      <VBox alignment="CENTER" HBox.hgrow="NEVER">
+         <ImageView fitHeight="300.0" fitWidth="900.0" preserveRatio="true">
+            <image>
+               <Image url="@logo.png" />
+            </image>
+         </ImageView>
+      </VBox>
+      
+      <!-- Signup Form à droite -->
+      <VBox alignment="CENTER" HBox.hgrow="NEVER">
+         <children>
+            <VBox styleClass="signup-form-card">
+               <children>
+                  <!-- Header -->
+                  <VBox alignment="CENTER" spacing="8.0">
+                     <Label text="Créer un compte" styleClass="signup-title" />
+                     <Label text="Remplissez vos informations" styleClass="signup-subtitle" />
+                  </VBox>
+                  
+                  <!-- Spacer -->
+                  <Region prefHeight="6.0" />
+                  
+                  <!-- Nom et Prénom -->
+                  <HBox spacing="12.0">
+                     <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                        <Label styleClass="input-label" text="Nom" />
+                        <TextField fx:id="nomField" styleClass="signup-input" promptText="Nom" />
+                     </VBox>
+                     <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                        <Label styleClass="input-label" text="Prénom" />
+                        <TextField fx:id="prenomField" styleClass="signup-input" promptText="Prénom" />
+                     </VBox>
+                  </HBox>
+                  
+                  <!-- Email -->
+                  <VBox styleClass="input-group">
+                     <Label styleClass="input-label" text="Email" />
+                     <TextField fx:id="emailField" styleClass="signup-input" promptText="exemple@stratix.com" />
+                  </VBox>
+                  
+                  <!-- Téléphone et CIN -->
+                  <HBox spacing="12.0">
+                     <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                        <Label styleClass="input-label" text="Téléphone" />
+                        <TextField fx:id="telField" styleClass="signup-input" promptText="+216 XX XXX XXX" />
+                     </VBox>
+                     <VBox styleClass="input-group" HBox.hgrow="ALWAYS">
+                        <Label styleClass="input-label" text="CIN" />
+                        <TextField fx:id="cinField" styleClass="signup-input" promptText="12345678" />
+                     </VBox>
+                  </HBox>
+                  
+                  <!-- Mot de passe -->
+                  <VBox styleClass="input-group">
+                     <Label styleClass="input-label" text="Mot de passe" />
+                     <PasswordField fx:id="passwordField" styleClass="signup-input" promptText="••••••••" />
+                  </VBox>
+                  
+                  <!-- Confirmer mot de passe -->
+                  <VBox styleClass="input-group">
+                     <Label styleClass="input-label" text="Confirmer mot de passe" />
+                     <PasswordField fx:id="confirmPasswordField" styleClass="signup-input" promptText="••••••••" />
+                  </VBox>
+                  
+                  <!-- Error Label -->
+                  <Label fx:id="errorLabel" styleClass="label-error" visible="false" wrapText="true" />
+                  
+                  <!-- Spacer -->
+                  <Region prefHeight="4.0" />
+                  
+                  <!-- Signup Button -->
+                  <Button fx:id="signupButton" styleClass="signup-button" mnemonicParsing="false" onAction="#handleSignup" text="Créer mon compte" maxWidth="Infinity" />
+                  
+                  <!-- Spacer -->
+                  <Region prefHeight="6.0" />
+                  
+                  <!-- Footer Links -->
+                  <HBox styleClass="link-container">
+                     <Label styleClass="link-text" text="Déjà un compte ?" />
+                     <Hyperlink fx:id="loginLink" styleClass="link-accent" onAction="#handleBackToLogin" text="Se connecter" />
+                  </HBox>
+                  
+                  <!-- Spacer -->
+                  <Region prefHeight="8.0" />
+                  
+                  <!-- Copyright -->
+                  <VBox alignment="CENTER">
+                     <Label text="© 2026 Stratix - Tous droits réservés" styleClass="login-copyright" />
+                  </VBox>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </HBox>
+</StackPane>

@@ -1,8 +1,8 @@
 package services;
 
+import Services.service_produit;
 import models.produit;
 import org.junit.jupiter.api.*;
-import service.service_produit;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -78,13 +78,13 @@ public class service_produitTest {
         assertTrue(trouve, "Le produit modifié devrait être présent");
     }
 
-    @AfterAll
-    static void cleanUp() throws SQLException {
-        if (idProduitTest > 0) {
+    //@AfterAll
+    //static void cleanUp() throws SQLException {
+      //  if (idProduitTest > 0) {
             // Supprimer uniquement le produit de test
-            service.delete(idProduitTest);
-        }
+        //    service.delete(idProduitTest);
+       // }
         // ou tout supprimer si vous préférez
         // service.deleteAll();
-    }
+  //  }
 }

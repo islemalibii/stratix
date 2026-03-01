@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" alignment="CENTER" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controllers.AjoutProjetController" style="-fx-background-color: #f8f9fa;">
+    <padding><Insets top="20" right="30" bottom="20" left="30"/></padding>
+
+    <Label text="🚀 Nouveau Projet" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+    <TextField fx:id="tfNom" promptText="Nom du projet" />
+    <TextArea fx:id="taDescription" promptText="Description..." prefRowCount="3" />
+
+    <HBox spacing="10">
+        <DatePicker fx:id="dpDateDebut" promptText="Début" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        <DatePicker fx:id="dpDateFin" promptText="Fin" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+    </HBox>
+
+    <TextField fx:id="tfBudget" promptText="Budget (dt)"/>
+
+    <Label text="Chef de Projet :" style="-fx-font-weight: bold;"/>
+    <ComboBox fx:id="cbResponsable" promptText="Choisir le chef" maxWidth="Infinity" />
+
+    <Label text="Membres de l'équipe (Ctrl+Clic) :" style="-fx-font-weight: bold;"/>
+    <ListView fx:id="lvMembres" prefHeight="80" />
+
+    <ChoiceBox fx:id="cbStatut" prefWidth="150" />
+
+    <HBox spacing="15" alignment="CENTER_RIGHT">
+        <Button text="Annuler" onAction="#annuler" style="-fx-background-color: #95a5a6; -fx-text-fill: white;"/>
+        <Button text="Créer" onAction="#ajouterProjet" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;"/>
+    </HBox>
+</VBox>

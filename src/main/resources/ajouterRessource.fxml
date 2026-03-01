@@ -2,12 +2,11 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.controllers.FormulaireRessourceController"
-            prefHeight="500" prefWidth="500"
+            fx:controller="controllers.FormulaireRessourceController"
+            prefHeight="550" prefWidth="500"
             style="-fx-background-color: white;">
 
     <!-- En-tête -->
@@ -36,6 +35,13 @@
                 <VBox spacing="5">
                     <Label text="Type de ressource :" style="-fx-font-weight: bold;"/>
                     <ComboBox fx:id="typeCombo" promptText="Choisir un type" prefWidth="400"/>
+                </VBox>
+
+                <!-- Zone pour type personnalisé (NOUVEAU) -->
+                <VBox fx:id="autreTypeContainer" spacing="5" managed="false" visible="false">
+                    <Label text="Type personnalisé :" style="-fx-font-weight: bold; -fx-text-fill: #e74c3c;"/>
+                    <TextField fx:id="autreTypeField" promptText="Saisissez votre type..."
+                               style="-fx-background-color: #fff3cd; -fx-border-color: #ffeeba;"/>
                 </VBox>
 
                 <!-- Quantité -->

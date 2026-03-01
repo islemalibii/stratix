@@ -5,47 +5,8 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.controllers.ProduitController"
+            fx:controller="controllers.ProduitController"
             prefHeight="600" prefWidth="1000">
-
-    <!-- Menu latéral gauche -->
-    <left>
-        <VBox spacing="10" style="-fx-background-color: #2c3e50; -fx-padding: 20;" prefWidth="200">
-            <Label text="Tableau de Bord" style="-fx-text-fill: #ecf0f1; -fx-font-size: 16; -fx-font-weight: bold; -fx-padding: 0 0 10 0;"/>
-
-            <Button text="📊 Employés" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
-                    onAction="#naviguerEmployes" prefWidth="180"/>
-
-            <Button text="📁 Projets" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
-                    onAction="#naviguerProjets" prefWidth="180"/>
-
-            <Button text="✅ Tâches" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
-                    onAction="#naviguerTaches" prefWidth="180"/>
-
-            <Button text=" Produits" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
-                    onAction="#naviguerProduits" prefWidth="180"/>
-
-            <Button text=" Ressources" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
-                    onAction="#naviguerRessources" prefWidth="180"/>
-
-            <!-- NOUVEAU BOUTON FRONT OFFICE -->
-            <Button text="👥 Front Office" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
-                    onAction="#ouvrirFrontOffice" prefWidth="180"/>
-
-            <Button text=" Prévoyance" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
-                    onAction="#naviguerPrevoyance" prefWidth="180"/>
-
-            <Button text=" Analyse" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-cursor: hand;"
-                    onAction="#naviguerAnalyse" prefWidth="180"/>
-
-            <Separator style="-fx-background: #7f8c8d; -fx-padding: 10 0 10 0;"/>
-
-            <Label text="L'ancienne à venir" style="-fx-text-fill: #ecf0f1; -fx-font-size: 14; -fx-font-weight: bold;"/>
-            <Label text=" Produit 1 - 10/01/2025" style="-fx-text-fill: #bdc3c7; -fx-padding: 2 0 2 5;"/>
-            <Label text=" Produit 2 - 27/08/2025" style="-fx-text-fill: #bdc3c7; -fx-padding: 2 0 2 5;"/>
-            <Label text=" Produit 3 - 15/05/2025" style="-fx-text-fill: #bdc3c7; -fx-padding: 2 0 2 5;"/>
-        </VBox>
-    </left>
 
     <!-- Centre avec ListView -->
     <center>
@@ -63,25 +24,29 @@
                 <Region HBox.hgrow="ALWAYS"/>
             </HBox>
 
-            <!-- Boutons d'action avec exports -->
+            <!-- Boutons d'action avec exports et tri -->
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <Label text="Gestion des Produits" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
                 <Region HBox.hgrow="ALWAYS"/>
 
                 <!-- Boutons d'export -->
-                <Button text="📊 Excel" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;"
-                        onAction="#exporterProduitsExcel"/>
                 <Button text="📄 PDF" style="-fx-background-color: #e67e22; -fx-text-fill: white; -fx-cursor: hand;"
                         onAction="#exporterProduitsPDF"/>
 
+                <!-- Boutons de tri -->
+                <MenuButton text="🔽 Trier par" style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-cursor: hand;">
+                    <items>
+                        <MenuItem text="Prix (croissant)" onAction="#trierParPrix"/>
+                        <MenuItem text="Prix (décroissant)" onAction="#trierParPrix"/>
+                        <MenuItem text="Nom" onAction="#trierParNom"/>
+                        <MenuItem text="Stock" onAction="#trierParStock"/>
+                    </items>
+                </MenuButton>
+
                 <!-- Boutons de gestion -->
-                <Button text=" Ajouter" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-cursor: hand;"
+                <Button text="➕ Nouveau Produit" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"
                         onAction="#ouvrirAjoutProduit"/>
-                <Button text="✏ Modifier" style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-cursor: hand;"
-                        onAction="#ouvrirModifierProduit"/>
-                <Button text="🗑 Supprimer" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;"
-                        onAction="#supprimerProduit"/>
-                <Button text=" Rafraîchir" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-cursor: hand;"
+                <Button text="🔄 Rafraîchir" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-cursor: hand;"
                         onAction="#rafraichirListe"/>
             </HBox>
 

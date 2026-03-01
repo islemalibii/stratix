@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" styleClass="popup-container" prefWidth="400" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AjoutCategorieController">
+    <Label fx:id="lblTitrePopup" text="AJOUTER UNE CATÉGORIE" styleClass="popup-title"/>
+    <Label fx:id="lblError" style="-fx-text-fill: red; -fx-wrap-text: true;" managed="true"/>
+    <GridPane hgap="15" vgap="12" styleClass="form-grid">
+        <Label text="Nom:" styleClass="form-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="txtNom" styleClass="form-field" promptText="Nom de la catégorie" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <Label text="Description:" styleClass="form-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextArea fx:id="txtDescription" prefRowCount="3" styleClass="form-field" promptText="Description de la catégorie" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    </GridPane>
+    <HBox spacing="10" styleClass="popup-buttons">
+        <Button fx:id="btnAction" text="Ajouter" onAction="#handleAjouter" styleClass="btn-success"/>
+        <Button text="Fermer" onAction="#handleFermer" styleClass="btn-gray"/>
+    </HBox>
+</VBox>

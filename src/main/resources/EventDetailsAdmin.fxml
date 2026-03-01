@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+
+<ScrollPane fitToWidth="true" styleClass="scroll-pane" stylesheets="@/style/global.css"
+            xmlns="http://javafx.com/javafx/20" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.EventDetailsAdminController">
+    <content>
+        <VBox spacing="20" style="-fx-padding: 30; -fx-background-color: transparent;">
+            <children>
+                <Button text="← Retour au Dashboard" onAction="#goBack" styleClass="btn-secondary" />
+
+                <HBox spacing="40" styleClass="card" style="-fx-padding: 30; -fx-background-radius: 20; -fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
+                    <children>
+                        <VBox alignment="TOP_CENTER" spacing="15">
+                            <children>
+                                <ImageView fx:id="eventImageView" fitHeight="350.0" fitWidth="450.0" pickOnBounds="true" preserveRatio="true" />
+                                <Label fx:id="statusBadge" styleClass="status-badge" />
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="15" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label fx:id="titleLabel" styleClass="heading-large" style="-fx-font-size: 28px; -fx-font-weight: bold;" wrapText="true" />
+                                <Separator />
+
+                                <GridPane vgap="12" hgap="25">
+                                    <columnConstraints>
+                                        <ColumnConstraints minWidth="100" />
+                                        <ColumnConstraints hgrow="ALWAYS" />
+                                    </columnConstraints>
+                                    <children>
+                                        <Label text="Statut :" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="input-label" style="-fx-font-weight: bold;" />
+                                        <Label fx:id="statusTextLabel"  GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                                        <Label text="Date :" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="input-label" style="-fx-font-weight: bold;" />
+                                        <Label fx:id="dateLabel"  GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                                        <Label text="Lieu :" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="input-label" style="-fx-font-weight: bold;" />
+                                        <Label fx:id="locationLabel"  GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                        <Label text="Type :" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="input-label" style="-fx-font-weight: bold;" />
+                                        <Label fx:id="typeLabel"  GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    </children>
+                                </GridPane>
+
+                                <VBox spacing="8">
+                                    <children>
+                                        <Label text="Description :" styleClass="input-label" style="-fx-font-weight: bold;" />
+                                        <Label fx:id="descriptionLabel" styleClass="card-description" wrapText="true" />
+                                    </children>
+                                </VBox>
+
+                                <Separator />
+
+                                <VBox spacing="10" VBox.vgrow="ALWAYS">
+                                    <children>
+                                        <Label text="Feedbacks :" styleClass="input-label" style="-fx-font-weight: bold;" />
+                                        <VBox fx:id="feedbackContainer" spacing="8" />
+                                    </children>
+                                </VBox>
+
+                                <HBox spacing="15" alignment="BOTTOM_RIGHT" style="-fx-padding: 20 0 0 0;">
+                                    <children>
+                                        <Button text="Modifier" onAction="#handleEdit" styleClass="btn-modify-card" prefWidth="180" prefHeight="40" />
+                                        <Button text="Archiver" onAction="#handleArchive" styleClass="btn-archive-card" prefWidth="150" prefHeight="40" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>

@@ -7,7 +7,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.controllers.FormulaireProduitController"
+            fx:controller="controllers.FormulaireProduitController"
             prefHeight="850" prefWidth="600"
             style="-fx-background-color: white;">
 
@@ -94,6 +94,12 @@
                            GridPane.rowIndex="4" GridPane.columnIndex="0"/>
                     <TextField fx:id="prixField" promptText="Ex: 1299.99"
                                GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                    <!-- Ligne pour les détails (à ajouter après les ressources) -->
+                    <Label text="Détails:" style="-fx-font-weight: bold;"
+                           GridPane.rowIndex="12" GridPane.columnIndex="0"/>
+                    <TextArea fx:id="detailsField" promptText="Détails supplémentaires..."
+                              prefRowCount="3" wrapText="true"
+                              GridPane.rowIndex="12" GridPane.columnIndex="1"/>
 
                     <!-- Ligne 5: Stock Actuel -->
                     <Label text="Stock actuel :" style="-fx-font-weight: bold;"
