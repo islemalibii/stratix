@@ -17,44 +17,26 @@ public class MyDataBase {
 
     private void connect() {
         try {
-            cnx = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("✅ Connecté à la base de données");
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur de connexion: " + e.getMessage());
-            this.cnx = null;
+            this.cnx= DriverManager.getConnection(URL,USER,PASSWORD);
+            System.out.println("connected...");
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());;
         }
+
     }
 
-    public static MyDataBase getInstance() {
-        if (instance == null) {
+public static MyDataBase getInstance(){
+    try {
+        if (instance == null || instance.getCnx() == null || instance.getCnx().isClosed()) {
             instance = new MyDataBase();
         }
-        return instance;
+    } catch (SQLException e) {
+        System.err.println("Failed to reconnect to database: " + e.getMessage());
     }
+    return instance;
+}
 
     public Connection getCnx() {
-        try {
-            // Vérifier si la connexion est fermée ou null
-            if (cnx == null || cnx.isClosed()) {
-                System.out.println("🔄 Reconnexion à la base de données...");
-                connect();
-            }
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur vérification connexion: " + e.getMessage());
-            connect();
-        }
         return cnx;
-    }
-
-    // Méthode pour fermer proprement la connexion
-    public void closeConnection() {
-        try {
-            if (cnx != null && !cnx.isClosed()) {
-                cnx.close();
-                System.out.println("✅ Connexion fermée");
-            }
-        } catch (SQLException e) {
-            System.err.println("❌ Erreur fermeture connexion: " + e.getMessage());
-        }
     }
 }
