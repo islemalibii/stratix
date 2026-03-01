@@ -435,13 +435,13 @@ public class MainController implements Initializable {
         javafx.scene.Scene scene = new javafx.scene.Scene(vbox, 450, 400);
         stage.setScene(scene);
         stage.setResizable(false);
+        stage.show();
         
-        stage.setOnShown(event -> nomField.requestFocus());
-        stage.showAndWait();
+        // Focus après affichage
+        javafx.application.Platform.runLater(() -> nomField.requestFocus());
     }
     
     private void showSimplePasswordDialog(Utilisateur user) {
-        // Créer une fenêtre Stage au lieu de Dialog
         javafx.stage.Stage stage = new javafx.stage.Stage();
         stage.setTitle("Changer mot de passe");
         stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
@@ -529,11 +529,10 @@ public class MainController implements Initializable {
         javafx.scene.Scene scene = new javafx.scene.Scene(vbox, 450, 450);
         stage.setScene(scene);
         stage.setResizable(false);
+        stage.show();
         
-        // Focus sur le premier champ après affichage
-        stage.setOnShown(event -> oldField.requestFocus());
-        
-        stage.showAndWait();
+        // Focus après affichage
+        javafx.application.Platform.runLater(() -> oldField.requestFocus());
     }
     
     private void showAlert(String title, String message) {
