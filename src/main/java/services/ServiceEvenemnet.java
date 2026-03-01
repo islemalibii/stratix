@@ -49,7 +49,8 @@ public class ServiceEvenemnet implements Services<Evenement> {
     @Override
     public void update(Evenement evenement) {
 
-        String req = "update evenement set type_event=? , date_event=? , description=? , statut=? , lieu=? , titre=?, image_url=? where id=?";
+        String req = "update evenement set type_event=? , date_event=? , description=? , statut=? , lieu=? , titre=?, image_url=?, latitude=?, longitude=?"+
+                " where id=?";
         try{
             PreparedStatement pst = cnx.prepareStatement(req);
 
@@ -60,7 +61,10 @@ public class ServiceEvenemnet implements Services<Evenement> {
             pst.setString(5, evenement.getLieu());
             pst.setString(6, evenement.getTitre());
             pst.setString(7, evenement.getImageUrl());
-            pst.setInt(8, evenement.getId());
+            pst.setDouble(8, evenement.getLatitude());
+            pst.setDouble(9, evenement.getLongitude());
+            pst.setInt(10, evenement.getId());
+
 
             pst.executeUpdate();
             System.out.println("evenement modifie");
