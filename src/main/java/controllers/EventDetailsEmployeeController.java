@@ -16,6 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import services.EventEmailApi;
+import services.ServiceEventParticipation;
 
 import java.io.IOException;
 
@@ -84,6 +85,17 @@ public class EventDetailsEmployeeController {
 
                 new Thread(() -> {
                     try {
+                        ServiceEventParticipation partService = new ServiceEventParticipation();
+
+                        if (partService.alreadyParticipated(e.getId(), userEmail)) {
+                            javafx.application.Platform.runLater(() -> {
+                                participateBtn.setText("Déjà inscrit");
+                                participateBtn.setDisable(true);
+                            });
+                            return;
+                        }
+
+                        partService.addParticipation(e.getId(), userEmail);
                         EventEmailApi.sendEmail(userEmail, e.getTitre(), e.getDate_event().toString());
 
                         javafx.application.Platform.runLater(() -> {

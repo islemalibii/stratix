@@ -2,7 +2,6 @@ package services;
 
 import interfaces.Services;
 import models.Evenement;
-import models.Ressource;
 import models.enums.EventStatus;
 import models.enums.EventType;
 import utils.MyDataBase;
@@ -101,6 +100,8 @@ public class ServiceEvenemnet implements Services<Evenement> {
                 e.setArchived(rs.getInt("isArchived") == 1);
                 e.setImageUrl(rs.getString("image_url"));
 
+                e.setLatitude(rs.getDouble("latitude"));
+                e.setLongitude(rs.getDouble("longitude"));
                 list.add(e);
             }
         } catch (SQLException ex) {

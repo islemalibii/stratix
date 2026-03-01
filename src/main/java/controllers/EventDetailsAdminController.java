@@ -1,22 +1,25 @@
 package controllers;
 
+import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import models.Evenement;
 import models.EventFeedback;
 import models.enums.EventStatus;
 import services.ServiceEvenemnet;
+import services.ServiceEventExcelExport;
 import services.ServiceEventFeedback;
 
 import java.io.IOException;
@@ -28,6 +31,8 @@ public class EventDetailsAdminController {
     @FXML private Label titleLabel, dateLabel, locationLabel, typeLabel, descriptionLabel, statusTextLabel, statusBadge;
     @FXML private VBox feedbackContainer;
     @FXML private VBox feedbackSection;
+    @FXML private WebView mapView;
+    @FXML private VBox mapSection;
 
 
     private Evenement currentEvent;
@@ -55,10 +60,22 @@ public class EventDetailsAdminController {
         //load ratings if terminer l event
         if (e.getStatut() == EventStatus.terminer) {
             feedbackSection.setVisible(true);
+            mapSection.setVisible(false);
+            mapSection.setManaged(false);
             loadFeedbacks(e.getId());
-        } else {
+
+        }else if (e.getStatut() == EventStatus.planifier) {
             feedbackSection.setVisible(false);
+            feedbackSection.setManaged(false);
+
+            mapSection.setVisible(true);
+            mapSection.setManaged(true);
+            setupMap(e);
+        } else {
+            mapSection.setVisible(false);
+            mapSection.setManaged(false);
         }
+
 
 
         try {
@@ -94,6 +111,52 @@ public class EventDetailsAdminController {
             lbl.setStyle("-fx-font-size:14px; -fx-padding:5; -fx-text-fill: black;");
             feedbackContainer.getChildren().add(lbl);
         }
+    }
+
+
+    private void setupMap(Evenement e) {
+        WebEngine engine = mapView.getEngine();
+        java.net.URL url = getClass().getResource("/map.html");
+
+        if (url == null) {
+            System.err.println("map.html non trouvé!");
+            return;
+        }
+
+        engine.load(url.toExternalForm());
+
+        engine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                // Formatting coordinates using Locale.US to ensure "." decimal separator
+                String script = String.format(java.util.Locale.US, "showCoordinates(%f, %f, '%s')",
+                        e.getLatitude(),
+                        e.getLongitude(),
+                        e.getLieu().replace("'", "\\'"));
+
+                // Small delay to ensure the Leaflet JS is ready
+                javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(javafx.util.Duration.millis(600));
+                delay.setOnFinished(event -> {
+                    try {
+                        engine.executeScript(script);
+                    } catch (Exception ex) {
+                        System.err.println("Erreur Script Map: " + ex.getMessage());
+                    }
+                });
+                delay.play();
+            }
+        });
+    }
+
+    @FXML
+    private void handleExportParticipants() {
+        if (currentEvent == null) {
+            System.out.println("No event selected");
+            return;
+        }
+        ServiceEventExcelExport service = new ServiceEventExcelExport();
+        service.exportParticipantsToExcel(currentEvent.getId());
+
+        System.out.println("Export finished!");
     }
 
     private void navigateTo(String fxmlPath) {

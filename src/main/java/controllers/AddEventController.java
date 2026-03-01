@@ -7,27 +7,21 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import models.Evenement;
-import models.Ressource;
 import models.enums.EventStatus;
 import models.enums.EventType;
 import netscape.javascript.JSObject;
 import services.ServiceEvenemnet;
 import javafx.stage.FileChooser;
-import services.ServiceEventRessource;
 
 import java.io.File;
 
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AddEventController {
     @FXML private TextField titreField;
