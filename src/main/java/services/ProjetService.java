@@ -208,9 +208,6 @@ public class ProjetService implements ProjServices {
         return list;
     }
 
-    /**
-     * Récupère un projet par son ID
-     */
     public Projet getProjetById(int id) {
         String sql = "SELECT * FROM projet WHERE id = ?";
 
@@ -231,12 +228,10 @@ public class ProjetService implements ProjServices {
         return null;
     }
 
-    // ⭐ MÉTHODE CORRIGÉE - Utilise 'TERMINEE' au lieu de 'Terminé'
     public void mettreAJourProgression(int projetId) {
         System.out.println("\n🔄 ===== MISE À JOUR PROGRESSION =====");
         System.out.println("🔄 Projet ID: " + projetId);
 
-        // Vérifier d'abord si le projet existe
         Projet projet = getProjetById(projetId);
         if (projet == null) {
             System.out.println("❌ ERREUR: Projet ID " + projetId + " n'existe pas!");
@@ -244,7 +239,6 @@ public class ProjetService implements ProjServices {
         }
         System.out.println("✅ Projet trouvé: " + projet.getNom());
 
-        // Afficher toutes les tâches du projet
         String sqlTaches = "SELECT id, titre, statut FROM tache WHERE projet_id = ?";
         try (Connection conn = MyDataBase.getInstance().getCnx();
              PreparedStatement ps = conn.prepareStatement(sqlTaches)) {
@@ -269,7 +263,6 @@ public class ProjetService implements ProjServices {
             e.printStackTrace();
         }
 
-        // ⭐ CORRECTION ICI - Utilisation de 'TERMINEE' au lieu de 'Terminé'
         String sqlCount = "SELECT " +
                 "COUNT(*) as total, " +
                 "SUM(CASE WHEN statut = 'TERMINEE' THEN 1 ELSE 0 END) as terminees " +
@@ -296,7 +289,6 @@ public class ProjetService implements ProjServices {
 
                 System.out.println("   📈 Progression calculée: " + progression + "%");
 
-                // Mettre à jour la table projet
                 String sqlUpdate = "UPDATE projet SET progression = ? WHERE id = ?";
                 try (PreparedStatement psUpdate = conn.prepareStatement(sqlUpdate)) {
                     psUpdate.setInt(1, progression);
@@ -319,7 +311,6 @@ public class ProjetService implements ProjServices {
         System.out.println("🔄 ===== FIN MISE À JOUR =====\n");
     }
 
-
     private Projet extractProjetFromResultSet(ResultSet rs) throws SQLException {
         Projet p = new Projet();
         p.setId(rs.getInt("id"));
@@ -337,9 +328,4 @@ public class ProjetService implements ProjServices {
 
         return p;
     }
-
-
-
-
-
 }

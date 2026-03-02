@@ -176,7 +176,6 @@ public class ListeProjetsController {
             document.add(new Paragraph("Description : " + p.getDescription()));
             document.add(new Paragraph(" "));
 
-            // 3. Génération du QR Code complet (Toutes les infos sauf ID)
             String qrData = String.format(
                     "STRATIX - FICHE PROJET\nNom: %s\nResponsable: %s\nStatut: %s\nBudget: %s DT\nProgression: %d%%\nDescription: %s",
                     p.getNom(), recupererNomChef(p.getResponsableId()), p.getStatut(), p.getBudget(), p.getProgression(), p.getDescription()
@@ -184,7 +183,6 @@ public class ListeProjetsController {
 
             String qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + URLEncoder.encode(qrData, StandardCharsets.UTF_8);
 
-            // Insertion de l'image QR Code dans le PDF
             com.lowagie.text.Image qrImage = com.lowagie.text.Image.getInstance(new java.net.URL(qrCodeUrl));
             qrImage.setAlignment(Element.ALIGN_CENTER);
             qrImage.scalePercent(80);

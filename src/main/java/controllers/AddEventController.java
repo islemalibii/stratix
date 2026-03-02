@@ -41,7 +41,6 @@ public class AddEventController {
     @FXML private ComboBox<EventType> typeCombo;
     @FXML private ComboBox<EventStatus> statusCombo;
 
-    //private List<Ressource> selectedRessources = new ArrayList<>();
     private ServiceEvenemnet service = new ServiceEvenemnet();
 
     @FXML
@@ -144,12 +143,10 @@ public class AddEventController {
         String address = mapSearchField.getText();
         if (address != null && !address.isEmpty()) {
             lieuField.setText(address);
-
             mapPicker.getEngine().executeScript("searchAddress('" + address.replace("'", "\\'") + "')");
         }
     }
 
-    // Inside your JavaConnector class (ensure it's PUBLIC)
     public class JavaConnector {
         public void setCoordinates(double lat, double lng) {
             javafx.application.Platform.runLater(() -> {

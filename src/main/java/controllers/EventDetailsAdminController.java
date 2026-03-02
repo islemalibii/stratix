@@ -126,9 +126,9 @@ public class EventDetailsAdminController {
         StringBuilder stars = new StringBuilder();
         for (int i = 1; i <= 5; i++) {
             if (i <= rating) {
-                stars.append("★"); // Filled star
+                stars.append("★");
             } else {
-                stars.append("☆"); // Empty star
+                stars.append("☆");
             }
         }
         return stars.toString();
