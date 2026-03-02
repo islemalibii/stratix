@@ -11,7 +11,7 @@
         <VBox spacing="0">
             <!-- Barre de navigation -->
             <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 15 30 10 30; -fx-background-color: #f8fafc;">
-                <Button onAction="#showDashboardFromButton" text="🏠 Dashboard"
+                <Button onAction="#showDashboardFromButton" text="🏠 Accueil"
                         style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-padding: 8 15; -fx-background-radius: 5; -fx-font-weight: bold; -fx-cursor: hand;" />
                 <Button onAction="#showPlanningFromButton" text="📅 Planning"
                         style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-padding: 8 15; -fx-background-radius: 5; -fx-font-weight: bold; -fx-cursor: hand;" />
@@ -25,7 +25,7 @@
 
             <!-- En-tête avec titre et petits boutons -->
             <HBox alignment="CENTER_LEFT" prefHeight="70" spacing="15" style="-fx-background-color: linear-gradient(to right, #1e293b, #0f172a); -fx-padding: 0 30;">
-                <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" text="📅 LISTE DES PLANNINGS" />
+                <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" text="📅 " />
                 <Circle radius="6" fill="#4ade80"/>
                 <Label fx:id="lblHeaderStats" style="-fx-text-fill: #94a3b8; -fx-font-size: 14px;" text="Visualisation globale - 24 planning(s)"/>
                 <Region HBox.hgrow="ALWAYS" />

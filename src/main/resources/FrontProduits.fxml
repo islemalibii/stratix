@@ -6,10 +6,10 @@
 
 
 <BorderPane xmlns="http://javafx.com/javafx/17"
-                xmlns:fx="http://javafx.com/fxml/1"
-                fx:controller="controllers.FrontProduitController"
-                prefHeight="700" prefWidth="1000"
-                style="-fx-background-color: #f5f5f5;">
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controllers.FrontProduitController"
+            prefHeight="700" prefWidth="1000"
+            style="-fx-background-color: #f5f5f5;">
 
     <!-- En-tête -->
     <top>
@@ -37,7 +37,10 @@
                         style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 8 15;"/>
                 <Region HBox.hgrow="ALWAYS"/>
 
-
+                <!-- Bouton pour voir les Ressources -->
+                <Button text=" Voir les Ressources"
+                        style="-fx-background-color: #764ba2; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 8 15;"
+                        onAction="#voirRessources"/>
             </HBox>
 
             <!-- Liste des produits -->

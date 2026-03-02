@@ -1,9 +1,9 @@
 package controllers;
 
-import controllers.FormulaireProduitController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,22 +11,21 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.produit;
-import service.export.ExportExcelService;
 import services.service_produit;
-
 import service.export.ExportPDFService;
+import service.export.ExportExcelService;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,26 +49,37 @@ public class ProduitController {
     private service_produit serviceProduit = new service_produit();
     private ObservableList<produit> produitsList = FXCollections.observableArrayList();
     private FilteredList<produit> filteredData;
+    private SortedList<produit> sortedData;
+    private boolean triAscendant = true;
 
     @FXML
     public void initialize() {
         System.out.println("Initialisation du contrôleur principal avec ListView...");
 
-        debugRessourcePath();
+        debugPaths();
         configurerAffichageProduits();
         chargerProduits();
-        configurerRecherche();
+        configurerRechercheEtTri();
         mettreAJourStatistiques();
     }
 
-    private void debugRessourcePath() {
-        System.out.println("=== DÉBOGAGE CHEMIN RESSOURCE ===");
+    private void debugPaths() {
+        System.out.println("=== DÉBOGAGE DES CHEMINS ===");
         System.out.println("Resource /fxml/Ressource.fxml: " + getClass().getResource("/fxml/Ressource.fxml"));
-        System.out.println("==================================");
+        System.out.println("Resource /fxml/detailsProduit.fxml: " + getClass().getResource("/fxml/detailsProduit.fxml"));
+        System.out.println("Resource /detailsProduit.fxml: " + getClass().getResource("/detailsProduit.fxml"));
+        System.out.println("==============================");
     }
 
-    private void configurerRecherche() {
+    private void configurerRechercheEtTri() {
+        // Créer la liste filtrée
         filteredData = new FilteredList<>(produitsList, p -> true);
+
+        // Créer la liste triée à partir de la liste filtrée
+        sortedData = new SortedList<>(filteredData);
+
+        // Appliquer le tri initial (par défaut, tri par nom)
+        sortedData.setComparator(Comparator.comparing(produit::getNom));
 
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             filtrerProduits(newValue);
@@ -81,7 +91,8 @@ public class ProduitController {
             filtrerProduits("");
         });
 
-        listViewProduits.setItems(filteredData);
+        // Lier la ListView à la liste triée
+        listViewProduits.setItems(sortedData);
     }
 
     private void filtrerProduits(String texteRecherche) {
@@ -105,6 +116,33 @@ public class ProduitController {
         });
 
         mettreAJourStatistiquesFiltrees();
+    }
+
+    @FXML
+    private void trierParPrix() {
+        triAscendant = !triAscendant;
+
+        if (triAscendant) {
+            sortedData.setComparator(Comparator.comparing(produit::getPrix));
+            showAlert(Alert.AlertType.INFORMATION, "Tri", "Produits triés par prix (croissant)");
+        } else {
+            sortedData.setComparator(Comparator.comparing(produit::getPrix).reversed());
+            showAlert(Alert.AlertType.INFORMATION, "Tri", "Produits triés par prix (décroissant)");
+        }
+    }
+
+    @FXML
+    private void trierParNom() {
+        sortedData.setComparator(Comparator.comparing(produit::getNom));
+        showAlert(Alert.AlertType.INFORMATION, "Tri", "Produits triés par nom");
+        triAscendant = true; // Réinitialiser l'état du tri par prix
+    }
+
+    @FXML
+    private void trierParStock() {
+        sortedData.setComparator(Comparator.comparing(produit::getStock_actuel));
+        showAlert(Alert.AlertType.INFORMATION, "Tri", "Produits triés par stock");
+        triAscendant = true; // Réinitialiser l'état du tri par prix
     }
 
     private void mettreAJourStatistiquesFiltrees() {
@@ -136,18 +174,10 @@ public class ProduitController {
         listViewProduits.setCellFactory(param -> new ListCell<produit>() {
             private final ImageView imageView = new ImageView();
             private final GridPane gridPane = new GridPane();
-            private final VBox contentBox = new VBox(5);
+            private final VBox contentBox = new VBox(8);
             private final HBox cellBox = new HBox(15);
-
-            private final Label nomAttribut = new Label("Nom:");
-            private final Label categorieAttribut = new Label("Catégorie:");
-            private final Label prixAttribut = new Label("Prix:");
-            private final Label stockAttribut = new Label("Stock:");
-            private final Label dateCreationAttribut = new Label("Date création:");
-            private final Label dateFabricationAttribut = new Label("Date fabrication:");
-            private final Label datePeremptionAttribut = new Label("Date péremption:");
-            private final Label dateGarantieAttribut = new Label("Garantie:");
-            private final Label ressourcesAttribut = new Label("Ressources:");
+            private final HBox buttonBox = new HBox(15);
+            private final HBox headerBox = new HBox(10);
 
             private final Label nomValeur = new Label();
             private final Label descriptionValeur = new Label();
@@ -161,76 +191,142 @@ public class ProduitController {
             private final Label ressourcesValeur = new Label();
             private final Label statutLabel = new Label();
 
+            private final Button btnDetails = new Button("🔍 Détails");
+            private final Button btnModifier = new Button("✏ Modifier");
+            private final Button btnSupprimer = new Button("🗑 Retirer");
+
             {
-                imageView.setFitHeight(120);
-                imageView.setFitWidth(120);
+                // Image
+                imageView.setFitHeight(100);
+                imageView.setFitWidth(100);
                 imageView.setPreserveRatio(true);
                 imageView.setStyle("-fx-border-color: #ddd; -fx-border-width: 1; -fx-border-radius: 5;");
 
-                String attributStyle = "-fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-font-size: 12px;";
-                nomAttribut.setStyle(attributStyle);
-                categorieAttribut.setStyle(attributStyle);
-                prixAttribut.setStyle(attributStyle);
-                stockAttribut.setStyle(attributStyle);
-                dateCreationAttribut.setStyle(attributStyle);
-                dateFabricationAttribut.setStyle(attributStyle);
-                datePeremptionAttribut.setStyle(attributStyle);
-                dateGarantieAttribut.setStyle(attributStyle);
-                ressourcesAttribut.setStyle(attributStyle);
-
-                String valeurStyle = "-fx-text-fill: #27ae60; -fx-font-size: 12px;";
+                // Styles
+                String valeurStyle = "-fx-text-fill: #2c3e50; -fx-font-size: 12px;";
                 nomValeur.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;");
-                descriptionValeur.setStyle("-fx-text-fill: #666; -fx-font-size: 11px; -fx-font-style: italic;");
+                descriptionValeur.setStyle("-fx-text-fill: #666; -fx-font-size: 12px; -fx-font-style: italic;");
                 categorieValeur.setStyle(valeurStyle);
-                prixValeur.setStyle(valeurStyle);
+                prixValeur.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 14px;");
+                stockValeur.setStyle(valeurStyle);
                 dateCreationValeur.setStyle(valeurStyle);
                 dateFabricationValeur.setStyle(valeurStyle);
                 datePeremptionValeur.setStyle(valeurStyle);
                 dateGarantieValeur.setStyle(valeurStyle);
                 ressourcesValeur.setStyle(valeurStyle);
 
-                descriptionValeur.setWrapText(true);
+                // Style des boutons
+                btnDetails.setStyle(
+                        "-fx-background-color: #3498db; " +
+                                "-fx-text-fill: white; " +
+                                "-fx-font-size: 13px; " +
+                                "-fx-font-weight: bold; " +
+                                "-fx-padding: 8 15; " +
+                                "-fx-cursor: hand; " +
+                                "-fx-background-radius: 5;"
+                );
+
+                btnModifier.setStyle(
+                        "-fx-background-color: #f39c12; " +
+                                "-fx-text-fill: white; " +
+                                "-fx-font-size: 13px; " +
+                                "-fx-font-weight: bold; " +
+                                "-fx-padding: 8 15; " +
+                                "-fx-cursor: hand; " +
+                                "-fx-background-radius: 5;"
+                );
+
+                btnSupprimer.setStyle(
+                        "-fx-background-color: #e74c3c; " +
+                                "-fx-text-fill: white; " +
+                                "-fx-font-size: 13px; " +
+                                "-fx-font-weight: bold; " +
+                                "-fx-padding: 8 15; " +
+                                "-fx-cursor: hand; " +
+                                "-fx-background-radius: 5;"
+                );
+
+                // Actions des boutons
+                btnDetails.setOnAction(event -> {
+                    produit selected = getItem();
+                    if (selected != null) ouvrirDetailsProduit(selected);
+                });
+
+                btnModifier.setOnAction(event -> {
+                    produit selected = getItem();
+                    if (selected != null) ouvrirModifierProduit(selected);
+                });
+
+                btnSupprimer.setOnAction(event -> {
+                    produit selected = getItem();
+                    if (selected != null) supprimerProduit(selected);
+                });
+
+                descriptionValeur.setWrapText(false);
                 descriptionValeur.setMaxWidth(300);
 
-                gridPane.setHgap(10);
-                gridPane.setVgap(5);
+                // Configuration du GridPane
+                ColumnConstraints col1 = new ColumnConstraints();
+                col1.setPercentWidth(25);
+                col1.setHalignment(javafx.geometry.HPos.RIGHT);
+
+                ColumnConstraints col2 = new ColumnConstraints();
+                col2.setPercentWidth(75);
+                col2.setHalignment(javafx.geometry.HPos.LEFT);
+
+                gridPane.getColumnConstraints().addAll(col1, col2);
+
+                gridPane.setHgap(8);
+                gridPane.setVgap(3);
                 gridPane.setPadding(new Insets(5));
+                gridPane.setMaxWidth(Double.MAX_VALUE);
+
+                // Ligne d'en-tête
+                headerBox.getChildren().addAll(nomValeur, prixValeur);
+                headerBox.setAlignment(Pos.CENTER_LEFT);
 
                 int row = 0;
-                gridPane.add(nomAttribut, 0, row);
-                gridPane.add(nomValeur, 1, row);
+                gridPane.add(headerBox, 0, row, 2, 1);
                 row++;
-                gridPane.add(descriptionValeur, 0, row, 2, 1);
-                row++;
-                gridPane.add(categorieAttribut, 0, row);
-                gridPane.add(categorieValeur, 1, row);
-                row++;
-                gridPane.add(prixAttribut, 0, row);
-                gridPane.add(prixValeur, 1, row);
-                row++;
-                gridPane.add(stockAttribut, 0, row);
-                gridPane.add(stockValeur, 1, row);
-                row++;
-                gridPane.add(dateCreationAttribut, 0, row);
-                gridPane.add(dateCreationValeur, 1, row);
-                row++;
-                gridPane.add(dateFabricationAttribut, 0, row);
-                gridPane.add(dateFabricationValeur, 1, row);
-                row++;
-                gridPane.add(datePeremptionAttribut, 0, row);
-                gridPane.add(datePeremptionValeur, 1, row);
-                row++;
-                gridPane.add(dateGarantieAttribut, 0, row);
-                gridPane.add(dateGarantieValeur, 1, row);
-                row++;
-                gridPane.add(ressourcesAttribut, 0, row);
-                gridPane.add(ressourcesValeur, 1, row);
 
-                contentBox.getChildren().addAll(gridPane, statutLabel);
+                if (descriptionValeur.getText() != null && !descriptionValeur.getText().isEmpty()) {
+                    gridPane.add(descriptionValeur, 0, row, 2, 1);
+                    row++;
+                }
+
+                ajouterLigne(gridPane, "Catégorie:", categorieValeur, row++);
+                ajouterLigne(gridPane, "Stock:", stockValeur, row++);
+                ajouterLigne(gridPane, "Création:", dateCreationValeur, row++);
+                ajouterLigne(gridPane, "Fabrication:", dateFabricationValeur, row++);
+                ajouterLigne(gridPane, "Péremption:", datePeremptionValeur, row++);
+                ajouterLigne(gridPane, "Garantie:", dateGarantieValeur, row++);
+                ajouterLigne(gridPane, "Ressources:", ressourcesValeur, row++);
+
+                // Boutons
+                buttonBox.getChildren().addAll(btnDetails, btnModifier, btnSupprimer);
+                buttonBox.setAlignment(Pos.CENTER_RIGHT);
+                buttonBox.setSpacing(15);
+
+                // Statut
+                statutLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+                statutLabel.setMaxWidth(Double.MAX_VALUE);
+                statutLabel.setAlignment(Pos.CENTER);
+
+                contentBox.getChildren().addAll(gridPane, statutLabel, buttonBox);
                 contentBox.setSpacing(10);
+                contentBox.setMaxWidth(Double.MAX_VALUE);
+
                 cellBox.getChildren().addAll(imageView, contentBox);
                 cellBox.setStyle("-fx-padding: 15; -fx-border-color: transparent transparent #ecf0f1 transparent; -fx-background-color: white;");
-                cellBox.setSpacing(20);
+                cellBox.setSpacing(15);
+                HBox.setHgrow(contentBox, Priority.ALWAYS);
+            }
+
+            private void ajouterLigne(GridPane grid, String label, Label valeur, int row) {
+                Label lbl = new Label(label);
+                lbl.setStyle("-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
+                grid.add(lbl, 0, row);
+                grid.add(valeur, 1, row);
             }
 
             @Override
@@ -240,81 +336,50 @@ public class ProduitController {
                     setText(null);
                     setGraphic(null);
                 } else {
+                    // Valeurs
                     nomValeur.setText(produit.getNom());
-                    String description = produit.getDescription();
-                    if (description != null && description.length() > 80) {
-                        description = description.substring(0, 77) + "...";
-                    }
-                    descriptionValeur.setText(description != null ? description : "Pas de description");
-                    categorieValeur.setText(produit.getCategorie() != null ? produit.getCategorie() : "Non spécifiée");
-                    prixValeur.setText(String.format("%.2f DT", produit.getPrix()));
+                    descriptionValeur.setText(produit.getDescription() != null ?
+                            (produit.getDescription().length() > 60 ? produit.getDescription().substring(0, 57) + "..." : produit.getDescription()) : "");
+                    categorieValeur.setText(produit.getCategorie() != null ? produit.getCategorie() : "-");
+                    prixValeur.setText(String.format("%.0f DT", produit.getPrix()));
+                    stockValeur.setText(produit.getStock_actuel() + " (min " + produit.getStock_min() + ")");
+                    dateCreationValeur.setText(produit.getDate_creation() != null ? produit.getDate_creation() : "-");
+                    dateFabricationValeur.setText(produit.getDate_fabrication() != null ? produit.getDate_fabrication() : "-");
+                    datePeremptionValeur.setText(produit.getDate_peremption() != null ? produit.getDate_peremption() : "-");
+                    dateGarantieValeur.setText(produit.getDate_garantie() != null ? produit.getDate_garantie() : "-");
+                    ressourcesValeur.setText(produit.getRessources_necessaires() != null ?
+                            (produit.getRessources_necessaires().length() > 40 ? produit.getRessources_necessaires().substring(0, 37) + "..." : produit.getRessources_necessaires()) : "-");
 
-                    String stockText = String.format("%d (min: %d)", produit.getStock_actuel(), produit.getStock_min());
-                    stockValeur.setText(stockText);
-                    if (produit.getStock_actuel() <= produit.getStock_min()) {
-                        stockValeur.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-font-size: 12px;");
-                    } else {
-                        stockValeur.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 12px;");
-                    }
+                    // Statut
+                    String statut;
+                    String couleur;
+                    String fond;
 
-                    dateCreationValeur.setText(produit.getDate_creation() != null ? produit.getDate_creation() : "Non spécifiée");
-                    dateFabricationValeur.setText(produit.getDate_fabrication() != null ? produit.getDate_fabrication() : "Non spécifiée");
-
-                    if (produit.getDate_peremption() != null) {
-                        datePeremptionValeur.setText(produit.getDate_peremption());
-                        if (produit.estPerime()) {
-                            datePeremptionValeur.setStyle("-fx-text-fill: red; -fx-font-weight: bold; -fx-font-size: 12px;");
-                        } else if (produit.estBientotPerime(30)) {
-                            datePeremptionValeur.setStyle("-fx-text-fill: orange; -fx-font-weight: bold; -fx-font-size: 12px;");
-                        } else {
-                            datePeremptionValeur.setStyle("-fx-text-fill: green; -fx-font-size: 12px;");
-                        }
-                    } else {
-                        datePeremptionValeur.setText("Non spécifiée");
-                        datePeremptionValeur.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
-                    }
-
-                    if (produit.getDate_garantie() != null) {
-                        dateGarantieValeur.setText(produit.getDate_garantie());
-                        if (produit.garantieExpiree()) {
-                            dateGarantieValeur.setStyle("-fx-text-fill: red; -fx-font-weight: bold; -fx-font-size: 12px;");
-                        } else {
-                            dateGarantieValeur.setStyle("-fx-text-fill: #27ae60; -fx-font-size: 12px;");
-                        }
-                    } else {
-                        dateGarantieValeur.setText("Non spécifiée");
-                        dateGarantieValeur.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
-                    }
-
-                    String ressources = produit.getRessources_necessaires();
-                    if (ressources != null && ressources.length() > 50) {
-                        ressources = ressources.substring(0, 47) + "...";
-                    }
-                    ressourcesValeur.setText(ressources != null ? ressources : "Aucune");
-
-                    String statut = "";
-                    String statutStyle = "";
                     if (produit.estPerime()) {
                         statut = "⚠ PRODUIT PÉRIMÉ ⚠";
-                        statutStyle = "-fx-background-color: #ffebee; -fx-text-fill: #c62828; -fx-padding: 5; -fx-background-radius: 5;";
+                        couleur = "#c62828";
+                        fond = "#ffebee";
                     } else if (produit.estBientotPerime(30)) {
-                        statut = "⚠ Bientôt périmé (moins de 30 jours)";
-                        statutStyle = "-fx-background-color: #fff3e0; -fx-text-fill: #ef6c00; -fx-padding: 5; -fx-background-radius: 5;";
+                        statut = "⚠ Bientôt périmé";
+                        couleur = "#ef6c00";
+                        fond = "#fff3e0";
                     } else if (produit.garantieExpiree()) {
                         statut = "⚠ Garantie expirée";
-                        statutStyle = "-fx-background-color: #ffebee; -fx-text-fill: #c62828; -fx-padding: 5; -fx-background-radius: 5;";
+                        couleur = "#c62828";
+                        fond = "#ffebee";
                     } else if (produit.getStock_actuel() <= produit.getStock_min()) {
                         statut = "⚠ Stock faible";
-                        statutStyle = "-fx-background-color: #fff3e0; -fx-text-fill: #ef6c00; -fx-padding: 5; -fx-background-radius: 5;";
+                        couleur = "#ef6c00";
+                        fond = "#fff3e0";
                     } else {
-                        statut = "✓ Produit en bon état";
-                        statutStyle = "-fx-background-color: #e8f5e8; -fx-text-fill: #2e7d32; -fx-padding: 5; -fx-background-radius: 5;";
+                        statut = "✓ Disponible";
+                        couleur = "#2e7d32";
+                        fond = "#e8f5e8";
                     }
 
                     statutLabel.setText(statut);
-                    statutLabel.setStyle(statutStyle);
-                    statutLabel.setMaxWidth(Double.MAX_VALUE);
-                    statutLabel.setAlignment(javafx.geometry.Pos.CENTER);
+                    statutLabel.setStyle("-fx-text-fill: " + couleur + "; -fx-font-weight: bold; -fx-font-size: 12px; " +
+                            "-fx-background-color: " + fond + "; -fx-padding: 5; -fx-background-radius: 5;");
 
                     chargerImageProduit(produit, imageView);
                     ajouterTooltipImage(imageView, produit);
@@ -322,6 +387,36 @@ public class ProduitController {
                 }
             }
         });
+    }
+
+    private void ouvrirDetailsProduit(produit selected) {
+        try {
+            URL fxmlUrl = getClass().getResource("/detailsProduit.fxml");
+
+            if (fxmlUrl == null) {
+                showAlert(Alert.AlertType.ERROR, "Erreur",
+                        "Fichier detailsProduit.fxml introuvable!\n" +
+                                "Vérifiez qu'il est dans src/main/resources/");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            Parent root = loader.load();
+
+            DetailsProduitController controller = loader.getController();
+            controller.setProduit(selected);
+
+            Stage stage = new Stage();
+            stage.setTitle("Détails du produit");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur",
+                    "Impossible d'ouvrir les détails: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void chargerImageProduit(produit produit, ImageView imageView) {
@@ -380,7 +475,6 @@ public class ProduitController {
             List<produit> produits = serviceProduit.getAll();
             produitsList.clear();
             produitsList.addAll(produits);
-            listViewProduits.setItems(produitsList);
             System.out.println(produits.size() + " produits chargés");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible de charger les produits: " + e.getMessage());
@@ -431,46 +525,35 @@ public class ProduitController {
         }
     }
 
-    @FXML
-    private void ouvrirModifierProduit() {
-        produit selected = listViewProduits.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert(Alert.AlertType.WARNING, "Attention", "Veuillez sélectionner un produit à modifier");
-            return;
-        }
+    private void ouvrirModifierProduit(produit selected) {
         try {
             URL fxmlUrl = getClass().getResource("/fxml/ajouterProduit.fxml");
             if (fxmlUrl == null) fxmlUrl = getClass().getResource("/ajouterProduit.fxml");
-            if (fxmlUrl == null) {
-                showAlert(Alert.AlertType.ERROR, "Erreur", "Fichier ajouterProduit.fxml introuvable!");
-                return;
-            }
+
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Parent root = loader.load();
+
             FormulaireProduitController controller = loader.getController();
             controller.setModeModification(selected);
             controller.setOnProduitAjoute(this::rafraichirListe);
+
             Stage stage = new Stage();
             stage.setTitle("Modifier un produit");
             stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
+
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible d'ouvrir le formulaire: " + e.getMessage());
         }
     }
 
-    @FXML
-    private void supprimerProduit() {
-        produit selected = listViewProduits.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            showAlert(Alert.AlertType.WARNING, "Attention", "Veuillez sélectionner un produit à supprimer");
-            return;
-        }
+    private void supprimerProduit(produit selected) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Confirmation de suppression");
         confirm.setHeaderText("Supprimer le produit");
         confirm.setContentText("Voulez-vous vraiment supprimer le produit \"" + selected.getNom() + "\" ?");
+
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
@@ -485,6 +568,26 @@ public class ProduitController {
                 showAlert(Alert.AlertType.ERROR, "Erreur", "Impossible de supprimer le produit: " + e.getMessage());
             }
         }
+    }
+
+    @FXML
+    private void ouvrirModifierProduit() {
+        produit selected = listViewProduits.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert(Alert.AlertType.WARNING, "Attention", "Veuillez sélectionner un produit à modifier");
+            return;
+        }
+        ouvrirModifierProduit(selected);
+    }
+
+    @FXML
+    private void supprimerProduit() {
+        produit selected = listViewProduits.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert(Alert.AlertType.WARNING, "Attention", "Veuillez sélectionner un produit à supprimer");
+            return;
+        }
+        supprimerProduit(selected);
     }
 
     @FXML
@@ -528,8 +631,6 @@ public class ProduitController {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-    // ==================== FONCTIONS D'EXPORT ====================
 
     @FXML
     private void exporterProduitsExcel() {
@@ -575,44 +676,6 @@ public class ProduitController {
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Erreur",
                     "Erreur lors de l'export PDF : " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    @FXML
-    private void ouvrirFrontOffice() {
-        try {
-            // Charger la vue Front Office des produits
-            URL fxmlUrl = getClass().getResource("/fxml/front/frontProduits.fxml");
-            if (fxmlUrl == null) {
-                // Essayer d'autres chemins possibles
-                fxmlUrl = getClass().getResource("/front/frontProduits.fxml");
-            }
-
-            if (fxmlUrl == null) {
-                showAlert(Alert.AlertType.ERROR, "Erreur",
-                        "Fichier frontProduits.fxml introuvable!\n" +
-                                "Vérifiez qu'il est dans src/main/resources/fxml/front/");
-                return;
-            }
-
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-            Parent root = loader.load();
-
-            // Créer une nouvelle fenêtre pour le Front Office
-            Stage frontStage = new Stage();
-            frontStage.setTitle("Front Office - Consultation");
-            frontStage.setScene(new Scene(root));
-            frontStage.setMaximized(true); // Ouvrir en plein écran
-
-            // Optionnel : rendre la fenêtre modale (bloque la fenêtre principale)
-            // frontStage.initModality(Modality.WINDOW_MODAL);
-            // frontStage.initOwner(listViewProduits.getScene().getWindow());
-
-            frontStage.show();
-
-        } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Erreur",
-                    "Impossible d'ouvrir le Front Office: " + e.getMessage());
             e.printStackTrace();
         }
     }

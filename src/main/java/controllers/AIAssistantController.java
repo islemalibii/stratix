@@ -6,7 +6,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.application.Platform;
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 import models.Service;
 import services.GroqService;
 import services.ServiceService;
@@ -44,32 +47,25 @@ public class AIAssistantController implements Initializable {
             statusLabel.setText("✅ " + services.size() + " services chargés - Assistant prêt");
 
             Platform.runLater(() -> {
-                addAIMessage("👋 Bonjour ! Je suis votre assistant IA (Groq).\n\n" +
+                addAIMessage(" Bonjour ! Je suis votre assistant .\n\n" +
                         "J'ai analysé " + services.size() + " services. " +
                         "Vous pouvez me poser des questions comme :\n\n" +
-                        "•  \"Quel est le plus gros budget ?\"\n" +
-                        "• \"Combien de formations ?\"\n" +
-                        "• \"Services sans responsable\"\n" +
-                        "• \"Budget total des services\"\n" +
-                        "• 🔍Détails du service X\"");
+                        "\"Quel est le plus gros budget ?\"\n" +
+                        "\"Combien de formations ?\"\n" +
+                        "\"Services sans responsable\"\n" +
+                        " \"Budget total des services\"\n" +
+                        "  Détails du service X\"");
             });
 
             // Configuration des boutons
             sendButton.setOnAction(e -> askQuestion());
             questionField.setOnAction(e -> askQuestion());
 
-            // Boutons rapides
-            setupQuickButtons();
-
         } catch (SQLException e) {
-            statusLabel.setText("Erreur de chargement");
+            statusLabel.setText("❌ Erreur de chargement");
             addAIMessage("Désolé, je n'ai pas pu charger les services : " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    private void setupQuickButtons() {
-
     }
 
     @FXML
@@ -83,7 +79,6 @@ public class AIAssistantController implements Initializable {
         sendButton.setDisable(true);
         statusLabel.setText("🤔 Réflexion en cours...");
 
-        // Appel API dans un thread séparé
         new Thread(() -> {
             try {
                 // Essayer l'API Groq
@@ -108,7 +103,6 @@ public class AIAssistantController implements Initializable {
         }).start();
     }
 
-
     private String getIntelligentLocalResponse(String question) {
         String q = question.toLowerCase().trim();
 
@@ -122,7 +116,7 @@ public class AIAssistantController implements Initializable {
             double total = services.stream()
                     .mapToDouble(Service::getBudget)
                     .sum();
-            return String.format("💰 Le budget total de tous les services est de **%.0f DT**.", total);
+            return String.format("💰 Le budget total de tous les services est de *%.0f DT*.", total);
         }
 
         // Plus gros budget
@@ -132,7 +126,7 @@ public class AIAssistantController implements Initializable {
                     .orElse(null);
 
             if (max != null) {
-                return String.format("🏆 Le service avec le plus gros budget est **%s** avec **%.0f DT** (Catégorie: %s)",
+                return String.format("🏆 Le service avec le plus gros budget est *%s* avec *%.0f DT* (Catégorie: %s)",
                         max.getTitre(), max.getBudget(),
                         max.getCategorie() != null ? max.getCategorie().getNom() : "Non catégorisé");
             }
@@ -146,7 +140,7 @@ public class AIAssistantController implements Initializable {
                     .count();
 
             if (count > 0) {
-                return String.format("🎓 Vous avez **%d** service(s) de formation.", count);
+                return String.format("🎓 Vous avez *%d* service(s) de formation.", count);
             } else {
                 return "📚 Vous n'avez aucun service de formation pour le moment.";
             }
@@ -161,7 +155,7 @@ public class AIAssistantController implements Initializable {
             if (without.isEmpty()) {
                 return "✅ Tous les services ont un responsable assigné.";
             } else {
-                StringBuilder sb = new StringBuilder("⚠️ Services sans responsable (**" + without.size() + "**) :\n\n");
+                StringBuilder sb = new StringBuilder("⚠️ Services sans responsable (*" + without.size() + "*) :\n\n");
                 for (Service s : without) {
                     sb.append("• ").append(s.getTitre()).append("\n");
                 }
@@ -175,12 +169,12 @@ public class AIAssistantController implements Initializable {
                     .mapToDouble(Service::getBudget)
                     .average()
                     .orElse(0);
-            return String.format("📊 Le budget moyen par service est de **%.0f DT**.", avg);
+            return String.format("📊 Le budget moyen par service est de *%.0f DT*.", avg);
         }
 
         // Liste des services
         if (q.contains("liste") || q.contains("tous les services")) {
-            StringBuilder sb = new StringBuilder("📋 **Liste des " + services.size() + " services** :\n\n");
+            StringBuilder sb = new StringBuilder("📋 *Liste des " + services.size() + " services* :\n\n");
             for (Service s : services) {
                 sb.append("• ").append(s.getTitre()).append(" (").append(s.getBudget()).append(" DT)\n");
             }
@@ -222,12 +216,19 @@ public class AIAssistantController implements Initializable {
 
     private void addUserMessage(String message) {
         HBox messageBox = new HBox();
-        messageBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+        messageBox.setAlignment(Pos.CENTER_RIGHT);
         messageBox.setPadding(new Insets(5, 10, 5, 50));
+        messageBox.setMaxWidth(Double.MAX_VALUE);
 
         Label messageLabel = new Label(message);
-        messageLabel.setStyle("-fx-background-color: #1a73e8; -fx-text-fill: white; " +
-                "-fx-background-radius: 15; -fx-padding: 10 15; -fx-wrap-text: true;");
+        messageLabel.setStyle(
+                "-fx-background-color: #1a73e8; " +
+                        "-fx-text-fill: white; " +
+                        "-fx-background-radius: 15 15 5 15; " +
+                        "-fx-padding: 10 15; " +
+                        "-fx-wrap-text: true; " +
+                        "-fx-font-size: 14px;"
+        );
         messageLabel.setMaxWidth(300);
         messageLabel.setWrapText(true);
 
@@ -235,36 +236,65 @@ public class AIAssistantController implements Initializable {
 
         Platform.runLater(() -> {
             chatContainer.getChildren().add(messageBox);
-            scrollToBottom();
+            // Petit délai pour que le scroll se fasse après l'ajout
+            PauseTransition pause = new PauseTransition(Duration.millis(50));
+            pause.setOnFinished(e -> scrollToBottom());
+            pause.play();
         });
     }
 
     private void addAIMessage(String message) {
         HBox messageBox = new HBox();
-        messageBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        messageBox.setAlignment(Pos.CENTER_LEFT);
         messageBox.setPadding(new Insets(5, 50, 5, 10));
+        messageBox.setSpacing(10);
+        messageBox.setMaxWidth(Double.MAX_VALUE);
 
         Label prefix = new Label("🤖");
-        prefix.setStyle("-fx-font-size: 20px; -fx-padding: 0 10 0 0;");
+        prefix.setStyle(
+                "-fx-font-size: 24px; " +
+                        "-fx-padding: 0 5 0 0;"
+        );
+
+        // Conteneur pour le message avec fond
+        VBox messageContainer = new VBox();
+        messageContainer.setMaxWidth(350);
 
         Label messageLabel = new Label(message);
-        messageLabel.setStyle("-fx-background-color: #f1f3f4; -fx-text-fill: #202124; " +
-                "-fx-background-radius: 15; -fx-padding: 10 15; -fx-wrap-text: true;");
-        messageLabel.setMaxWidth(350);
+        messageLabel.setStyle(
+                "-fx-background-color: #f1f3f4; " +
+                        "-fx-text-fill: #202124; " +
+                        "-fx-background-radius: 15 15 15 5; " +
+                        "-fx-padding: 12 15; " +
+                        "-fx-wrap-text: true; " +
+                        "-fx-font-size: 14px;"
+        );
         messageLabel.setWrapText(true);
 
-        messageBox.getChildren().addAll(prefix, messageLabel);
+        messageContainer.getChildren().add(messageLabel);
+        messageBox.getChildren().addAll(prefix, messageContainer);
 
         Platform.runLater(() -> {
             chatContainer.getChildren().add(messageBox);
-            scrollToBottom();
+            // Petit délai pour que le scroll se fasse après l'ajout
+            PauseTransition pause = new PauseTransition(Duration.millis(50));
+            pause.setOnFinished(e -> scrollToBottom());
+            pause.play();
         });
     }
-    //
 
     private void scrollToBottom() {
         if (scrollPane != null) {
+            // Scroll progressif pour voir le dernier message
             scrollPane.setVvalue(1.0);
+
+            // Force le focus sur le scrollPane pour s'assurer que le scroll est pris en compte
+            scrollPane.requestFocus();
+
+            // Deuxième tentative après un court délai
+            PauseTransition pause = new PauseTransition(Duration.millis(100));
+            pause.setOnFinished(e -> scrollPane.setVvalue(1.0));
+            pause.play();
         }
     }
 }

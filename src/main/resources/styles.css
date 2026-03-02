@@ -28,7 +28,7 @@
     -fx-border-color: rgba(255, 255, 255, 0.08);
     -fx-border-width: 1;
     -fx-border-radius: 12;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0, 0, 2);
+    -fx-max-width: 450;
 }
 
 .feature-icon-box {
@@ -67,13 +67,12 @@
     -fx-background-radius: 28;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 25, 0, 0, 5);
     -fx-max-width: 420;
-    -fx-min-width: 420;
-    -fx-pref-width: 420;
+    -fx-min-width: 380;
 }
 
 .login-form-title {
     -fx-text-fill: #111827;
-    -fx-font-size: 34;
+    -fx-font-size: 28; /* Slightly smaller than 34 for better scaling */
     -fx-font-weight: bold;
 }
 
@@ -82,6 +81,9 @@
     -fx-font-size: 14;
 }
 
+.ImageView {
+    -fx-max-width: 100%;
+}
 .login-field-label {
     -fx-text-fill: #1F2937;
     -fx-font-size: 14;

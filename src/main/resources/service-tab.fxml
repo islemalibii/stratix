@@ -7,7 +7,7 @@
 <StackPane xmlns="http://javafx.com/javafx/17"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="controllers.ServiceTabController"
-           stylesheets="/css/style.css">
+           style="-fx-background-color: #f5f7fa;">
 
     <VBox spacing="20" styleClass="modern-container">
         <HBox styleClass="sub-nav-bar" spacing="5" alignment="CENTER_LEFT">
@@ -61,13 +61,17 @@
     </VBox>
 
     <StackPane fx:id="assistantBubble"
-               style="-fx-background-radius: 20; -fx-background-color: #8b5cf6; -fx-min-width: 80; -fx-min-height: 60; -fx-max-width: 60; -fx-max-height: 60; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);"
+               style="-fx-background-radius: 30; -fx-background-color: linear-gradient(to bottom right, #8b5cf6, #6d28d9); -fx-min-width: 70; -fx-min-height: 70; -fx-max-width: 70; -fx-max-height: 70; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(109,40,217,0.4), 15, 0, 0, 5);"
                onMouseClicked="#toggleAssistant"
                StackPane.alignment="BOTTOM_RIGHT">
-        <Label text="🤖" style="-fx-font-size: 50px; -fx-text-fill: white;"/>
+        <StackPane.margin>
+            <Insets bottom="38" right="38"/> <!-- 1cm = 38px -->
+        </StackPane.margin>
 
-        <StackPane style="-fx-background-color: #f35369; -fx-background-radius: 10; -fx-min-width: 20; -fx-min-height: 20; -fx-max-width: 20; -fx-max-height: 20; -fx-translate-x: 15; -fx-translate-y: -15;">
-            <Label text="1" style="-fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+        <Label text="🤖" style="-fx-font-size: 40px; -fx-text-fill: white; -fx-rotate: 5;"/>
+
+        <StackPane style="-fx-background-color: #ef4444; -fx-background-radius: 12; -fx-min-width: 24; -fx-min-height: 24; -fx-max-width: 24; -fx-max-height: 24; -fx-translate-x: 15; -fx-translate-y: -15; -fx-effect: dropshadow(gaussian, rgba(239,68,68,0.4), 5, 0, 0, 2);">
+            <Label text="1" style="-fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: bold;"/>
         </StackPane>
     </StackPane>
 
