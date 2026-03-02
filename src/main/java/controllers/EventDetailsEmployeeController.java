@@ -146,7 +146,6 @@ public class EventDetailsEmployeeController {
 
 
     private void setupMap(Evenement e) {
-        // Check if coords are actually there
         if (e.getLatitude() == 0 && e.getLongitude() == 0) {
             System.err.println("Warning: Event coordinates are 0.0. Map might not show correctly.");
         }
@@ -159,11 +158,9 @@ public class EventDetailsEmployeeController {
 
         engine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
-                // Use Locale.US to force decimal points (.) instead of commas (,)
                 String script = String.format(java.util.Locale.US, "showCoordinates(%f, %f, '%s')",
                         e.getLatitude(), e.getLongitude(), e.getLieu().replace("'", "\\'"));
 
-                // Use a slightly longer delay to ensure Leaflet.js is fully parsed
                 javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(javafx.util.Duration.millis(800));
                 delay.setOnFinished(ev -> {
                     engine.executeScript(script);

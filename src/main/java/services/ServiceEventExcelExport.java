@@ -27,7 +27,6 @@ public class ServiceEventExcelExport {
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("Participants");
 
-            // HEADER
             Row header = sheet.createRow(0);
             header.createCell(0).setCellValue("Nom");
             header.createCell(1).setCellValue("Prenom");
@@ -36,7 +35,6 @@ public class ServiceEventExcelExport {
 
             int rowNum = 1;
 
-            // DATA
             while (rs.next()) {
                 Row row = sheet.createRow(rowNum++);
 
@@ -46,7 +44,6 @@ public class ServiceEventExcelExport {
                 row.createCell(3).setCellValue(rs.getString("email"));
             }
 
-            // SAVE FILE
             javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
             fileChooser.setTitle("Save Excel File");
             fileChooser.setInitialFileName("participants_event_" + eventId + ".xlsx");
@@ -71,7 +68,6 @@ public class ServiceEventExcelExport {
         }
     }
 
-    // ✅ FETCH PARTICIPANTS USING YOUR CONNECTION STYLE
     private ResultSet getParticipants(int eventId) {
 
         ResultSet rs = null;
@@ -84,9 +80,7 @@ public class ServiceEventExcelExport {
 
             PreparedStatement pst = cnx.prepareStatement(query);
 
-            // SAME STYLE AS YOUR LAT/LONG
             pst.setInt(1, eventId);
-
             rs = pst.executeQuery();
 
         } catch (Exception e) {

@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
@@ -107,12 +108,31 @@ public class EventDetailsAdminController {
         }
 
         for (EventFeedback f : feedbacks) {
-            Label lbl = new Label("Note: " + f.getRating() + " - " + f.getCommentaire());
-            lbl.setStyle("-fx-font-size:14px; -fx-padding:5; -fx-text-fill: black;");
-            feedbackContainer.getChildren().add(lbl);
+            HBox feedbackRow = new HBox(10);
+            feedbackRow.setStyle("-fx-padding: 5; -fx-alignment: center-left;");
+
+            Label starsLabel = new Label(getStarRating(f.getRating()));
+            starsLabel.setStyle("-fx-text-fill: #FFD700; -fx-font-size: 16px; -fx-font-weight: bold;");
+
+            Label commentLabel = new Label("- " + f.getCommentaire());
+            commentLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: black;");
+
+            feedbackRow.getChildren().addAll(starsLabel, commentLabel);
+            feedbackContainer.getChildren().add(feedbackRow);
         }
     }
 
+    private String getStarRating(int rating) {
+        StringBuilder stars = new StringBuilder();
+        for (int i = 1; i <= 5; i++) {
+            if (i <= rating) {
+                stars.append("★"); // Filled star
+            } else {
+                stars.append("☆"); // Empty star
+            }
+        }
+        return stars.toString();
+    }
 
     private void setupMap(Evenement e) {
         WebEngine engine = mapView.getEngine();
@@ -127,13 +147,11 @@ public class EventDetailsAdminController {
 
         engine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
-                // Formatting coordinates using Locale.US to ensure "." decimal separator
                 String script = String.format(java.util.Locale.US, "showCoordinates(%f, %f, '%s')",
                         e.getLatitude(),
                         e.getLongitude(),
                         e.getLieu().replace("'", "\\'"));
 
-                // Small delay to ensure the Leaflet JS is ready
                 javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(javafx.util.Duration.millis(600));
                 delay.setOnFinished(event -> {
                     try {
